@@ -187,9 +187,6 @@ int32_t main(void)
     /* Init I2C to access codec */
     I2C_Init();
 
-    /* Select source from HIRC(12MHz) */
-    CLK_SetModuleClock(SPI0_MODULE, CLK_CLKSEL2_SPI0SEL_PCLK1, MODULE_NoMsk);
-
     /* Open I2S0 interface and set to slave mode, stereo channel, I2S format */
     SPII2S_Open(SPI0, SPII2S_MODE_SLAVE, 48000, SPII2S_DATABIT_16, SPII2S_STEREO, SPII2S_FORMAT_I2S);
 

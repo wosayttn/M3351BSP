@@ -881,10 +881,6 @@ static int32_t USARTn_Control(const USART_Info_t *ptr_usart_info, uint32_t contr
 
     switch (control & ARM_USART_DATA_BITS_Msk)    // --- Mode Parameters: Data Bits
     {
-        case ARM_USART_DATA_BITS_6:                 // Data bits: 6
-            word_len = UUART_WORD_LEN_6;
-            break;
-
         case ARM_USART_DATA_BITS_7:                 // Data bits: 7
             word_len = UUART_WORD_LEN_7;
             break;

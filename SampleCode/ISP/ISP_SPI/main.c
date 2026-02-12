@@ -57,7 +57,7 @@ int32_t SYS_Init(void)
     SET_SPI0_SS_PA3();
 
     /* Enable SPI0 clock pin schmitt trigger */
-    PA->SMTEN |= GPIO_SMTEN_SMTEN2_Msk;
+    GPIO_ENABLE_SCHMITT_TRIGGER(PA, (BIT0 | BIT1 | BIT2 | BIT3));
 
     return 0;
 }

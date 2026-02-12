@@ -363,16 +363,15 @@ __WEAK void Reset_Handler_PreInit(void)
      * or global variables in this function.
      */
 #ifndef NVT_CMSE_NON_SECURE
+    /* Clock Setting is only available in secure mode */
     /* Unlock protected registers */
     SYS_UnlockReg();
-    /* Clock Setting is only available in secure mode */
     /* Set PCLK0 to HCLK/2 */
     CLK_SET_PCLK0DIV(CLK_PCLKDIV_APB0DIV_DIV2);
     /* Set PCLK1 to HCLK/2 */
     CLK_SET_PCLK1DIV(CLK_PCLKDIV_APB1DIV_DIV2);
     /* Set core clock */
     CLK_SetCoreClock(FREQ_144MHZ);
-
     /* Update System Core Clock */
     SystemCoreClockUpdate();
     /* Lock protected registers */
@@ -383,7 +382,12 @@ __WEAK void Reset_Handler_PreInit(void)
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
-__NO_RETURN void Reset_Handler(void)
+#if defined (__GNUC__) && !defined(__ARMCC_VERSION)
+    __attribute__((naked))
+#else
+    __NO_RETURN
+#endif
+void Reset_Handler(void)
 {
     __set_PSP((uint32_t)(&__INITIAL_SP));
 
@@ -404,6 +408,7 @@ __NO_RETURN void Reset_Handler(void)
     {
         Reset_Handler_PreInit();
         /* When CACHE is enabled, data coherence must be care about when updaing flash. */
+        CACHE_Flush();
         CACHE_Enable();
     }
 

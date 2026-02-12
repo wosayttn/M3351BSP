@@ -328,6 +328,9 @@ void I3C_BusClkConfig(I3C_DEVICE_T *dev)
     }
 
     dev->port->BUSFAT |= (count << I3C_BUSFAT_FREETC_Pos);
+
+    /* I3C Read Termination Bit Low Count */
+    dev->port->SCLEXTTB |= I3C_SCLEXTTB_TERMCNTM_Msk;
 }
 
 /**
@@ -383,8 +386,6 @@ void I3C_PresentStateInfo(I3C_DEVICE_T *dev)
             {
                 I3C_DrvMsg("\nController Write Transfer Ongoing\n");
             }
-            //else if(sts == 4) Not support in M3331
-            //    I3C_DrvMsg("\nRead Data Prefetch State\n");
             else if (sts == 5)
             {
                 I3C_DrvMsg("\nController Read Transfer Ongoing\n");

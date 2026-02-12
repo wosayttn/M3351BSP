@@ -275,14 +275,14 @@
     // </e>
     // <e> USART10 (UUART0)
     // <i> Configuration settings for Driver_USART10 in component ::CMSIS Driver:USART
-    #define RTE_USART10                       0
+    #define RTE_USART10                       1
     //   <e> PDMA Rx
     //     <o1> Number <0=>0 <1=>1
     //     <i>  Selects PDMA Number
     //     <o2> Channel(0~15) <0-15>
     //     <i>  Selects PDMA Channel
     //   </e>
-    #define RTE_USART10_RX_PDMA               0
+    #define RTE_USART10_RX_PDMA               1
     #define RTE_USART10_RX_PDMA_NUMBER        0
     #define RTE_USART10_RX_PDMA_CHANNEL       10
 
@@ -292,20 +292,20 @@
     //     <o2> Channel(0~15) <0-15>
     //     <i>  Selects PDMA Channel
     //   </e>
-    #define RTE_USART10_TX_PDMA               0
+    #define RTE_USART10_TX_PDMA               1
     #define RTE_USART10_TX_PDMA_NUMBER        1
     #define RTE_USART10_TX_PDMA_CHANNEL       10
     // </e>
     // <e> USART11 (UUART1)
     // <i> Configuration settings for Driver_USART11 in component ::CMSIS Driver:USART
-    #define RTE_USART11                       0
+    #define RTE_USART11                       1
     //   <e> PDMA Rx
     //     <o1> Number <0=>0 <1=>1
     //     <i>  Selects PDMA Number
     //     <o2> Channel(0~15) <0-15>
     //     <i>  Selects PDMA Channel
     //   </e>
-    #define RTE_USART11_RX_PDMA               0
+    #define RTE_USART11_RX_PDMA               1
     #define RTE_USART11_RX_PDMA_NUMBER        0
     #define RTE_USART11_RX_PDMA_CHANNEL       11
 
@@ -315,7 +315,7 @@
     //     <o2> Channel(0~15) <0-15>
     //     <i>  Selects PDMA Channel
     //   </e>
-    #define RTE_USART11_TX_PDMA               0
+    #define RTE_USART11_TX_PDMA               1
     #define RTE_USART11_TX_PDMA_NUMBER        1
     #define RTE_USART11_TX_PDMA_CHANNEL       11
     // </e>

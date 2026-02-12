@@ -62,16 +62,15 @@ int32_t main(void)
     /* Init Debug UART to 115200-8N1 for print message */
     InitDebugUart();
 
-    /* Disable CACHE to ensure execution */
-    CACHE_Disable();
     printf("System clock:   %d Hz.\n", SystemCoreClock);
     printf("+--------------------------------------+\n");
     printf("|      SecureISP Demo Sample Code      |\n");
     printf("+--------------------------------------+\n");
 
-    ExecuteSecureISP();
-
-    while (1) {}
+    while (1)
+    {
+        ExecuteSecureISP();
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

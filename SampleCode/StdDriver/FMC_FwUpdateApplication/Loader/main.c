@@ -138,7 +138,9 @@ void Download(void)
         printf("Total trnasfer size is %d\n", i32Err);
     }
 
+    CACHE_Flush();
     printf("\n Firmware download completed.\n");
+    UART_WAIT_TX_EMPTY(DEBUG_PORT);
 }
 
 int32_t main(void)
@@ -299,6 +301,7 @@ int32_t main(void)
             }
             else
             {
+                UART_WAIT_TX_EMPTY(DEBUG_PORT);
                 /* Remap to Loader */
                 FMC_SetVectorPageAddr(LOADER_BASE);
                 SYS_ResetCPU();

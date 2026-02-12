@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>DEBUG_PORT=UART0_NS</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\Library\CMSIS\Core\Include;..\..\..\..\..\Library\CMSIS\compiler\include;..\..\..\..\..\Library\Device\Nuvoton\M3351\Include;..\..\..\..\..\Library\StdDriver\inc;..\..</IncludePath>
             </VariousControls>

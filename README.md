@@ -17,7 +17,7 @@ To experience the powerful features of M3351 series in few minutes, please selec
 	This document shows the revision history of M3351 Series BSP.
 
 - VS Code Quick Start Guide
-	This documents guide to install, configure and use VS Code.
+	This document guides to install, configure and use VS Code.
 
 
 ## .\Library\

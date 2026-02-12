@@ -217,8 +217,6 @@ int32_t main(void)
     initialise_monitor_handles();
 #endif
 
-    /* Disable CACHE to ensure execution */
-    CACHE_Disable();
     printf("\n\n");
     printf("System clock:   %d Hz.\n", SystemCoreClock);
     printf("USB Host clock: %d Hz.\n", CLK_GetUSBFreq());

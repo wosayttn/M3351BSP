@@ -2,7 +2,7 @@
  * @file     main.c
  * @version  V1.00
  * @brief    A multi-boot system to boot different applications from different address.
- *          This sample code implemented 1 LDROM code and 4 APROM code.
+ *           This sample code implemented 1 LDROM code and 4 APROM code.
  *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.
@@ -19,16 +19,11 @@ int32_t SYS_Init(void)
     /*------------------------------------------------------------------------*/
     /* Init System Clock                                                      */
     /*------------------------------------------------------------------------*/
-    /* Enable HXT clock */
-    CLK_EnableXtalRC(CLK_PWRCTL_HXTEN_Msk);
+    /* Enable HIRC clock */
+    CLK_EnableXtalRC(CLK_PWRCTL_HIRCEN_Msk);
 
-    /* Wait for HXT clock ready */
-    CLK_WaitClockReady(CLK_STATUS_HXTSTB_Msk);
-
-    /* Set PCLK0 to HCLK/2 */
-    CLK_SET_PCLK0DIV(CLK_PCLKDIV_APB0DIV_DIV2);
-    /* Set PCLK1 to HCLK/2 */
-    CLK_SET_PCLK1DIV(CLK_PCLKDIV_APB1DIV_DIV2);
+    /* Wait for HIRC clock ready */
+    CLK_WaitClockReady(CLK_STATUS_HIRCSTB_Msk);
 
     /* Set core clock */
     CLK_SetCoreClock(FREQ_144MHZ);
@@ -97,15 +92,15 @@ int32_t main(void)
     switch (u8Char)
     {
         case '0':
-            FMC_SetVectorPageAddr(0x40000);
+            FMC_SetVectorPageAddr(FMC_APROM_BASE + 0x40000);
             break;
 
         case '1':
-            FMC_SetVectorPageAddr(0x80000);
+            FMC_SetVectorPageAddr(FMC_APROM_BASE + 0x80000);
             break;
 
         case '2':
-            FMC_SetVectorPageAddr(0xC0000);
+            FMC_SetVectorPageAddr(FMC_APROM_BASE + 0xC0000);
             break;
 
         case '3':
@@ -113,7 +108,7 @@ int32_t main(void)
             break;
 
         default:
-            FMC_SetVectorPageAddr(0x0);
+            FMC_SetVectorPageAddr(FMC_APROM_BASE);
             break;
     }
 

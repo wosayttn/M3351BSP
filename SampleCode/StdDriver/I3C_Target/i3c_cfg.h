@@ -32,14 +32,14 @@
 //      <10000000=> 10M
 //      <12500000=> 12.5M
 // <i> Select the SDR SCL frequency
-#define DEVICE_SDR_FREQ         (10000000)
+#define DEVICE_SDR_FREQ         (8000000)
 
 
 // <o> Set DMA Function ON/OFF
 //      <0=> DMA Function OFF
 //      <1=> DMA Function ON
 // <i> Select DMA function for I3C wrtie and read opeartion.
-#define DEVICE_DMA_ENABLED      (1)
+#define DEVICE_DMA_ENABLED      (0)
 
 
 // <c1> Enable Interrupt Debug Log

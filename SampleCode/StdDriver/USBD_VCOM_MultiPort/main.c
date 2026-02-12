@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file     main.c
  * @version  V1.00
- * @brief    Demonstrate how to implement a USB dual virtual COM port device.
+ * @brief    Demonstrate how to implement a USB multi virtual COM ports device.
  *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.
@@ -1855,7 +1855,7 @@ int32_t main(void)
 
     printf("\n");
     printf("+-------------------------------------------------------------+\n");
-    printf("|        NuMicro USB Virtual COM Dual Port Sample Code        |\n");
+    printf("|        NuMicro USB Virtual COM Multi-Port Sample Code       |\n");
     printf("+-------------------------------------------------------------+\n");
 
     USBD_Open(&gsInfo, VCOM_ClassRequest, NULL);

@@ -53,13 +53,6 @@
 #define SET_LVR       0
 
 /*
-// <o0> POR
-//      <0=> Disable
-//      <1=> Enable
-*/
-#define SET_POR       0
-
-/*
 // <o0> LIRC
 //      <0=> Disable
 //      <1=> Enable
@@ -80,7 +73,6 @@
 void PowerDownFunction(void);
 void GPB_IRQHandler(void);
 int32_t LvrSetting(void);
-void PorSetting(void);
 int32_t LircSetting(void);
 int32_t LxtSetting(void);
 void SYS_Init(void);
@@ -171,20 +163,6 @@ int32_t LvrSetting(void)
     }
 
     return 0;
-}
-
-void PorSetting(void)
-{
-    if (SET_POR == 0)
-    {
-        /* Disable POR */
-        SYS_DISABLE_POR();
-    }
-    else
-    {
-        /* Enable POR */
-        SYS_ENABLE_POR();
-    }
 }
 
 int32_t LircSetting(void)
@@ -392,9 +370,6 @@ int main(void)
 
     /* LVR setting */
     if (LvrSetting() < 0) goto lexit;
-
-    /* POR setting */
-    PorSetting();
 
     /* LIRC setting */
     if (LircSetting() < 0) goto lexit;

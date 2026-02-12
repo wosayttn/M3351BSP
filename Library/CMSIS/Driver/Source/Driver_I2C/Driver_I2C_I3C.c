@@ -342,7 +342,7 @@ static int32_t I3C0_MasterReceive(uint32_t addr, uint8_t *data, uint32_t num, bo
     NVIC_DisableIRQ(I3C0_IRQn);
     I3C0->INTSTSEN = 0xFFFFFFFF;
     I3C0->INTEN = I3C_INTEN_RXTH_Msk | I3C_INTEN_RESPRDY_Msk | I3C_INTEN_TFRABORT_Msk | I3C_INTEN_TFRERR_Msk;
-    I3C0->DBTHCTL = 0x2 << I3C_DBTHCTL_RXTH_Pos;
+    I3C0->DBTHCTL = 0x1 << I3C_DBTHCTL_RXTH_Pos;
     I3C0->QUETHCTL = 0x0;
     i3c0_rw_info.status.mode = 1; // 1=Master
     i3c0_rw_info.status.busy = 1;

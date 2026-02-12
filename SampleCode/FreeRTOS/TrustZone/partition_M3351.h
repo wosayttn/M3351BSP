@@ -15,7 +15,29 @@
 */
 
 /*
-//    <o> Secure SRAM Size <0x8000-0x150000:0x8000>
+    Secure SRAM Size
+*/
+/*
+// Bit 0..19
+// <o.0..19> Secure SRAM Size   <0x2000=>  8 KB
+//                              <0x4000=>  16 KB
+//                              <0x6000=>  24 KB
+//                              <0x8000=>  32 KB
+//                              <0xA000=>  40 KB
+//                              <0xc000=>  48 KB
+//                              <0xE000=>  56 KB
+//                              <0x10000=> 64 KB
+//                              <0x12000=> 72 KB
+//                              <0x14000=> 80 KB
+//                              <0x16000=> 88 KB
+//                              <0x18000=> 96 KB
+//                              <0x1A000=> 104 KB
+//                              <0x1C000=> 112 KB
+//                              <0x1E000=> 120 KB
+//                              <0x20000=> 128 KB
+//                              <0x22000=> 136 KB (If ECC disabled)
+//                              <0x24000=> 144 KB (If ECC disabled)
+//                              <0x28000=> 160 KB (If ECC disabled)
 */
 #define SCU_SECURE_SRAM_SIZE        0x10000
 #define NON_SECURE_SRAM_BASE        (0x20000000 + 0x10000000 + SCU_SECURE_SRAM_SIZE)
@@ -40,6 +62,32 @@
 // </h>
 */
 
+/*
+// <e> DFMC Non-secure Base Address
+*/
+#define DFMC_INIT_NSCBA              1
+/*
+//    <o> Secure DFMC Flash Size <0x1000-0x10000:0x1000>
+*/
+#define DFMC_SECURE_REGION_SIZE      0x4000
+#define DFMC_SECURE_END              (DFMC_DATA_FLASH_BASE + DFMC_SECURE_REGION_SIZE)
+#define DFMC_NON_SECURE_BASE         (DFMC_SECURE_END + NS_OFFSET)
+
+/*
+// <e> Enable EEPROM
+*/
+#define DFMC_ENABLE_EEPROM          1
+
+/*
+// <o.0>  EEPROM Secure Attribute   <1=> Secure <0=> Non-Secure
+*/
+#define DFMC_SECURE_EEPROM          0x1
+/*
+// </e>
+*/
+/*
+// </e>
+*/
 /*============================================================================*/
 
 /*
@@ -51,10 +99,9 @@
 */
 /*
 // Module 0..31
-//   <o.0>  USBD        <0=> Secure <1=> Non-Secure
 //   <o.8>  PDMA        <0=> Secure <1=> Non-Secure
+//   <o.9>  USBH        <0=> Secure <1=> Non-Secure
 //   <o.16> EBI         <0=> Secure <1=> Non-Secure
-//   <o.24> USBH        <0=> Secure <1=> Non-Secure
 */
 #define SCU_INIT_PNSSET0_VAL      0x0
 /*
@@ -62,8 +109,10 @@
 */
 /*
 // Module 0..31
+//   <h> CANFD
 //   <o.0>  CANFD0      <0=> Secure <1=> Non-Secure
 //   <o.4>  CANFD1      <0=> Secure <1=> Non-Secure
+//   </h>
 //   <o.17> CRC         <0=> Secure <1=> Non-Secure
 //   <o.22> CACHE       <0=> Secure <1=> Non-Secure
 */
@@ -76,21 +125,20 @@
 //   <o.1>  RTC         <0=> Secure <1=> Non-Secure
 //   <o.2>  WDT1        <0=> Secure <1=> Non-Secure
 //   <o.3>  EADC0       <0=> Secure <1=> Non-Secure
-//   <o.4>  EADC1       <0=> Secure <1=> Non-Secure
 //   <o.5>  ACMP01      <0=> Secure <1=> Non-Secure
-//
 //   <o.7>  DAC         <0=> Secure <1=> Non-Secure
+//   <o.11> EADC1       <0=> Secure <1=> Non-Secure
 //   <h> TIMER
-//   <o.16> TMR23       <0=> Secure <1=> Non-Secure
-//   <o.17> TMR45       <0=> Secure <1=> Non-Secure
-//   </h>
-//   <h> PWM
-//   <o.24> PWM0        <0=> Secure <1=> Non-Secure
-//   <o.25> PWM1        <0=> Secure <1=> Non-Secure
+//   <o.16> TMR01       <0=> Secure <1=> Non-Secure
+//   <o.17> TMR23       <0=> Secure <1=> Non-Secure
 //   </h>
 //   <h> BPWM
 //   <o.26>  BPWM0      <0=> Secure <1=> Non-Secure
 //   <o.27>  BPWM1      <0=> Secure <1=> Non-Secure
+//   </h>
+//   <h> PWM
+//   <o.28> PWM0        <0=> Secure <1=> Non-Secure
+//   <o.29> PWM1        <0=> Secure <1=> Non-Secure
 //   </h>
 */
 #define SCU_INIT_PNSSET2_VAL      0x0
@@ -176,8 +224,9 @@
 */
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PA
+//   <i> PA12 ~ PA15 are reserved for USB
 //   <o.0>  PA0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PA1         <0=> Secure <1=> Non-Secure
 //   <o.2>  PA2         <0=> Secure <1=> Non-Secure
@@ -190,17 +239,13 @@
 //   <o.9>  PA9         <0=> Secure <1=> Non-Secure
 //   <o.10> PA10        <0=> Secure <1=> Non-Secure
 //   <o.11> PA11        <0=> Secure <1=> Non-Secure
-//   <o.12> PA12        <0=> Secure <1=> Non-Secure
-//   <o.13> PA13        <0=> Secure <1=> Non-Secure
-//   <o.14> PA14        <0=> Secure <1=> Non-Secure
-//   <o.15> PA15        <0=> Secure <1=> Non-Secure
 //   </h>
 
 */
 #define SCU_INIT_IONSSET0_VAL      0x00000000
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PB
 //   <o.0>  PB0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PB1         <0=> Secure <1=> Non-Secure
@@ -224,7 +269,7 @@
 
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PC
 //   <o.0>  PC0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PC1         <0=> Secure <1=> Non-Secure
@@ -246,7 +291,7 @@
 #define SCU_INIT_IONSSET2_VAL      0x00000000
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PD
 //   <o.0>  PD0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PD1         <0=> Secure <1=> Non-Secure
@@ -270,7 +315,7 @@
 
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PE
 //   <o.0>  PE0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PE1         <0=> Secure <1=> Non-Secure
@@ -294,7 +339,7 @@
 
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PF
 //   <o.0>  PF0         <0=> Secure <1=> Non-Secure
 //   <o.1>  PF1         <0=> Secure <1=> Non-Secure
@@ -315,7 +360,7 @@
 
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PG
 //   <o.2>  PG2         <0=> Secure <1=> Non-Secure
 //   <o.3>  PG3         <0=> Secure <1=> Non-Secure
@@ -332,7 +377,7 @@
 #define SCU_INIT_IONSSET6_VAL      0x00000000
 
 /*
-// Bit 0..31
+// Bit 0..15
 //   <h> PH
 //   <o.4>  PH4         <0=> Secure <1=> Non-Secure
 //   <o.5>  PH5         <0=> Secure <1=> Non-Secure
@@ -360,7 +405,7 @@
 */
 
 /*
-// Bit 0..31
+// Bit 0..7
 //   <o.0>  EINT0       <0=> Secure <1=> Non-Secure
 //   <o.1>  EINT1       <0=> Secure <1=> Non-Secure
 //   <o.2>  EINT2       <0=> Secure <1=> Non-Secure
@@ -386,7 +431,7 @@
 */
 
 /*
-// Bit 0..31
+// Bit 0..7
 //   <o.0>  GPA         <0=> Secure <1=> Non-Secure
 //   <o.1>  GPB         <0=> Secure <1=> Non-Secure
 //   <o.2>  GPC         <0=> Secure <1=> Non-Secure
@@ -530,105 +575,105 @@
 */
 
 /*
-   <e>Initialize SAU Region 4 (Config Non-secure Callable in system_M3351.c)
-   <i> Setup SAU Region 4 memory attributes
+//   <e>Initialize SAU Region 4 (Config Non-secure Callable in system_M3351.c)
+//   <i> Setup SAU Region 4 memory attributes
 */
 #define SAU_INIT_REGION4    0
 /*
-     <o>Start Address <0-0xFFFFFFE0>
+//     <o>Start Address <0-0xFFFFFFE0>
 */
 #define SAU_INIT_START4     0      /* start address of SAU region 4 */
 
 /*
-     <o>End Address <0x1F-0xFFFFFFFF>
+//     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END4       0      /* end address of SAU region 4 */
 
 /*
-     <o>Region is
-         <0=>Non-secure
-         <1=>Secure, Non-secure Callable
+//     <o>Region is
+//         <0=>Non-secure
+//         <1=>Secure, Non-secure Callable
 */
 #define SAU_INIT_NSC4       1
 /*
-   </e>
+//   </e>
 */
 
 /*
-   <e>Initialize SAU Region 5 (Non-secure APROM)
-   <i> Setup SAU Region 5 memory attributes
+//   <e>Initialize SAU Region 5 (Non-secure APROM)
+//   <i> Setup SAU Region 5 memory attributes
 */
 #define SAU_INIT_REGION5    1
 /*
-     <o>Start Address <0-0xFFFFFFE0>
+//     <o>Start Address <0-0xFFFFFFE0>
 */
 #define SAU_INIT_START5     FMC_NON_SECURE_BASE     /* start address of SAU region 5 */
 
 /*
-     <o>End Address <0x1F-0xFFFFFFFF>
+//     <o>End Address <0x1F-0xFFFFFFFF>
 */
-#define SAU_INIT_END5       0x102FFFFF              /* end address of SAU region 5 */
+#define SAU_INIT_END5       0x100FFFFF              /* end address of SAU region 5 */
 
 /*
-     <o>Region is
-         <0=>Non-secure
-         <1=>Secure, Non-secure Callable
+//     <o>Region is
+//         <0=>Non-secure
+//         <1=>Secure, Non-secure Callable
 */
 #define SAU_INIT_NSC5       0
 /*
-   </e>
+//   </e>
 */
 
 /*
-   <e>Initialize SAU Region 6 (Non-secure SRAM)
-   <i> Setup SAU Region 6 memory attributes
+//   <e>Initialize SAU Region 6 (Non-secure SRAM)
+//   <i> Setup SAU Region 6 memory attributes
 */
 #define SAU_INIT_REGION6    1
 
 /*
-     <o>Start Address <0-0xFFFFFFE0>
+//     <o>Start Address <0-0xFFFFFFE0>
 */
 #define SAU_INIT_START6     NON_SECURE_SRAM_BASE    /* start address of SAU region 6 */
 
 /*
-     <o>End Address <0x1F-0xFFFFFFFF>
+//     <o>End Address <0x1F-0xFFFFFFFF>
 */
-#define SAU_INIT_END6       0x3024FFFF              /* end address of SAU region 6 */
+#define SAU_INIT_END6       0x30027FFF              /* end address of SAU region 6 */
 
 /*
-     <o>Region is
-         <0=>Non-secure
-         <1=>Secure, Non-secure Callable
+//     <o>Region is
+//         <0=>Non-secure
+//         <1=>Secure, Non-secure Callable
 */
 #define SAU_INIT_NSC6       0
 /*
-   </e>
+//   </e>
 */
 
 /*
-   <e>Initialize SAU Region 7 (Non-secure IP region)
-   <i> Setup SAU Region 7 memory attributes
+//   <e>Initialize SAU Region 7 (Non-secure IP region)
+//   <i> Setup SAU Region 7 memory attributes
 */
 #define SAU_INIT_REGION7    1
 
 /*
-     <o>Start Address <0-0xFFFFFFE0>
+//     <o>Start Address <0-0xFFFFFFE0>
 */
 #define SAU_INIT_START7     0x50000000      /* start address of SAU region 7 */
 
 /*
-     <o>End Address <0x1F-0xFFFFFFFF>
+//     <o>End Address <0x1F-0xFFFFFFFF>
 */
 #define SAU_INIT_END7       0x5FFFFFFF      /* end address of SAU region 7 */
 
 /*
-     <o>Region is
-         <0=>Non-secure
-         <1=>Secure, Non-secure Callable
+//     <o>Region is
+//         <0=>Non-secure
+//         <1=>Secure, Non-secure Callable
 */
 #define SAU_INIT_NSC7       0
 /*
-   </e>
+//   </e>
 */
 
 /*
@@ -672,12 +717,12 @@
 */
 
 /*
-// <e>Setup behaviour of Floating Point and Vector Unit (FPU/MVE)
+// <e>Setup behaviour of Floating Point Unit (FPU)
 */
 #define TZ_FPU_NS_USAGE 1
 
 /*
-// <o>Floating Point and Vector Unit usage
+// <o>Floating Point Unit usage
 //     <0=> Secure state only
 //     <3=> Secure and Non-secure state
 //   <i> Value for SCB->NSACR register bits CP10, CP11
@@ -718,7 +763,7 @@
  */
 
 #define SAU_INIT_REGION(n) \
-    SAU->RNR  =  (n                                      & SAU_RNR_REGION_Msk); \
+    SAU->RNR  =  ((n)                                    & SAU_RNR_REGION_Msk); \
     SAU->RBAR =  (SAU_INIT_START##n                      & SAU_RBAR_BADDR_Msk); \
     SAU->RLAR =  (SAU_INIT_END##n                        & SAU_RLAR_LADDR_Msk) | \
                  ((SAU_INIT_NSC##n << SAU_RLAR_NSC_Pos)  & SAU_RLAR_NSC_Msk)   | 1U

@@ -109,13 +109,14 @@ int32_t main(void)
     {
         printf("EEPROM is disabled. Please wait chip reset to enable it ...\n");
         FMC_ENABLE_CFG_UPDATE();        /* Enable User Configuration update */
-        FMC_WriteConfig(FMC_USER_CONFIG_14, u32Config & ~BIT5);
+        FMC_WriteConfig(FMC_USER_CONFIG_14, (u32Config & ~(BIT5 | 0xF)) | 0xD);
         FMC_DISABLE_CFG_UPDATE();       /* Disable User Configuration update */
         SYS_ResetChip();                /* Perform chip reset to make new User Config take effect */
     }
 
     FMC_Close();                        /* Disable FMC ISP function */
 
+    printf("FMC user config 14 of DFMC:   0x%08X\n", u32Config);
     /* Enable DFMC ISP function. Before using DFMC function, it should unlock system register first. */
     DFMC_Open();
 

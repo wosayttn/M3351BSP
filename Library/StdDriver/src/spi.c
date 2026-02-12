@@ -93,8 +93,8 @@ static uint32_t SPI_GetModuleClkSrcFreq(const SPI_T *spi)
 
     switch (u32SPIClkSrcSel)
     {
-        case SPI_CLKSEL_PLL_DIV2:
-            u32RetValue = (CLK_GetPLLClockFreq() >> 1);          /* Clock source is PLL */
+        case SPI_CLKSEL_PLL:
+            u32RetValue = CLK_GetPLLClockFreq();          /* Clock source is PLL */
             break;
 
         case SPI_CLKSEL_PCLK2:

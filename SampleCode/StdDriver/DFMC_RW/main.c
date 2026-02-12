@@ -189,6 +189,8 @@ int32_t main(void)
         SYS_ResetChip();
     }
 
+    FMC_Close();
+
     /* Enable DFMC ISP function. Before using DFMC function, it should unlock system register first. */
     DFMC_Open();
 

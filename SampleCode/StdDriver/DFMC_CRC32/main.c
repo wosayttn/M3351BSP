@@ -55,7 +55,7 @@ int32_t SYS_Init(void)
 
 int32_t main(void)
 {
-    uint32_t u32Data, u32ChkSum;
+    uint32_t u32Data, u32ChkSum, u32Config;
 
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -69,6 +69,22 @@ int32_t main(void)
 
     /* Unlock protected registers */
     SYS_UnlockReg();
+
+    /* This sample code calculates CRC32 checksum of whole DFMC data flash area.
+       Therefore we need to disable EEPROM function to access whole DFMC data flash. */
+    FMC_Open();                         /* Enable FMC ISP function */
+    u32Config = FMC_Read(FMC_USER_CONFIG_14);
+
+    if ((u32Config & BIT5) == 0)        /* Check if EEPROM is enabled */
+    {
+        printf("EEPROM is enabled. Please wait chip reset to disable it ...\n");
+        FMC_ENABLE_CFG_UPDATE();        /* Enable User Configuration update */
+        FMC_EraseConfig(FMC_USER_CONFIG_14);
+        FMC_DISABLE_CFG_UPDATE();       /* Disable User Configuration update */
+        SYS_ResetChip();                /* Perform chip reset to make new User Config take effect */
+    }
+
+    FMC_Close();                        /* Disable FMC ISP function */
 
     /* Enable DFMC ISP function. Before using DFMC function, it should unlock system register first. */
     DFMC_Open();

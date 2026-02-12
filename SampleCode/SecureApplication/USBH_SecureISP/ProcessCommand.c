@@ -376,23 +376,19 @@ static uint32_t _Perform_CRC32(uint32_t *pu32buf, uint16_t len, uint8_t mode)
   */
 static int32_t _AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_t *KEY, uint32_t *IV)
 {
-    uint32_t u32TimeOutCnt;
+    int32_t i32TimeOutCnt;
 
-    /* KEY and IV are byte order (32 bit) reversed, Swap32(x)) and stored in ISP_INFO_T */
-    memcpy((void *)&CRYPTO->AES_KEY[0], KEY, (4 * 8));
-    memcpy((void *)&CRYPTO->AES_IV[0], IV, (4 * 4));
+    AES_Open(CRYPTO, 0, 1, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
+    AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
+    AES_SetInitVect(CRYPTO, 0, IV);
+    AES_SetDMATransfer(CRYPTO, 0, (uint32_t)in, (uint32_t)out, len);
+    AES_Start(CRYPTO, 0, CRYPTO_DMA_ONE_SHOT);
 
-    CRYPTO->AES_SADDR = (uint32_t)in;
-    CRYPTO->AES_DADDR = (uint32_t)out;
-    CRYPTO->AES_CNT   = len;
-    CRYPTO->AES_CTL = ((AES_KEY_SIZE_256 << CRYPTO_AES_CTL_KEYSZ_Pos) | (AES_IN_OUT_SWAP << CRYPTO_AES_CTL_OUTSWAP_Pos));
-    CRYPTO->AES_CTL |= (CRYPTO_AES_CTL_ENCRYPTO_Msk);
-    CRYPTO->AES_CTL |= ((AES_MODE_CFB << CRYPTO_AES_CTL_OPMODE_Pos) | CRYPTO_AES_CTL_START_Msk | CRYPTO_AES_CTL_DMAEN_Msk);
-    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
     while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
     {
-        if (--u32TimeOutCnt == 0)
+        if (i32TimeOutCnt-- < 0)
             return -1;
     }
 
@@ -404,22 +400,19 @@ static int32_t _AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_
   */
 static int32_t _AES256Decrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_t *KEY, uint32_t *IV)
 {
-    uint32_t u32TimeOutCnt;
+    int32_t i32TimeOutCnt;
 
-    /* KEY and IV are byte order (32 bit) reversed, Swap32(x)) and stored in ISP_INFO_T */
-    memcpy((void *)&CRYPTO->AES_KEY[0], KEY, (4 * 8));
-    memcpy((void *)&CRYPTO->AES_IV[0], IV, (4 * 4));
+    AES_Open(CRYPTO, 0, 0, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
+    AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
+    AES_SetInitVect(CRYPTO, 0, IV);
+    AES_SetDMATransfer(CRYPTO, 0, (uint32_t)in, (uint32_t)out, len);
+    AES_Start(CRYPTO, 0, CRYPTO_DMA_ONE_SHOT);
 
-    CRYPTO->AES_SADDR = (uint32_t)in;
-    CRYPTO->AES_DADDR = (uint32_t)out;
-    CRYPTO->AES_CNT   = len;
-    CRYPTO->AES_CTL = ((AES_KEY_SIZE_256 << CRYPTO_AES_CTL_KEYSZ_Pos) | (AES_IN_OUT_SWAP << CRYPTO_AES_CTL_OUTSWAP_Pos));
-    CRYPTO->AES_CTL |= ((AES_MODE_CFB << CRYPTO_AES_CTL_OPMODE_Pos) | CRYPTO_AES_CTL_START_Msk | CRYPTO_AES_CTL_DMAEN_Msk);
-    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
     while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
     {
-        if (--u32TimeOutCnt == 0)
+        if (i32TimeOutCnt-- < 0)
             return -1;
     }
 

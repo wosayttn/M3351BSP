@@ -137,7 +137,7 @@ static uint8_t gu8ProductStringDesc[] =
 {
     32,             /* bLength          */
     DESC_STRING,    /* bDescriptorType  */
-    'M', 0, '2', 0, '3', 0, '5', 0, '4', 0, ' ', 0, 'S', 0, 'e', 0, 'c', 0, 'u', 0, 'r', 0, 'e', 0, 'I', 0, 'S', 0, 'P', 0
+    'M', 0, '3', 0, '3', 0, '5', 0, '1', 0, ' ', 0, 'S', 0, 'e', 0, 'c', 0, 'u', 0, 'r', 0, 'e', 0, 'I', 0, 'S', 0, 'P', 0
 };
 
 /*!<USB BOS Descriptor */

@@ -12,6 +12,9 @@
 #include "xmodem.h"
 #include "NuDB_common.h"
 
+// Uncomment to build new App for test
+//#define NEW_APP
+
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -56,11 +59,11 @@ int32_t SYS_Init(void)
     /*------------------------------------------------------------------------*/
     /* Init System Clock                                                      */
     /*------------------------------------------------------------------------*/
-    /* Enable HXT clock */
-    CLK_EnableXtalRC(CLK_PWRCTL_HXTEN_Msk);
+    /* Enable HIRC clock */
+    CLK_EnableXtalRC(CLK_PWRCTL_HIRCEN_Msk);
 
-    /* Wait for HXT clock ready */
-    CLK_WaitClockReady(CLK_STATUS_HXTSTB_Msk);
+    /* Wait for HIRC clock ready */
+    CLK_WaitClockReady(CLK_STATUS_HIRCSTB_Msk);
 
     /* Set PCLK0 to HCLK/2 */
     CLK_SET_PCLK0DIV(CLK_PCLKDIV_APB0DIV_DIV2);

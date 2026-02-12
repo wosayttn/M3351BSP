@@ -54,10 +54,10 @@
 #endif
 
 #if defined (RTE_Driver_SAI)
-#if RTE_SAI0 && RTE_SPI0
-    #error "SPI0 is used by multiple CMSIS Drivers! Please check RTE device configuration to fix it."
+    #if RTE_SAI0 && RTE_SPI0
+        #error "SPI0 is used by multiple CMSIS Drivers! Please check RTE device configuration to fix it."
+    #endif
 #endif
-#endif 
 
 // *****************************************************************************
 
@@ -1198,8 +1198,8 @@ set_speed:
                     (pSPIn->sState.u32Mode & ARM_SPI_SS_SLAVE_MODE_Msk) == ARM_SPI_SS_SLAVE_SW)
             {
 
-                SPI_DisableAutoSS(phspi);
-                (arg == ARM_SPI_SS_INACTIVE) ? SPI_SET_SS_HIGH(phspi) : SPI_SET_SS_LOW(phspi);
+                //SPI_DisableAutoSS(phspi);
+                //(arg == ARM_SPI_SS_INACTIVE) ? SPI_SET_SS_HIGH(phspi) : SPI_SET_SS_LOW(phspi);
                 return ARM_DRIVER_OK;
             }
 
@@ -1216,7 +1216,7 @@ set_speed:
         {
             case ARM_SPI_SS_MASTER_UNUSED:
                 SPI_DisableAutoSS(phspi);
-                phspi->SSCTL |= SPI_SSCTL_SLV3WIRE_Msk;
+                SPI_SET_SS_HIGH(phspi);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_MASTER_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_MASTER_UNUSED;
                 break;
@@ -1247,7 +1247,7 @@ set_speed:
         switch (control & ARM_SPI_SS_SLAVE_MODE_Msk)
         {
             case ARM_SPI_SS_SLAVE_HW:
-                SPI_EnableAutoSS(phspi, SPI_SS, SPI_SS_ACTIVE_LOW);
+                //SPI_EnableAutoSS(phspi, SPI_SS, SPI_SS_ACTIVE_LOW);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_SLAVE_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_SLAVE_HW;
                 break;
@@ -1258,8 +1258,8 @@ set_speed:
                     return ARM_DRIVER_ERROR_PARAMETER;
                 }
 
-                SPI_DisableAutoSS(phspi);
-                (arg == ARM_SPI_SS_INACTIVE) ? SPI_SET_SS_HIGH(phspi) : SPI_SET_SS_LOW(phspi);
+                //SPI_DisableAutoSS(phspi);
+                //(arg == ARM_SPI_SS_INACTIVE) ? SPI_SET_SS_HIGH(phspi) : SPI_SET_SS_LOW(phspi);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_SLAVE_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_SLAVE_SW;
                 break;

@@ -119,8 +119,8 @@ static inline uint32_t spi_idx_from_port_rt(uint32_t n)
                                               SPI_TO_QSPI_PDMA_TX_CH(n),       \
                                               SPI_TO_QSPI_PDMA_RX_NUM(n),      \
                                               SPI_TO_QSPI_PDMA_TX_NUM(n),      \
-                                             }                                \
-                                           };
+                                              }                                \
+                                             };
 
 // Local driver functions declarations (for instances)
 #if (RTE_SPI_QSPI0 == 1)
@@ -1120,8 +1120,8 @@ set_speed:
                     (pSPIn->sState.u32Mode & ARM_SPI_SS_SLAVE_MODE_Msk) == ARM_SPI_SS_SLAVE_SW)
             {
 
-                QSPI_DisableAutoSS(phspi);
-                (arg == ARM_SPI_SS_INACTIVE) ? QSPI_SET_SS_HIGH(phspi) : QSPI_SET_SS_LOW(phspi);
+                //QSPI_DisableAutoSS(phspi);
+                //(arg == ARM_SPI_SS_INACTIVE) ? QSPI_SET_SS_HIGH(phspi) : QSPI_SET_SS_LOW(phspi);
                 return ARM_DRIVER_OK;
             }
 
@@ -1138,7 +1138,7 @@ set_speed:
         {
             case ARM_SPI_SS_MASTER_UNUSED:
                 QSPI_DisableAutoSS(phspi);
-                phspi->SSCTL |= QSPI_SSCTL_SLV3WIRE_Msk;
+                QSPI_SET_SS_HIGH(phspi);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_MASTER_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_MASTER_UNUSED;
                 break;
@@ -1169,7 +1169,7 @@ set_speed:
         switch (control & ARM_SPI_SS_SLAVE_MODE_Msk)
         {
             case ARM_SPI_SS_SLAVE_HW:
-                QSPI_EnableAutoSS(phspi, QSPI_SS, QSPI_SS_ACTIVE_LOW);
+                //QSPI_EnableAutoSS(phspi, QSPI_SS, QSPI_SS_ACTIVE_LOW);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_SLAVE_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_SLAVE_HW;
                 break;
@@ -1180,8 +1180,8 @@ set_speed:
                     return ARM_DRIVER_ERROR_PARAMETER;
                 }
 
-                QSPI_DisableAutoSS(phspi);
-                (arg == ARM_SPI_SS_INACTIVE) ? QSPI_SET_SS_HIGH(phspi) : QSPI_SET_SS_LOW(phspi);
+                //QSPI_DisableAutoSS(phspi);
+                //(arg == ARM_SPI_SS_INACTIVE) ? QSPI_SET_SS_HIGH(phspi) : QSPI_SET_SS_LOW(phspi);
                 pSPIn->sState.u32Mode &= ~ARM_SPI_SS_SLAVE_MODE_Msk;
                 pSPIn->sState.u32Mode |= ARM_SPI_SS_SLAVE_SW;
                 break;

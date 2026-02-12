@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file     usbd_User.c
  * @version  V1.00
- * @brief    Simplified M5531 series USBD driver source file
+ * @brief    Simplified USBD driver source file
  *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.

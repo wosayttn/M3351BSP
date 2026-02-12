@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file     usbd_User.h
  * @version  V1.00
- * @brief    Simplified M5531 series USBD driver header file
+ * @brief    Simplified USBD driver header file
  *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.
@@ -356,7 +356,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Stop USB transaction of the specified endpoint ID
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return     None
   *
@@ -368,7 +368,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Set USB DATA1 PID for the specified endpoint ID
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return     None
   *
@@ -381,7 +381,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Set USB DATA0 PID for the specified endpoint ID
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return     None
   *
@@ -394,7 +394,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Set USB payload size (IN data)
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @param[in]  size The transfer length.
   *
@@ -408,7 +408,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Get USB payload size (OUT data)
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return     The value of USB_MXPLDx register.
   *
@@ -420,7 +420,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Configure endpoint
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @param[in]  config The USB configuration.
   *
@@ -434,7 +434,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Set USB endpoint buffer
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @param[in]  offset The SRAM offset.
   *
@@ -448,7 +448,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief      Get the offset of the specified USB endpoint buffer
   *
-  * @param[in]  ep The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]  ep The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return     The offset of the specified endpoint buffer.
   *
@@ -460,7 +460,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief       Set USB endpoint stall state
   *
-  * @param[in]   ep  The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]   ep  The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return      None
   *
@@ -472,7 +472,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief       Clear USB endpoint stall state
   *
-  * @param[in]   ep  The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]   ep  The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @return      None
   *
@@ -483,7 +483,7 @@ extern const S_USBD_INFO_T gsInfo;
 /**
   * @brief       Get USB endpoint stall state
   *
-  * @param[in]   ep  The USB endpoint ID. M5531 series supports 25 hardware endpoint ID. This parameter could be 0 ~ 7.
+  * @param[in]   ep  The USB endpoint ID. M3351 Series supports 23 hardware endpoint ID. This parameter could be 0 ~ 22.
   *
   * @retval      0      USB endpoint is not stalled.
   * @retval      Others USB endpoint is stalled.

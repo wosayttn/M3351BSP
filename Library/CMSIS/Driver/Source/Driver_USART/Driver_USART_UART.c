@@ -835,7 +835,7 @@ static uint32_t USARTn_GetRxCount(const USART_Info_t *ptr_usart_info)
 static int32_t USARTn_Control(const USART_Info_t *ptr_usart_info, uint32_t control, uint32_t arg)
 {
     ARM_USART_STATUS status;
-    uint32_t         word_len;
+    uint32_t         word_len = UART_WORD_LEN_8;
     uint32_t         parity = UART_PARITY_NONE;
     uint32_t         stop_bits = UART_STOP_BIT_1;
     uint32_t         baud_rate = 0;
@@ -947,10 +947,6 @@ static int32_t USARTn_Control(const USART_Info_t *ptr_usart_info, uint32_t contr
 
     switch (control & ARM_USART_DATA_BITS_Msk)    // --- Mode Parameters: Data Bits
     {
-        case ARM_USART_DATA_BITS_6:                 // Data bits: 6
-            word_len = UART_WORD_LEN_6;
-            break;
-
         case ARM_USART_DATA_BITS_7:                 // Data bits: 7
             word_len = UART_WORD_LEN_7;
             break;
