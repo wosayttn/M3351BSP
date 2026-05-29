@@ -15,11 +15,14 @@
 static volatile uint32_t u32Status;
 static volatile uint32_t u32IC0Hold;
 
+void TIMER0_IRQHandler(void);
+void ECAP0_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    if (TIMER_GetIntFlag(TIMER0) == 1)
+    if (TIMER_GetIntFlag(TIMER0) == 1U)
     {
         /* Clear Timer0 time-out interrupt flag */
         TIMER_ClearIntFlag(TIMER0);
@@ -86,7 +89,7 @@ void ECAP0_IRQHandler(void)
         ECAP_CLR_CAPTURE_FLAG(ECAP0, ECAP_STATUS_CAPOVF_Msk);
     }
 
-    while (ECAP_GET_INT_STATUS(ECAP0) & 0xFF)
+    while ((ECAP_GET_INT_STATUS(ECAP0) & ECAP_STATUS_FLAG_MASK) != 0U)
     {
         if (--u32TimeOutCnt == 0)
         {
@@ -145,7 +148,7 @@ static void SYS_Init(void)
     SYS_LockReg();
 }
 
-void ECAP0_Init(void)
+static void ECAP0_Init(void)
 {
     /* Enable ECAP0*/
     ECAP_Open(ECAP0, ECAP_DISABLE_COMPARE);
@@ -167,7 +170,7 @@ void ECAP0_Init(void)
     NVIC_EnableIRQ(ECAP0_IRQn);
 }
 
-void Timer0_Init(void)
+static void Timer0_Init(void)
 {
     /* Open Timer0 in periodic mode, enable interrupt and 1 interrupt tick per second */
     TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 10000);
@@ -179,7 +182,8 @@ void Timer0_Init(void)
 
 int main(void)
 {
-    uint32_t u32Hz = 0, u32Hz_DET = 0;
+    uint32_t u32Hz = 0U;
+    uint32_t u32Hz_DET;
 
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -190,7 +194,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("+----------------------------------------------+\n");
     printf("|   Enhanced Input Capture Timer Sample Code   |\n");
     printf("+----------------------------------------------+\n");
@@ -224,13 +228,13 @@ int main(void)
 
     while (1)
     {
-        if (u32Status != 0)
+        if (u32Status != 0U)
         {
             /* Input Capture status is changed, and get a new hold value of input capture counter */
             u32Status = 0;
 
             /* Calculate the IC0 input frequency */
-            u32Hz_DET = (SystemCoreClock / 2) / (u32IC0Hold + 1);
+            u32Hz_DET = (SystemCoreClock / 2U) / (u32IC0Hold + 1U);
 
 
             if (u32Hz != u32Hz_DET)
@@ -240,7 +244,7 @@ int main(void)
             }
             else
             {
-                printf("\nECAP0_IC0 input frequency is %d (Hz),u32IC0Hold=0x%08x\n", u32Hz, u32IC0Hold);
+                printf("\nECAP0_IC0 input frequency is %u (Hz),u32IC0Hold=0x%08x\n", u32Hz, u32IC0Hold);
                 TIMER_Stop(TIMER0); //Disable timer Counting.
                 break;
             }
@@ -263,7 +267,7 @@ int main(void)
     printf("\nExit ECAP sample code\n");
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

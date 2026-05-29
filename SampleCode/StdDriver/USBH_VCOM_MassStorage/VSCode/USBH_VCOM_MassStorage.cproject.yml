@@ -28,6 +28,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -42,6 +44,8 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--gc-sections,-Map="$elf()$.map"
@@ -55,7 +59,7 @@ project:
     - group: CMSIS
       files:
         - file: ../../../../Library/Device/Nuvoton/M3351/Source/system_M3351.c
-        - file: ../../../../Library/Device/Nuvoton/M3351/Source/startup_M3351.c       
+        - file: ../../../../Library/Device/Nuvoton/M3351/Source/startup_M3351.c
     - group: Driver
       files:
         - file: ../../../../Library/StdDriver/src/clk.c
@@ -80,7 +84,7 @@ project:
       files:
         - file: ../../../../Library/UsbHostLib/src_cdc/cdc_driver.c
         - file: ../../../../Library/UsbHostLib/src_cdc/cdc_core.c
-        - file: ../../../../Library/UsbHostLib/src_cdc/cdc_parser.c    
+        - file: ../../../../Library/UsbHostLib/src_cdc/cdc_parser.c
     - group: ThirdParty_FatFs
       files:
         - file: ../../../../ThirdParty/FatFs/source/ff.c

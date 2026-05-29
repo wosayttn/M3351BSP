@@ -77,15 +77,15 @@ DEV_REQ_T;
 /*
  *  Descriptor Types
  */
-#define USB_DT_STANDARD                0x00
-#define USB_DT_CLASS                   0x20
+#define USB_DT_STANDARD                0x00U
+#define USB_DT_CLASS                   0x20U
 #define USB_DT_VENDOR                  0x40
 
-#define USB_DT_DEVICE                  0x01
-#define USB_DT_CONFIGURATION           0x02
-#define USB_DT_STRING                  0x03
-#define USB_DT_INTERFACE               0x04
-#define USB_DT_ENDPOINT                0x05
+#define USB_DT_DEVICE                  0x01U
+#define USB_DT_CONFIGURATION           0x02U
+#define USB_DT_STRING                  0x03U
+#define USB_DT_INTERFACE               0x04U
+#define USB_DT_ENDPOINT                0x05U
 #define USB_DT_DEVICE_QUALIFIER        0x06
 #define USB_DT_OTHER_SPEED_CONF        0x07
 #define USB_DT_IFACE_POWER             0x08
@@ -259,18 +259,18 @@ typedef struct __attribute__((__packed__)) usb_endpoint_descriptor    /*!< Endpo
 /*
  *  Endpoint descriptor bEndpointAddress[7] - direction
  */
-#define EP_ADDR_DIR_MASK               0x80
-#define EP_ADDR_DIR_IN                 0x80
-#define EP_ADDR_DIR_OUT                0x00
+#define EP_ADDR_DIR_MASK               0x80U
+#define EP_ADDR_DIR_IN                 0x80U
+#define EP_ADDR_DIR_OUT                0x00U
 
 /*
  *  Endpoint descriptor bmAttributes[1:0] - transfer type
  */
-#define EP_ATTR_TT_MASK                0x03
-#define EP_ATTR_TT_CTRL                0x00
-#define EP_ATTR_TT_ISO                 0x01
-#define EP_ATTR_TT_BULK                0x02
-#define EP_ATTR_TT_INT                 0x03
+#define EP_ATTR_TT_MASK                0x03U
+#define EP_ATTR_TT_CTRL                0x00U
+#define EP_ATTR_TT_ISO                 0x01U
+#define EP_ATTR_TT_BULK                0x02U
+#define EP_ATTR_TT_INT                 0x03U
 
 /*----------------------------------------------------------------------------------*/
 /*  USB Host controller driver                                                      */
@@ -364,7 +364,7 @@ typedef struct iface_t
 /*  URB (USB Request Block)                                                         */
 /*----------------------------------------------------------------------------------*/
 
-#define IF_PER_UTR             8      /* number of frames per UTR isochronous transfer (DO NOT modify it!)  */
+#define IF_PER_UTR             8U      /* number of frames per UTR isochronous transfer (DO NOT modify it!)  */
 
 typedef void (*FUNC_UTR_T)(struct utr_t *);
 
@@ -420,17 +420,17 @@ extern void usbh_dump_ep_info(EP_INFO_T *ep);
 extern void usbh_memory_init(void);
 extern uint32_t  usbh_memory_used(void);
 extern void *usbh_alloc_mem(int size);
-extern int usbh_free_mem(void *p, int size);
+extern int usbh_free_mem(const void *p, int size);
 extern int  alloc_dev_address(void);
 extern void free_dev_address(int dev_addr);
 extern UDEV_T *alloc_device(void);
 extern void free_device(UDEV_T *udev);
 extern UTR_T *alloc_utr(UDEV_T *udev);
-extern void free_utr(UTR_T *utr);
+extern void free_utr(const UTR_T *utr);
 extern ED_T *alloc_ohci_ED(void);
-extern void free_ohci_ED(ED_T *ed);
+extern void free_ohci_ED(const ED_T *ed);
 extern TD_T *alloc_ohci_TD(UTR_T *utr);
-extern void free_ohci_TD(TD_T *td);
+extern void free_ohci_TD(const TD_T *td);
 
 extern void usbh_hub_init(void);
 extern int  connect_device(UDEV_T *udev);

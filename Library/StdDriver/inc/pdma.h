@@ -314,7 +314,7 @@ extern "C"
  * @details     This macro stop the selected channel.
  * \hideinitializer
  */
-#define PDMA_STOP(pdma,u32Ch) ((uint32_t)((pdma)->PAUSE = (1 << (u32Ch))))
+#define PDMA_STOP(pdma,u32Ch) ((pdma)->PAUSE = (1UL << (u32Ch)))
 
 /**
  * @brief       Pause the channel
@@ -325,7 +325,7 @@ extern "C"
  * @details     This macro pause the selected channel.
  * \hideinitializer
  */
-#define PDMA_PAUSE(pdma,u32Ch) ((uint32_t)((pdma)->PAUSE = (1 << (u32Ch))))
+#define PDMA_PAUSE(pdma,u32Ch) ((pdma)->PAUSE = (1UL << (u32Ch)))
 
 /**
  * @brief       Reset the channel
@@ -336,7 +336,7 @@ extern "C"
  * @details     This macro reset the selected channel.
  * \hideinitializer
  */
-#define PDMA_RESET(pdma,u32Ch) ((uint32_t)((pdma)->CHRST = (1 << (u32Ch))))
+#define PDMA_RESET(pdma,u32Ch) ((pdma)->CHRST = (1UL << (u32Ch)))
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Define PDMA functions prototype                                                                          */

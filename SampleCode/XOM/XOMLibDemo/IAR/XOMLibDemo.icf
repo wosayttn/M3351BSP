@@ -2,7 +2,7 @@
 /*-Editor annotation file-*/
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
 /*-Specials-*/
-define symbol __ICFEDIT_intvec_start__ = 0x00000000;
+define symbol __ICFEDIT_intvec_start__ = 0x00008000;
 
 /* Default value for ENABLE_SRAM2, can be overridden by adding "ENABLE_SRAM2=1" in
  *   IAR Project -> Options -> Linker -> Config
@@ -19,11 +19,25 @@ if ((ENABLE_SRAM2 != 0) && (ENABLE_SRAM2 != 1)) {
 }
 
 /*-Memory Regions-*/
-define symbol __ICFEDIT_region_ROM_start__  = 0x00000000;
-define symbol __ICFEDIT_region_ROM_end__    = ( 0x00004000 - 1 );
+define symbol __ICFEDIT_region_ROM_start__  = 0x00008000;
+define symbol __ICFEDIT_region_ROM_end__    = ( 0x0000C000 - 1 );
 
 define symbol __ICFEDIT_region_RAM_start__  = 0x20000000;
 define symbol __ICFEDIT_region_RAM_end__    = ( 0x20020000 + (ENABLE_SRAM2 * 0x8000) - 1 );
+
+/* Validate memory ranges to avoid wrapped regions caused by end < start */
+if (__ICFEDIT_region_ROM_end__ < __ICFEDIT_region_ROM_start__) {
+    error "Invalid ROM region: __ICFEDIT_region_ROM_end__ must be >= __ICFEDIT_region_ROM_start__";
+}
+
+if (__ICFEDIT_region_RAM_end__ < __ICFEDIT_region_RAM_start__) {
+    error "Invalid RAM region: __ICFEDIT_region_RAM_end__ must be >= __ICFEDIT_region_RAM_start__";
+}
+
+/* Validate vector table location is inside ROM range */
+if ((__ICFEDIT_intvec_start__ < __ICFEDIT_region_ROM_start__) || (__ICFEDIT_intvec_start__ > __ICFEDIT_region_ROM_end__)) {
+    error "Invalid vector table location: __ICFEDIT_intvec_start__ must be inside ROM region";
+}
 
 /*-Sizes-*/
 define symbol __ICFEDIT_size_cstack__ = 0x00000400;

@@ -544,6 +544,8 @@ static int32_t _GCM(mbedtls_gcm_context *ctx, const uint8_t *iv, uint32_t ivlen,
     uint32_t size;
     uint32_t key[8];
 
+    len_aligned = 0;
+
     for (i = 0; i < 8; i++)
     {
         key[i] = CRYPTO->AES_KEY[i];

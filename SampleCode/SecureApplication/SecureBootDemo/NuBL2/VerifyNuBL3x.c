@@ -21,9 +21,26 @@ void Reg2Hex(int32_t count, uint32_t volatile reg[], char output[]);
 int32_t Cal_SHA256_Flash(uint32_t u32Addr, uint32_t u32Bytes, uint32_t *pu32Digest);
 int32_t Cal_SHA256_SRAM(uint32_t u32Addr, uint32_t u32Bytes, uint32_t *pu32Digest);
 
-char Qx[ECDSA_EC256_KEY_LEN * 2 + 1] = "18ab8717ffe2bb2545238176bc3bd43d49fa036759979994a4eacbfe7be1c620",
-                                       Qy[ECDSA_EC256_KEY_LEN * 2 + 1] = "724cb73609d0106a325b570016310f9b10c9738b5ce489a0efac88f2062d58da";
-
+/**
+ * @brief Public Key Constants for Secure Boot Image Verification.
+ *
+ * @note [CRA COMPLIANCE - Secure by Design]:
+ * This array contains the PUBLIC key components (Qx, Qy) used for firmware
+ * signature validation. It does NOT contain confidential or private key data.
+ *
+ * @warning DEMONSTRATION ONLY / REQUIRED USER ACTION:
+ * The key data provided below is an open-source sample intended for local testing only.
+ * To comply with the EU Cyber Resilience Act (CRA), manufacturers MUST replace this
+ * public key with their own unique, securely generated production public key matching
+ * their private key infrastructure.
+ *
+ * @warning INTEGRITY PROTECTION MANDATE:
+ * Under CRA Annex I, the final production public key array MUST be compiled into a
+ * write-protected, read-only memory segment (e.g., const data section, flash memory,
+ * or hardware OTP fuses) to prevent malicious runtime tampering or unauthorized substitution.
+ */
+const char Qx[ECDSA_EC256_KEY_LEN * 2 + 1] = "18ab8717ffe2bb2545238176bc3bd43d49fa036759979994a4eacbfe7be1c620";
+const char Qy[ECDSA_EC256_KEY_LEN * 2 + 1] = "724cb73609d0106a325b570016310f9b10c9738b5ce489a0efac88f2062d58da";
 
 
 static void BytesSwap(char *buf, int32_t len)
@@ -296,7 +313,15 @@ int32_t VerifyNuBL3x(uint32_t u32ImgBaseAddr, uint32_t u32ImgByteSize, uint32_t 
 
             if (i32RetCode != 0)
             {
-                printf("ECC signature verification failed (Error code: %d) !\n", i32RetCode);
+                if (i32RetCode == MBEDTLS_ERR_MPI_ALLOC_FAILED)
+                {
+                    printf("Memory allocation failed. Please increase the heap size in the linker script.\n");
+                }
+                else
+                {
+                    printf("ECC signature verification failed (Error code: %d) !\n", i32RetCode);
+                }
+
                 return eBOOT_ERRCODE_BADSIGN;
             }
         }

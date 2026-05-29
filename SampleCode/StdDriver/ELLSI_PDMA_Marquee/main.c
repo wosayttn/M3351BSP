@@ -12,16 +12,7 @@
 
 #define TEST_COUNT  5
 
-volatile uint32_t g_au32RED_Marquee0[TEST_COUNT] = {0x000000FF, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
-volatile uint32_t g_au32RED_Marquee1[TEST_COUNT] = {0xFF000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
-volatile uint32_t g_au32RED_Marquee2[TEST_COUNT] = {0x00000000, 0x00FF0000, 0x00000000, 0x00000000, 0x00000000};
-volatile uint32_t g_au32RED_Marquee3[TEST_COUNT] = {0x00000000, 0x00000000, 0x0000FF00, 0x00000000, 0x00000000};
-volatile uint32_t g_au32RED_Marquee4[TEST_COUNT] = {0x00000000, 0x00000000, 0x00000000, 0x000000FF, 0x00000000};
-volatile uint32_t g_au32RED_Marquee5[TEST_COUNT] = {0x00000000, 0x00000000, 0x00000000, 0xFF000000, 0x00000000};
-volatile uint32_t g_au32RED_Marquee6[TEST_COUNT] = {0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
-volatile uint32_t g_u32PatternToggle = 0;
-
-void SYS_Init(void)
+static void SYS_Init(void)
 {
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -69,7 +60,7 @@ void SYS_Init(void)
     SYS_LockReg();
 }
 
-void ELLSI_Init(void)
+static void ELLSI_Init(void)
 {
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init ELLSI                                                                                               */
@@ -90,6 +81,15 @@ void ELLSI_Init(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
+    static const uint32_t g_au32RED_Marquee0[TEST_COUNT] = {0x000000FFU, 0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee1[TEST_COUNT] = {0xFF000000U, 0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee2[TEST_COUNT] = {0x00000000U, 0x00FF0000U, 0x00000000U, 0x00000000U, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee3[TEST_COUNT] = {0x00000000U, 0x00000000U, 0x0000FF00U, 0x00000000U, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee4[TEST_COUNT] = {0x00000000U, 0x00000000U, 0x00000000U, 0x000000FFU, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee5[TEST_COUNT] = {0x00000000U, 0x00000000U, 0x00000000U, 0xFF000000U, 0x00000000U};
+    static const uint32_t g_au32RED_Marquee6[TEST_COUNT] = {0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U};
+    uint32_t g_u32PatternToggle = 0U;
+
     /* Init System, IP clock and multi-function I/O. */
     SYS_Init();
     /* Init Debug UART to 115200-8N1 for print message */
@@ -99,10 +99,11 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %d Hz\n", SystemCoreClock);
+    printf("\n\nCPU @ %u Hz\n", CLK_GetHCLKFreq());
     printf("+-------------------------------------------------+\n");
     printf("|      ELLSI Marquee Sample Code (PDMA Mode)      |\n");
     printf("+-------------------------------------------------+\n");
+    printf("Please connect LED strips with PB.9.\n");
     printf("The first to sixth LEDs will flash red in sequence.\n\n");
 
     /* Init ELLSI */
@@ -116,48 +117,48 @@ int main(void)
     SYS_LockReg();
 
     /* Open Channel 0 */
-    PDMA_Open(PDMA0, 1 << 0);
+    PDMA_Open(PDMA0, 1U << 0);
     /* Transfer type is single transfer */
     PDMA_SetBurstType(PDMA0, 0, PDMA_REQ_SINGLE, 0);
 
-    g_u32PatternToggle = 0;
+    g_u32PatternToggle = 0U;
 
-    while (g_u32PatternToggle < 7)
+    while (g_u32PatternToggle < 7U)
     {
         /*Disable ELLSI Tx before PDMA setting*/
         ELLSI_DISABLE(ELLSI0);
 
-        if (g_u32PatternToggle == 0)
+        if (g_u32PatternToggle == 0U)
         {
             /* Set source address is g_au32RED_Marquee0, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee0, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 1)
+        else if (g_u32PatternToggle == 1U)
         {
             /* Set source address is g_au32RED_Marquee1, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee1, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 2)
+        else if (g_u32PatternToggle == 2U)
         {
             /* Set source address is g_au32RED_Marquee2, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee2, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 3)
+        else if (g_u32PatternToggle == 3U)
         {
             /* Set source address is g_au32RED_Marquee3, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee3, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 4)
+        else if (g_u32PatternToggle == 4U)
         {
             /* Set source address is g_au32RED_Marquee4, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee4, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 5)
+        else if (g_u32PatternToggle == 5U)
         {
             /* Set source address is g_au32RED_Marquee5, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee5, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
         }
-        else if (g_u32PatternToggle == 6)
+        else
         {
             /* Set source address is g_au32RED_Marquee6, destination address is &ELLSI0->DATA */
             PDMA_SetTransferAddr(PDMA0, 0, (uint32_t)g_au32RED_Marquee6, PDMA_SAR_INC, (uint32_t)&ELLSI0->DATA, PDMA_DAR_FIX);
@@ -182,7 +183,9 @@ int main(void)
 
     printf("Exit ELLSI sample code.\n");
 
-    while (1);
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

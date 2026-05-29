@@ -15,15 +15,29 @@
 /*---------------------------------------------------------------------------------------------------------*/
 static volatile int complete = 0;
 
+void TIMER1_IRQHandler(void);
+
 // Timer 0 is working in event count mode, and Timer 1 in capture mode, so we read the
 // capture value from Timer 1, not timer 0.
 void TIMER1_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+    uint32_t u32Counter;
 
     TIMER_ClearCaptureIntFlag(TIMER1);
     // Timer counter value records the duration for 100 event counts.
-    printf("Event frequency is %d Hz\n", 100000000 / TIMER_GetCounter(TIMER1) * 100);
+    u32Counter = TIMER_GetCounter(TIMER1);
+
+    if (u32Counter == 0UL)
+    {
+        printf("Event frequency is invalid (counter = 0)\n");
+    }
+    else
+    {
+        uint32_t u32EventFreq = (uint32_t)(((uint64_t)CLK_GetPCLK0Freq() * 100ULL) / u32Counter);
+
+        printf("Event frequency is %u Hz\n", u32EventFreq);
+    }
 
     complete = 1;
 
@@ -93,7 +107,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     /* This sample code demonstrate inter timer trigger mode using Timer0 and Timer1.
      * In this mode, Timer0 is working as counter, and triggers Timer1.
      * Using Timer1 to calculate the amount of time used by Timer0 to count specified amount of events.
@@ -107,11 +121,11 @@ int main(void)
     TIMER_Open(TIMER0, TIMER_ONESHOT_MODE, 100);
 
     // Update prescale and compare value. Calculate average frequency every 100 events
-    TIMER_SET_PRESCALE_VALUE(TIMER0, 0);
+    TIMER_SET_PRESCALE_VALUE(TIMER0, 0U);
     TIMER_SET_CMP_VALUE(TIMER0, 100);
 
     // Update Timer 1 prescale value.
-    TIMER_SET_PRESCALE_VALUE(TIMER1, 0);
+    TIMER_SET_PRESCALE_VALUE(TIMER1, 0U);
 
     // We need capture interrupt
     NVIC_EnableIRQ(TIMER1_IRQn);
@@ -122,7 +136,7 @@ int main(void)
         // Count event by timer 0, disable drop count (set to 0), disable timeout (set to 0). Enable interrupt after complete
         TIMER_EnableFreqCounter(TIMER0, 0, 0, TRUE);
 
-        while (complete == 0);
+        while (complete == 0) {}
     }
 }
 

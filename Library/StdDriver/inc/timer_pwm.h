@@ -33,8 +33,8 @@ extern "C"
 /*---------------------------------------------------------------------------------------------------------*/
 /*  TPWM Output Channel Selection Definitions                                                               */
 /*---------------------------------------------------------------------------------------------------------*/
-#define TPWM_TOUT_PIN_FROM_TMx                   (BIT0)       /*!< Indicate PWMx output to Tx pins \hideinitializer */
-#define TPWM_TOUT_PIN_FROM_TMx_EXT               (BIT8)       /*!< Indicate PWMx output to Tx_ext pins \hideinitializer */
+#define TPWM_TOUT_PIN_FROM_TMx                  (0x0ul << TIMER_PWMPOCTL_POSEL_Pos)  /*!< Indicate PWMx output to Tx pins \hideinitializer */
+#define TPWM_TOUT_PIN_FROM_TMx_EXT              (0x1ul << TIMER_PWMPOCTL_POSEL_Pos)  /*!< Indicate PWMx output to Tx_ext pins \hideinitializer */
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*  TPWM Counter Mode Constant Definitions                                                                 */
@@ -110,7 +110,7 @@ extern "C"
   * @note       If prescaler is 0, then there is no scaling in counter clock source.
   * \hideinitializer
   */
-#define TPWM_SET_PRESCALER(timer, prescaler) ((timer)->PWMCLKPSC = (prescaler))
+#define TPWM_SET_PRESCALER(timer, prescaler) ((timer)->PWMCLKPSC = ((prescaler) & TIMER_PWMCLKPSC_CLKPSC_Msk))
 
 /**
   * @brief      Get Counter Clock Prescaler
@@ -129,7 +129,7 @@ extern "C"
   * @details    This macro is used to set the period of specified TIMER_PWM.
   * \hideinitializer
   */
-#define TPWM_SET_PERIOD(timer, period)  ((timer)->PWMPERIOD = (period))
+#define TPWM_SET_PERIOD(timer, period)  ((timer)->PWMPERIOD = ((period) & TIMER_PWMPERIOD_PERIOD_Msk))
 
 /**
   * @brief      Get Counter Period
@@ -148,7 +148,7 @@ extern "C"
   * @details    This macro is used to set the comparator value of specified TIMER_PWM.
   * \hideinitializer
   */
-#define TPWM_SET_CMPDAT(timer, cmp)     ((timer)->PWMCMPDAT = (cmp))
+#define TPWM_SET_CMPDAT(timer, cmp)     ((timer)->PWMCMPDAT = ((cmp) & TIMER_PWMCMPDAT_CMP_Msk))
 
 /**
   * @brief      Get Comparator Value
@@ -179,7 +179,7 @@ extern "C"
   * @note       If the corresponding bit in u32ChMask parameter is 0, then output function will be disabled in this channel.
   * \hideinitializer
   */
-#define TPWM_ENABLE_OUTPUT(timer, u32ChMask)  ((timer)->PWMPOCTL = (u32ChMask))
+#define TPWM_ENABLE_OUTPUT(timer, u32ChMask)  ((timer)->PWMPOCTL = (((timer)->PWMPOCTL & ~TIMER_PWMPOCTL_POEN_Msk) | ((u32ChMask) & TIMER_PWMPOCTL_POEN_Msk)))
 
 /**
   * @brief      Select Toggle-output Pin
@@ -190,7 +190,7 @@ extern "C"
   * @return     None
   * @details    This macro is used to select TPWM toggle-output pin is output on Tx or Tx_EXT pin.
   */
-#define TPWM_SELECT_TOUT_PIN(timer, u32ToutSel)    ((timer)->PWMPOCTL = ((timer)->PWMPOCTL & ~TIMER_PWMPOCTL_POSEL_Msk) | (u32ToutSel))
+#define TPWM_SELECT_TOUT_PIN(timer, u32ToutSel)    ((timer)->PWMPOCTL = ((timer)->PWMPOCTL & ~TIMER_PWMPOCTL_POSEL_Msk) | (u32ToutSel & TIMER_PWMPOCTL_POSEL_Msk))
 
 /**
   * @brief      Set Output Inverse
@@ -435,12 +435,12 @@ extern "C"
   * @return     None
   * @details    This macro is used to select timer Counter Mode.
   */
-#define TPWM_SET_CNT_MODE(timer, mode)      ((timer)->PWMCTL = ((timer)->PWMCTL&~TIMER_PWMCTL_CNTMODE_Msk) | (mode<<TIMER_PWMCTL_CNTMODE_Pos))
+#define TPWM_SET_CNT_MODE(timer, mode)      ((timer)->PWMCTL = ((timer)->PWMCTL & ~TIMER_PWMCTL_CNTMODE_Msk) | (((mode) & 0x1UL) << TIMER_PWMCTL_CNTMODE_Pos))
 
 /* Declare these inline functions here to avoid MISRA C 2004 rule 8.1 error */
 __STATIC_INLINE void TPWM_EnableWakeup(TIMER_T *timer);
 __STATIC_INLINE void TPWM_DisableWakeup(TIMER_T *timer);
-__STATIC_INLINE uint32_t TPWM_GetWakeupFlag(TIMER_T *timer);
+__STATIC_INLINE uint32_t TPWM_GetWakeupFlag(const TIMER_T *timer);
 __STATIC_INLINE void TPWM_ClearWakeupFlag(TIMER_T *timer);
 
 /**
@@ -479,7 +479,7 @@ __STATIC_INLINE void TPWM_DisableWakeup(TIMER_T *timer)
   * @details    This function indicates TPWM interrupt event has waked up system or not.
   * \hideinitializer
   */
-__STATIC_INLINE uint32_t TPWM_GetWakeupFlag(TIMER_T *timer)
+__STATIC_INLINE uint32_t TPWM_GetWakeupFlag(const TIMER_T *timer)
 {
     return ((timer->PWMSTATUS & TIMER_PWMSTATUS_PWMINTWKF_Msk) ? 1 : 0);
 }
@@ -506,7 +506,7 @@ void TPWM_DisableAcc(TIMER_T *timer);
 void TPWM_EnableAccInt(TIMER_T *timer);
 void TPWM_DisableAccInt(TIMER_T *timer);
 void TPWM_ClearAccInt(TIMER_T *timer);
-uint32_t TPWM_GetAccInt(TIMER_T *timer);
+uint32_t TPWM_GetAccInt(const TIMER_T *timer);
 void TPWM_EnableAccPDMA(TIMER_T *timer);
 void TPWM_DisableAccPDMA(TIMER_T *timer);
 void TPWM_EnableAccStopMode(TIMER_T *timer);

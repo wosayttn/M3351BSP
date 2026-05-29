@@ -148,7 +148,7 @@ XOM0 XOM_START XOM_SIZE
     XOM0_ROM +0
     {
 		; Enable "Execute-only code" option of xom.c
-        * (+XO)
+        xom.o (+XO)
     }
 
     ; We should not use RW / ZI in XOM.

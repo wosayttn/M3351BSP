@@ -181,6 +181,12 @@ int main(void)
                 break;
 
             case '1':
+                if (FMC_Read(FMC_LDROM_BASE) == 0xFFFFFFFF)
+                {
+                    printf("No valid code in LDROM. Select [0] to load code to LDROM first.\n");
+                    break;
+                }
+
                 printf("\n\nChange VECMAP and branch to LDROM ...\n");
                 UART_WAIT_TX_EMPTY(DEBUG_PORT); /* To make sure all message has been print out */
 

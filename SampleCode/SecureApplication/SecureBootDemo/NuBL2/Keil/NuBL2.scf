@@ -41,7 +41,7 @@
 #endif
 
 #ifndef HEAP_SIZE
-	#define HEAP_SIZE       0x00000800
+	#define HEAP_SIZE       0x00001000
 #endif
 
 /*--------------------- CMSE Veneer Configuration ---------------------------

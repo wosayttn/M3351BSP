@@ -5,7 +5,6 @@ project:
     - output:
         # bin, elf, hex, lib
         type: ["elf", "bin"]
-    - setup: Options for XOMLibDemo
       processor:
         fpu: "sp"
         endian: little
@@ -23,6 +22,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -37,10 +38,24 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--gc-sections,-Map="$elf()$.map"
             - -Wl,--no-warn-rwx-segments
+    - setup: Options for Bank0
+      for-context: .Bank0
+      output:
+        base-name: XOMLibDemo_Bank0
+      define:
+        - DL_BANK: 0
+    - setup: Options for Bank1
+      for-context: .Bank1
+      output:
+        base-name: XOMLibDemo_Bank1
+      define:
+        - DL_BANK: 1
   linker:
     - script: ./XOMLibDemo.scf
       for-compiler: AC6

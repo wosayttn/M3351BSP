@@ -61,7 +61,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nThis sample code use timer to create a small delay \n");
 
     while (1)

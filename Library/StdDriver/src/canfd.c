@@ -76,9 +76,9 @@
 #define TX_FIFO_E1B_EVENT_TSC_Pos   (4)
 #define TX_FIFO_E1B_EVENT_TSC_Msk   (0x1UL << TX_FIFO_E1B_EVENT_TSC_Pos)
 
-/* Tx Event FIFO Element TSC(Timestamp Captured) */
-#define TX_FIFO_E1B_EVENT_TXTS_Pos  (0)
-#define TX_FIFO_E1B_EVENT_TXTS_Msk  (0xFUL << TX_FIFO_E1B_EVENT_TSC_Pos)
+/* Tx Event FIFO Element TXTSP(Tx Timestamp Pointer) */
+#define TX_FIFO_E1B_EVENT_TXTSP_Pos (0)
+#define TX_FIFO_E1B_EVENT_TXTSP_Msk (0xFUL << TX_FIFO_E1B_EVENT_TXTSP_Pos)
 
 /* Rx Buffer and FIFO Element ESI2(Error State Indicator) */
 #define RX_BUFFER_AND_FIFO_R0_ELEM_ESI_Pos  (31)
@@ -188,6 +188,145 @@
   @{
 */
 
+/** @cond HIDDEN_SYMBOLS */
+/**
+  * @brief      Returns module clock of specified CAN FD interface
+  *
+  * @param[in]  psCanfd      The pointer of CAN FD module.
+  *
+  * @return     Module clock of specified CAN FD interface.
+  */
+static uint32_t CANFD_GetSourceClock(const CANFD_T *psCanfd)
+{
+    uint32_t u32ClkSrc = 0;
+    uint32_t u32ClkFreq = __HIRC;
+
+    /* Get CAN FD module clock source and divider */
+    if (psCanfd == (CANFD_T *)CANFD0)
+    {
+        u32ClkSrc = CLK_GetModuleClockSource(CANFD0_MODULE);
+    }
+    else if (psCanfd == (CANFD_T *)CANFD1)
+    {
+        u32ClkSrc = CLK_GetModuleClockSource(CANFD1_MODULE);
+    }
+    else
+    {
+        u32ClkFreq = 0UL;
+    }
+
+    if (u32ClkFreq != 0UL)
+    {
+        /* Get CAN FD module clock */
+        if (u32ClkSrc == 0UL)
+        {
+            u32ClkFreq = __HXT;
+        }
+        else if (u32ClkSrc == 1UL)
+        {
+            u32ClkFreq = CLK_GetPLLClockFreq();
+        }
+        else if (u32ClkSrc == 2UL)
+        {
+            u32ClkFreq = CLK_GetHCLKFreq();
+        }
+        else
+        {
+            u32ClkFreq = __HIRC;
+        }
+    }
+
+    return u32ClkFreq;
+}
+/** @endcond HIDDEN_SYMBOLS */
+
+/**
+ * @brief       Gets the CAN FD interface Nominal bit rate.
+ *
+ * @param[in]   psCanfd      The pointer of CAN FD module.
+ *
+ * @return      Nominal bit rate of specified CAN FD interface.
+ * @details     Gets the CAN FD interface Nominal bit rate.
+ */
+uint32_t CANFD_GetNominalBitRate(const CANFD_T *psCanfd)
+{
+    uint32_t u8Tq = 0UL;
+    uint32_t u8NtSeg1 = 0UL;
+    uint32_t u8NtSeg2 = 0UL;
+    uint32_t u32BitRate = 0UL;
+    uint32_t u32CanfdClk = 0UL;
+    uint32_t u32CanfdDiv = 0UL;
+
+    u32CanfdClk = CANFD_GetSourceClock(psCanfd);
+
+    if (psCanfd == (CANFD_T *)CANFD0)
+    {
+        u32CanfdDiv = ((CLK->CLKDIV1 & CLK_CLKDIV1_CANFD0DIV_Msk) >> CLK_CLKDIV1_CANFD0DIV_Pos) + 1UL;
+    }
+    else if (psCanfd == (CANFD_T *)CANFD1)
+    {
+        u32CanfdDiv = ((CLK->CLKDIV1 & CLK_CLKDIV1_CANFD1DIV_Msk) >> CLK_CLKDIV1_CANFD1DIV_Pos) + 1UL;
+    }
+    else
+    {
+        return 0UL;
+    }
+
+    u32CanfdClk = u32CanfdClk / u32CanfdDiv;
+    u8Tq = ((psCanfd->NBTP & CANFD_NBTP_NBRP_Msk) >> CANFD_NBTP_NBRP_Pos) + 1UL;
+    u8NtSeg1 = ((psCanfd->NBTP & CANFD_NBTP_NTSEG1_Msk) >> CANFD_NBTP_NTSEG1_Pos);
+    u8NtSeg2 = ((psCanfd->NBTP & CANFD_NBTP_NTSEG2_Msk) >> CANFD_NBTP_NTSEG2_Pos);
+    u32BitRate = (u32CanfdClk / u8Tq) / (u8NtSeg1 + u8NtSeg2 + 3UL);
+
+    return u32BitRate;
+}
+
+/**
+ * @brief       Gets the CAN FD interface Data bit rate.
+ *
+ * @param[in]   psCanfd      The pointer of CAN FD module.
+ *
+ * @return      Data bit rate of specified CAN FD interface.
+ * @details     Gets the CAN FD interface Data bit rate.
+ *              If CAN FD interface is in CAN mode, this function will return 0. Because data bit rate is only valid in CAN FD mode.
+ */
+uint32_t CANFD_GetDataBitRate(const CANFD_T *psCanfd)
+{
+    uint32_t u8Tq = 0UL;
+    uint32_t u8NtSeg1 = 0UL;
+    uint32_t u8NtSeg2 = 0UL;
+    uint32_t u32BitRate = 0UL;
+    uint32_t u32CanfdClk = 0UL;
+    uint32_t u32CanfdDiv = 0UL;
+
+    if ((psCanfd->CCCR & CANFD_CCCR_FDOE_Msk) == 0UL)
+    {
+        return 0UL;
+    }
+
+    u32CanfdClk = CANFD_GetSourceClock(psCanfd);
+
+    if (psCanfd == (CANFD_T *)CANFD0)
+    {
+        u32CanfdDiv = ((CLK->CLKDIV1 & CLK_CLKDIV1_CANFD0DIV_Msk) >> CLK_CLKDIV1_CANFD0DIV_Pos) + 1UL;
+    }
+    else if (psCanfd == (CANFD_T *)CANFD1)
+    {
+        u32CanfdDiv = ((CLK->CLKDIV1 & CLK_CLKDIV1_CANFD1DIV_Msk) >> CLK_CLKDIV1_CANFD1DIV_Pos) + 1UL;
+    }
+    else
+    {
+        return 0UL;
+    }
+
+    u32CanfdClk = u32CanfdClk / u32CanfdDiv;
+    u8Tq = ((psCanfd->DBTP & CANFD_DBTP_DBRP_Msk) >> CANFD_DBTP_DBRP_Pos) + 1UL;
+    u8NtSeg1 = ((psCanfd->DBTP & CANFD_DBTP_DTSEG1_Msk) >> CANFD_DBTP_DTSEG1_Pos);
+    u8NtSeg2 = ((psCanfd->DBTP & CANFD_DBTP_DTSEG2_Msk) >> CANFD_DBTP_DTSEG2_Pos);
+    u32BitRate = (u32CanfdClk / u8Tq) / (u8NtSeg1 + u8NtSeg2 + 3UL);
+
+    return u32BitRate;
+}
 
 /**
  * @brief       Calculates the CAN FD RAM buffer address.
@@ -553,10 +692,7 @@ static void CANFD_GetSegments(uint32_t u32NominalBaudRate, uint32_t u32DataBaudR
 static uint32_t CANFD_CalculateTimingValues(const CANFD_T *psCanfd, uint32_t u32NominalBaudRate, uint32_t u32DataBaudRate, uint32_t u32SourceClock_Hz, CANFD_TIMEING_CONFIG_T *psConfig)
 {
 
-    uint32_t u32Nclk2;
     uint32_t u32Ntq;
-    uint32_t u32Dclk;
-    uint32_t u32Dclk2;
     uint32_t u32Dtq;
     uint32_t u32NominalBaudRateTemp = u32NominalBaudRate;
 
@@ -572,6 +708,8 @@ static uint32_t CANFD_CalculateTimingValues(const CANFD_T *psCanfd, uint32_t u32
 
         for (psConfig->u16NominalPrescaler = 0x001UL; psConfig->u16NominalPrescaler <= 0x400UL; (psConfig->u16NominalPrescaler)++)
         {
+            uint32_t u32Nclk2;
+
             u32Nclk2 = u32Nclk * (uint32_t)psConfig->u16NominalPrescaler;
 
             if (((u32SourceClock_Hz / u32Nclk2) <= 5UL) && ((u32SourceClock_Hz % u32Nclk2) == 0UL))
@@ -602,10 +740,14 @@ static uint32_t CANFD_CalculateTimingValues(const CANFD_T *psCanfd, uint32_t u32
                     /* Calculate data settings */
                     for (u32Dtq = (uint32_t)MAX_TIME_QUANTA; u32Dtq >= (uint32_t)MIN_TIME_QUANTA; u32Dtq--)
                     {
+                        uint32_t u32Dclk;
+
                         u32Dclk = u32DataBaudRate * u32Dtq;
 
                         for (psConfig->u8DataPrescaler = 0x01UL; psConfig->u8DataPrescaler <= 0x20UL; (psConfig->u8DataPrescaler)++)
                         {
+                            uint32_t u32Dclk2;
+
                             u32Dclk2 = u32Dclk * psConfig->u8DataPrescaler;
 
                             if (u32SourceClock_Hz == ((uint32_t)u32Dclk2 * psConfig->u8PreDivider))
@@ -1335,7 +1477,7 @@ void CANFD_ConfigXIDFC(CANFD_T *psCanfd, CANFD_RAM_PART_T *psRamConfig, const CA
  *
  * @details     Writes a 11-bit Standard ID filter element in the Message RAM.
  */
-void CANFD_SetSIDFltr(CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32Filter)
+void CANFD_SetSIDFltr(const CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32Filter)
 {
     CANFD_STD_FILTER_T *psFilter;
 
@@ -1365,7 +1507,7 @@ void CANFD_SetSIDFltr(CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32Filter)
  *
  * @details     Writes a 29-bit extended id filter element in the Message RAM.
  */
-void CANFD_SetXIDFltr(CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32FilterLow, uint32_t u32FilterHigh)
+void CANFD_SetXIDFltr(const CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32FilterLow, uint32_t u32FilterHigh)
 {
     CANFD_EXT_FILTER_T *psFilter;
 
@@ -1777,7 +1919,7 @@ uint32_t CANFD_ReadTxFifoEventMsg(CANFD_T *psCanfd, uint8_t u8MbIdx, CANFD_TX_EV
  *
  * @details     Copy all Event Elements from TX Event FIFO to the Software Event List .
  */
-void CANFD_CopyTxEvntFifoToUsrBuf(CANFD_T *psCanfd, uint32_t u32TxEvntNum, CANFD_TX_EVNT_ELEM_T *psTxEvntElem)
+void CANFD_CopyTxEvntFifoToUsrBuf(const CANFD_T *psCanfd, uint32_t u32TxEvntNum, CANFD_TX_EVNT_ELEM_T *psTxEvntElem)
 {
     const uint32_t *pu32TxEvnt;
 

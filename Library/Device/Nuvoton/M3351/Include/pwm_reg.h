@@ -1250,7 +1250,7 @@ typedef struct
      * | :----: | :----:   | :---- |
      * |[7:0]   |IFACNT    |PWM_CHn Interrupt Flag Counter
      * |        |          |The register sets the count number which defines (IFACNT+1) times of PWM_CHn period occurs to set bit IFAIFn to request the PWM period interrupt
-     * |        |          |PWM flag will be set in every IFACNT[15:0] times of PWM period.
+     * |        |          |PWM flag will be set in every IFACNT[7:0] times of PWM period.
      * |[24]    |STPMOD    |PWM_CHn Accumulator Stop Mode Enable Bits
      * |        |          |0 = PWM_CHn Stop Mode Disable.
      * |        |          |1 = PWM_CHn Stop Mode Enable.
@@ -1292,24 +1292,15 @@ typedef struct
      * ---------------------------------------------------------------------------------------------------
      * |Bits    |Field     |Descriptions
      * | :----: | :----:   | :---- |
-     * |[0]     |APDMAEN0  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
-     * |[1]     |APDMAEN1  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
-     * |[2]     |APDMAEN2  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
-     * |[3]     |APDMAEN3  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
-     * |[4]     |APDMAEN4  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
-     * |[5]     |APDMAEN5  |Channel n Accumulator PDMA Enable Bits
-     * |        |          |0 = Channel n PDMA function Disabled.
-     * |        |          |1 = Channel n PDMA function Enabled for the channel n to trigger PDMA to transfer memory data to register.
+     * |[0]     |APDMAEN0  |Channel 0,1 Accumulator PDMA Enable Bits
+     * |        |          |0 = Channel 0,1 PDMA function Disabled.
+     * |        |          |1 = Channel 0,1 PDMA function Enabled for the channel 0,1 to trigger PDMA to transfer memory data to register.
+     * |[2]     |APDMAEN2  |Channel 2,3 Accumulator PDMA Enable Bits
+     * |        |          |0 = Channel 2,3 PDMA function Disabled.
+     * |        |          |1 = Channel 2,3 PDMA function Enabled for the channel 2,3 to trigger PDMA to transfer memory data to register.
+     * |[4]     |APDMAEN4  |Channel 4,5 Accumulator PDMA Enable Bits
+     * |        |          |0 = Channel 4,5 PDMA function Disabled.
+     * |        |          |1 = Channel 4,5 PDMA function Enabled for the channel 4,5 to trigger PDMA to transfer memory data to register.
      * @var PWM_T::CAPINEN
      * Offset: 0x200  PWM Capture Input Enable Register
      * ---------------------------------------------------------------------------------------------------

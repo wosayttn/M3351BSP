@@ -12,13 +12,15 @@
 
 #define ACMP_CH       1UL
 
+void TIMER0_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
     // Clear timer capture interrupt flag.
     TIMER_ClearCaptureIntFlag(TIMER0);
-    printf("ACMP triggered timer reset while counter is at %d\n", TIMER_GetCaptureData(TIMER0));
+    printf("ACMP triggered timer reset while counter is at %u\n", TIMER_GetCaptureData(TIMER0));
 
     while (TIMER_GetCaptureIntFlag(TIMER0))
     {
@@ -76,7 +78,7 @@ static void SYS_Init(void)
     /* Set PB4 multi-function pin for ACMP1 positive input pin */
     SET_ACMP1_P1_PB4();
     /* Disable digital input path of analog pin ACMP1_P1 to prevent leakage */
-    GPIO_DISABLE_DIGITAL_PATH(PB, (1ul << 4));
+    GPIO_DISABLE_DIGITAL_PATH(PB, BIT4);
     /* Lock protected registers */
     SYS_LockReg();
 }
@@ -92,7 +94,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     // Set PB.5 to output mode
     GPIO_SetMode(PB, BIT5, GPIO_MODE_OUTPUT);
     // Set PB.5 init state to high
@@ -103,10 +105,10 @@ int main(void)
     getchar();
 
     // Give a dummy target frequency here. Will over write capture resolution with macro
-    TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 1000000);
+    TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 1000000U);
 
     // Update prescale to set proper resolution.
-    TIMER_SET_PRESCALE_VALUE(TIMER0, 0);
+    TIMER_SET_PRESCALE_VALUE(TIMER0, 0U);
 
     // Set compare value as large as possible, so don't need to worry about counter overrun too frequently.
     TIMER_SET_CMP_VALUE(TIMER0, 0xFFFFFF);
@@ -132,9 +134,9 @@ int main(void)
     while (1)
     {
         PB5 = 0; // low
-        CLK_SysTickDelay(10000);
+        CLK_SysTickDelay(10000U);
         PB5 = 1;  // high
-        CLK_SysTickDelay(10000);
+        CLK_SysTickDelay(10000U);
     }
 }
 

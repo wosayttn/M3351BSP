@@ -10,7 +10,11 @@
 #include <stdlib.h>
 #include "NuMicro.h"
 
-volatile uint8_t g_u8SlvPWRDNWK = 0, g_u8SlvTMRWK = 0;
+static volatile uint8_t g_u8SlvPWRDNWK = 0U;
+static volatile uint8_t g_u8SlvTMRWK = 0U;
+
+void TIMER0_IRQHandler(void);
+void PWRWU_IRQHandler(void);
 
 void TIMER0_IRQHandler(void)
 {
@@ -57,7 +61,7 @@ void PWRWU_IRQHandler(void)
     }
 }
 
-void EnterToPowerDown(uint32_t u32PDMode)
+static void EnterToPowerDown(uint32_t u32PDMode)
 {
     printf("Entering power-down mode...\n");
     /* Waiting for UART printf finish*/
@@ -141,7 +145,7 @@ static void SYS_Init(void)
 
 int main(void)
 {
-    uint32_t u32TimeOutCnt = SystemCoreClock >> 1;
+    uint32_t u32TimeOutCnt;
     int i = 0;
 
     /* Init System, IP clock and multi-function I/O */
@@ -153,7 +157,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("Timer power down/wake up sample code\n");
 
     /* Output selected clock to CKO*/
@@ -179,11 +183,12 @@ int main(void)
     while (1)
     {
         u32TimeOutCnt = SystemCoreClock >> 1;
-        g_u8SlvPWRDNWK = g_u8SlvTMRWK = 0;
+        g_u8SlvPWRDNWK = 0U;
+        g_u8SlvTMRWK = 0U;
         EnterToPowerDown(CLK_PMUCTL_PDMSEL_NPD1);
 
         /* Waiting for system wake-up and timer wake-up finish */
-        while ((g_u8SlvPWRDNWK == 0) || (g_u8SlvTMRWK == 0))
+        while ((g_u8SlvPWRDNWK == 0U) || (g_u8SlvTMRWK == 0U))
         {
             if (--u32TimeOutCnt == 0)
             {

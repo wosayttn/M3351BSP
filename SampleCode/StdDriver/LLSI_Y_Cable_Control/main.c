@@ -15,6 +15,10 @@
 #include "led_control.h"
 #include "led_gen2_control.h"
 
+void SYS_Init(void);
+void SysTick_Initial(void);
+void SysTick_Handler(void);
+
 void SYS_Init(void)
 {
     /* Unlock protected registers */
@@ -64,7 +68,7 @@ void SysTick_Initial(void)
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk;
 
     /* Set load value to make SysTick period is 1 ms */
-    SysTick->LOAD = __HSI / 1000;
+    SysTick->LOAD = __HSI / 1000U;
 
     /* Clear SysTick counter */
     SysTick->VAL = 0;
@@ -84,7 +88,8 @@ void SysTick_Initial(void)
 
 void SysTick_Handler(void)
 {
-    uint8_t i, j;
+    uint8_t i;
+    uint8_t j;
 
     /* Clear interrupt flag */
     SysTick->VAL = 0;
@@ -106,7 +111,9 @@ void SysTick_Handler(void)
     for (i = 0; i < LED_GEN2_MAX_SUPPORT_PORT; i++)
     {
         for (j = 0; j < LED_Gen2_Port_Setting[i].Strip_Count; j++)
-            LED_Gen2_Port_Setting[i].LED_Gen2_Setting[j + 1].LEDSetting.TimeCounter++;
+        {
+            LED_Gen2_Port_Setting[i].LED_Gen2_Setting[j + 1U].LEDSetting.TimeCounter++;
+        }
     }
 
     /* Update LED frame data */
@@ -122,7 +129,11 @@ void SysTick_Handler(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
-    uint32_t i, j, k;
+    uint32_t i;
+    uint32_t j;
+    uint32_t k;
+    uint32_t u32HasGen2Control;
+    uint32_t u32AllPdmaDone;
 
     /* Init System, IP clock and multi-function I/O. */
     SYS_Init();
@@ -133,10 +144,11 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock: %d\n", SystemCoreClock);
+    printf("System core clock: %u\n", CLK_GetHCLKFreq());
     printf("+----------------------------------------+\n");
     printf("|    LLSI Y-cable Control Sample Code    |\n");
     printf("+----------------------------------------+\n");
+    printf("Please connect AP6112Y LED strips with PB.15.\n");
     printf("  NOTE: This sample code needs to work with AP6112Y LED strip.\n\n");
 
     /* Set LED effects */
@@ -152,7 +164,11 @@ int main(void)
     }
 
     for (i = 0; i < TOTAL_LED_AREA; i++)
-        while (!LED_Mapping[i]->fPDMA_Done);
+    {
+        while (!LED_Mapping[i]->fPDMA_Done)
+        {
+        }
+    }
 
     /* Detect LED Gen2 */
     Init_Gen2_LED_Capture();
@@ -164,11 +180,11 @@ int main(void)
         LED_Gen2_LLSI_PDMA_Init(i);
         /* Detect LED Gen2 */
         LED_Gen2_Set_Ctrl_Setting(i);
-        LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Status = 0x01;
-        LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Flag = 1;
+        LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Status = 0x01U;
+        LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Flag = 1U;
 
         /* Start detect */
-        while (LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Flag == 1)
+        while (LED_Gen2_Port_Setting[Gen2_Ctrl.Current_Port].Control_Flag == 1U)
         {
             LED_Gen2_Control_Port();
         }
@@ -194,73 +210,96 @@ int main(void)
         /* Serial LED Control */
         if (LED_Frame_Update_flag)
         {
+            u32HasGen2Control = 0U;
+
             /* Check no LED Gen2 control process */
             for (j = 0; j < TOTAL_LED_AREA; j++)
             {
-                if (LED_Gen2_Port_Setting[j].Control_Flag == 1)
-                    goto EXIT;
+                if (LED_Gen2_Port_Setting[j].Control_Flag == 1U)
+                {
+                    u32HasGen2Control = 1U;
+                    break;
+                }
             }
 
-            for (j = 0; j < TOTAL_LED_AREA; j++)
+            if (u32HasGen2Control == 0U)
             {
-                /* Use Gen1 LED */
-                if (LED_Gen2_Port_Setting[j].Use_Gen2 == 0)
+                for (j = 0; j < TOTAL_LED_AREA; j++)
                 {
-                    if (LED_Mapping[j]->AP_Sync == 0)
+                    /* Use Gen1 LED */
+                    if (LED_Gen2_Port_Setting[j].Use_Gen2 == 0U)
                     {
-                        for (i = 0; i < LED_Mapping[j]->Array_Size; i++)
+                        if (LED_Mapping[j]->AP_Sync == 0U)
                         {
-                            *(LED_Mapping[j]->LED_Data + i) = 0x0;
+                            for (i = 0; i < LED_Mapping[j]->Array_Size; i++)
+                            {
+                                LED_Mapping[j]->LED_Data[i] = 0U;
+                            }
+
+                            /* LED data */
+                            LED_Mapping[j]->Mode_FUNC(LED_Mapping[j]);
                         }
 
-                        /* LED data */
-                        LED_Mapping[j]->Mode_FUNC(LED_Mapping[j]);
+                        /* Set Serial Data */
+                        Set_LED_Data(LED_Mapping[j]);
                     }
-
-                    /* Set Serial Data */
-                    Set_LED_Data(LED_Mapping[j]);
+                    else
+                    {
+                        LED_Gen2_Control(j);
+                    }
                 }
-                else
+
+                for (k = 0; k < TOTAL_LED_AREA; k++)
                 {
-                    LED_Gen2_Control(j);
+                    LLSI_SET_PDMA_MODE(LLSI_Port_Mapping[k]);
                 }
             }
 
-            for (k = 0; k < TOTAL_LED_AREA; k++)
-                LLSI_SET_PDMA_MODE(LLSI_Port_Mapping[k]);
-
-EXIT:
             /* Clear flag */
-            LED_Frame_Update_flag = 0;
+            LED_Frame_Update_flag = 0U;
         }
 
         /* Control LED Gen2 on target port */
         for (j = 0; j < TOTAL_LED_AREA; j++)
         {
-            if ((LED_Mapping[j]->fPDMA_Done == 1) && (LED_Gen2_Port_Setting[j].Control_Flag == 1))
+            if ((LED_Mapping[j]->fPDMA_Done == 1U) && (LED_Gen2_Port_Setting[j].Control_Flag == 1U))
             {
+                u32AllPdmaDone = 1U;
+
                 /* Check whole data transmission done */
                 for (k = 0; k < TOTAL_LED_AREA; k++)
                 {
-                    if (LED_Mapping[k]->fPDMA_Done == 0)
-                        goto WAIT;
+                    if (LED_Mapping[k]->fPDMA_Done == 0U)
+                    {
+                        u32AllPdmaDone = 0U;
+                        break;
+                    }
+                }
+
+                if (u32AllPdmaDone == 0U)
+                {
+                    continue;
                 }
 
                 /* Set active target port */
-                if (LED_Gen2_Port_Setting[j].Control_Status == 0x01)
+                if (LED_Gen2_Port_Setting[j].Control_Status == 0x01U)
                 {
                     /* Initial LED Gen2 Setting */
                     LED_Gen2_Initial_Setting(j);
                     LED_Gen2_LLSI_PDMA_Init(j);
                     LED_Gen2_Set_Ctrl_Setting(j);
                     /* Restore setting */
-                    LED_Gen2_Port_Setting[j].Control_Status = 0x01;
-                    LED_Gen2_Port_Setting[j].Control_Flag = 1;
+                    LED_Gen2_Port_Setting[j].Control_Status = 0x01U;
+                    LED_Gen2_Port_Setting[j].Control_Flag = 1U;
                 }
-                else if (LED_Gen2_Port_Setting[j].Control_Status == 0x20)
+                else if (LED_Gen2_Port_Setting[j].Control_Status == 0x20U)
                 {
                     /* Initial LED Gen2 Setting */
                     LED_Gen2_Set_Ctrl_Setting(j);
+                }
+                else
+                {
+                    /* No action */
                 }
 
                 LED_Gen2_Control_Port();
@@ -270,7 +309,6 @@ EXIT:
         /* Polling if PDMA aborts */
         Polling_PDMA_Abort();
 
-WAIT:
         __NOP();
     }
 }

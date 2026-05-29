@@ -12,7 +12,7 @@
 int FMC_Proc(uint32_t u32Cmd, uint32_t u32StartAddr, uint32_t u32EndAddr, uint32_t *pu32Data)
 {
     uint32_t u32Addr, u32RegVal;
-    uint32_t u32TimeOutCount = SystemCoreClock;
+    uint32_t u32TimeOutCount;
 
     for (u32Addr = u32StartAddr; u32Addr < u32EndAddr;)
     {
@@ -34,6 +34,8 @@ int FMC_Proc(uint32_t u32Cmd, uint32_t u32StartAddr, uint32_t u32EndAddr, uint32
 
         FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
         __ISB();
+
+        u32TimeOutCount = SystemCoreClock;
 
         /* Wait ISP cmd complete */
         while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)
@@ -161,6 +163,7 @@ int EraseAP(uint32_t u32StartAddr, uint32_t u32EraseSize)
 
         u32TimeOutCount = FMC_TIMEOUT_ERASE;
 
+        /* Wait ISP cmd complete */
         while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)   /* Wait for ISP command done. */
         {
             if (--u32TimeOutCount == 0)

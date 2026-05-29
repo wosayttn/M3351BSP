@@ -15,13 +15,13 @@
 #include "NuMicro.h"
 
 #ifndef FMC_INIT_MIRROR_BOUND
-    #define FMC_INIT_MIRROR_BOUND       0x0
+    #define FMC_INIT_MIRROR_BOUND       0x0U
 #endif
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table
  *----------------------------------------------------------------------------*/
-extern const VECTOR_TABLE_Type __VECTOR_TABLE[];
+extern const VECTOR_TABLE_Type __VECTOR_TABLE[FMC_VECMAP_SIZE / 4U];
 
 /*----------------------------------------------------------------------------
   System Core Clock Variable
@@ -34,6 +34,7 @@ void TZ_SAU_Setup(void);
 void FMC_NSCBA_Setup(void);
 void SCU_Setup(void);
 void NSC_Init(uint32_t u32RegionIdx);
+void SCU_IRQHandler(void);
 
 #if defined (__ARM_FEATURE_CMSE) &&  (__ARM_FEATURE_CMSE == 3U)
 const char *sc_astrMasterName[] =
@@ -100,7 +101,7 @@ __WEAK void SetDebugUartCLK(void)
 
 #if(DEBUG_PORT_UART_IDX  == 0)
     /* Select UART0 clock source from HIRC */
-    CLK_SetModuleClock(DEBUG_PORT_MODULE, DEBUG_PORT_CLKSEL, DEBUG_PORT_CLKDIV(1));
+    CLK_SetModuleClock(DEBUG_PORT_MODULE, DEBUG_PORT_CLKSEL, CLK_CLKDIV0_UART0((uint32_t)0x1U));
 
     /* Enable UART clock */
     CLK_EnableModuleClock(DEBUG_PORT_MODULE);
@@ -142,106 +143,106 @@ __WEAK void InitDebugUart(void)
  */
 __WEAK int32_t InitPreDefMPURegion(const ARM_MPU_Region_t *psMPURegion, uint32_t u32RegionCnt)
 {
-    int32_t i32RetCode = 0;
-
-    int32_t i32RegionIdx = 0;
-    const uint8_t WTRA   = ARM_MPU_ATTR_MEMORY_(1, 0, 1, 0); // Non-transient, Write-Through, Read-allocate, Not Write-allocate
-    const uint8_t WBWARA = ARM_MPU_ATTR_MEMORY_(1, 1, 1, 1); // Non-transient, Write-Back, Read-allocate, Write-allocate
+    int32_t  i32RetCode   = 0;
+    uint32_t u32RegionIdx = 0U;
+    const uint8_t WTRA    = ARM_MPU_ATTR_MEMORY_(1U, 0U, 1U, 0U); // Non-transient, Write-Through, Read-allocate, Not Write-allocate
+    const uint8_t WBWARA  = ARM_MPU_ATTR_MEMORY_(1U, 1U, 1U, 1U); // Non-transient, Write-Back, Read-allocate, Write-allocate
 
     NVT_UNUSED(WTRA);
     NVT_UNUSED(WBWARA);
 
-#if (MPU_INIT_MEM_ATTRS & BIT0)
+#if ((MPU_INIT_MEM_ATTRS & BIT0) == BIT0)
     ARM_MPU_SetMemAttr(eMPU_ATTR_DEV_nGnRnE,        ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE_nGnRnE, ARM_MPU_ATTR_DEVICE_nGnRnE));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT1)
+#if ((MPU_INIT_MEM_ATTRS & BIT1) == BIT1)
     ARM_MPU_SetMemAttr(eMPU_ATTR_DEV_nGnRE,         ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE_nGnRE,  ARM_MPU_ATTR_DEVICE_nGnRnE));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT2)
+#if ((MPU_INIT_MEM_ATTRS & BIT2) == BIT2)
     ARM_MPU_SetMemAttr(eMPU_ATTR_DEV_nGRE,          ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE_nGRE,   ARM_MPU_ATTR_DEVICE_nGRE));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT3)
+#if ((MPU_INIT_MEM_ATTRS & BIT3) == BIT3)
     ARM_MPU_SetMemAttr(eMPU_ATTR_DEV_GRE,           ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE_GRE,    ARM_MPU_ATTR_DEVICE_GRE));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT4)
+#if ((MPU_INIT_MEM_ATTRS & BIT4) == BIT4)
     ARM_MPU_SetMemAttr(eMPU_ATTR_NON_CACHEABLE,     ARM_MPU_ATTR(ARM_MPU_ATTR_NON_CACHEABLE, ARM_MPU_ATTR_NON_CACHEABLE));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT5)
+#if ((MPU_INIT_MEM_ATTRS & BIT5) == BIT5)
     ARM_MPU_SetMemAttr(eMPU_ATTR_CACHEABLE_WTRA,    ARM_MPU_ATTR(WTRA, WTRA));
 #endif
 
-#if (MPU_INIT_MEM_ATTRS & BIT6)
+#if ((MPU_INIT_MEM_ATTRS & BIT6) == BIT6)
     ARM_MPU_SetMemAttr(eMPU_ATTR_CACHEABLE_WBWARA,  ARM_MPU_ATTR(WBWARA, WBWARA));
 #endif
 
-    i32RegionIdx = 0;
+    u32RegionIdx = 0U;
 
-#if (MPU_INIT_REGIONS != 0)
+#if (MPU_INIT_REGIONS != 0U)
 
-    if (MPU_INIT_REGION(0) != 0)
+    if (MPU_INIT_REGION(0) != 0U)
     {
-        //printf("[0] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(0), MPU_INIT_LIMIT(0));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(0, MPU_INIT_BASE(0)), ARM_MPU_RLAR(MPU_INIT_LIMIT(0), MPU_MEM_ATTR(0)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(0, MPU_INIT_BASE(0)), ARM_MPU_RLAR(MPU_INIT_LIMIT(0), MPU_MEM_ATTR(0)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(1) != 0)
+    if (MPU_INIT_REGION(1) != 0U)
     {
-        //printf("[1] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(1), MPU_INIT_LIMIT(1));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(1, MPU_INIT_BASE(1)), ARM_MPU_RLAR(MPU_INIT_LIMIT(1), MPU_MEM_ATTR(1)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(1, MPU_INIT_BASE(1)), ARM_MPU_RLAR(MPU_INIT_LIMIT(1), MPU_MEM_ATTR(1)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(2) != 0)
+    if (MPU_INIT_REGION(2) != 0U)
     {
-        //printf("[2] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(2), MPU_INIT_LIMIT(2));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(2, MPU_INIT_BASE(2)), ARM_MPU_RLAR(MPU_INIT_LIMIT(2), MPU_MEM_ATTR(2)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(2, MPU_INIT_BASE(2)), ARM_MPU_RLAR(MPU_INIT_LIMIT(2), MPU_MEM_ATTR(2)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(3) != 0)
+    if (MPU_INIT_REGION(3) != 0U)
     {
-        //printf("[3] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(3), MPU_INIT_LIMIT(3));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(3, MPU_INIT_BASE(3)), ARM_MPU_RLAR(MPU_INIT_LIMIT(3), MPU_MEM_ATTR(3)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(3, MPU_INIT_BASE(3)), ARM_MPU_RLAR(MPU_INIT_LIMIT(3), MPU_MEM_ATTR(3)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(4) != 0)
+    if (MPU_INIT_REGION(4) != 0U)
     {
-        //printf("[4] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(4), MPU_INIT_LIMIT(4));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(4, MPU_INIT_BASE(4)), ARM_MPU_RLAR(MPU_INIT_LIMIT(4), MPU_MEM_ATTR(4)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(4, MPU_INIT_BASE(4)), ARM_MPU_RLAR(MPU_INIT_LIMIT(4), MPU_MEM_ATTR(4)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(5) != 0)
+    if (MPU_INIT_REGION(5) != 0U)
     {
-        //printf("[5] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(5), MPU_INIT_LIMIT(5));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(5, MPU_INIT_BASE(5)), ARM_MPU_RLAR(MPU_INIT_LIMIT(5), MPU_MEM_ATTR(5)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(5, MPU_INIT_BASE(5)), ARM_MPU_RLAR(MPU_INIT_LIMIT(5), MPU_MEM_ATTR(5)));
+        u32RegionIdx++;
     }
 
-    if (MPU_INIT_REGION(6) != 0)
+    if (MPU_INIT_REGION(6) != 0U)
     {
-        //printf("[6] Base: 0x%08X, Limit: 0x%08X\n", MPU_INIT_BASE(6), MPU_INIT_LIMIT(6));
-        ARM_MPU_SetRegion(i32RegionIdx, MPU_INIT_RBAR(6, MPU_INIT_BASE(6)), ARM_MPU_RLAR(MPU_INIT_LIMIT(6), MPU_MEM_ATTR(6)));
-        i32RegionIdx++;
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(6, MPU_INIT_BASE(6)), ARM_MPU_RLAR(MPU_INIT_LIMIT(6), MPU_MEM_ATTR(6)));
+        u32RegionIdx++;
+    }
+
+    if (MPU_INIT_REGION(7) != 0U)
+    {
+        ARM_MPU_SetRegion(u32RegionIdx, MPU_INIT_RBAR(7, MPU_INIT_BASE(7)), ARM_MPU_RLAR(MPU_INIT_LIMIT(7), MPU_MEM_ATTR(7)));
+        u32RegionIdx++;
     }
 
 #endif  // (MPU_INIT_REGIONS != 0)
 
-    if (psMPURegion != NULL)
+    if (psMPURegion)
     {
-        //printf("u32RegionCnt: %d, (MPU_REGIONS_MAX - i32RegionIdx): %d\n", u32RegionCnt, (MPU_REGIONS_MAX - i32RegionIdx));
-
-        if (u32RegionCnt < (uint32_t)(MPU_REGIONS_MAX - i32RegionIdx - 1))
-            ARM_MPU_Load(i32RegionIdx, psMPURegion, u32RegionCnt);
+        if (u32RegionCnt < (uint32_t)(MPU_REGIONS_MAX - u32RegionIdx - 1UL))
+        {
+            ARM_MPU_Load(u32RegionIdx, psMPURegion, u32RegionCnt);
+        }
         else
+        {
             return -1;
+        }
     }
 
     // Enable MPU with default priv access to all other regions
@@ -257,7 +258,7 @@ __WEAK int32_t InitPreDefMPURegion(const ARM_MPU_Region_t *psMPURegion, uint32_t
 void SystemInit(void)
 {
 #if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-    SCB->VTOR = (uint32_t)(&__VECTOR_TABLE[0]);
+    SCB->VTOR = (uint32_t)(&__VECTOR_TABLE);
 #endif
 
 #ifdef UNALIGNED_SUPPORT_DISABLE
@@ -271,7 +272,7 @@ void SystemInit(void)
 #endif
 
     /* Initialize MPU setting and use default configurations. */
-    InitPreDefMPURegion(NULL, 0);
+    (void)InitPreDefMPURegion(NULL, 0U);
 }
 
 #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
@@ -283,11 +284,14 @@ void SystemInit(void)
  */
 void FMC_NSCBA_Setup(void)
 {
+    uint32_t u32TimeOutCnt;
     uint32_t bForceReset = FALSE;
 
     /* Skip NSCBA Setup according config */
     if (FMC_INIT_NSCBA == 0)
+    {
         return;
+    }
 
     /* Check if NSCBA value with current active NSCBA */
     if ((SCU->FNSADDR != FMC_SECURE_END) ||
@@ -307,18 +311,32 @@ void FMC_NSCBA_Setup(void)
         FMC->ISPCMD = FMC_ISPCMD_READ;
         FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+        u32TimeOutCnt = FMC_TIMEOUT_READ;
+
         while (FMC->ISPTRG)
-            ;
+        {
+            if (--u32TimeOutCnt == 0)
+            {
+                return ;
+            }
+        }
 
         /* Setting NSCBA when it is empty */
-        if (FMC->ISPDAT != 0xFFFFFFFFul)
+        if (FMC->ISPDAT != 0xFFFFFFFFUL)
         {
             /* Erase old setting */
             FMC->ISPCMD = FMC_ISPCMD_CFG_ERASE;
             FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+            u32TimeOutCnt = FMC_TIMEOUT_ERASE;
+
             while (FMC->ISPTRG)
-                ;
+            {
+                if (--u32TimeOutCnt == 0)
+                {
+                    return ;
+                }
+            }
         }
 
         /* Set new base */
@@ -326,8 +344,15 @@ void FMC_NSCBA_Setup(void)
         FMC->ISPCMD = FMC_ISPCMD_PROGRAM;
         FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+        u32TimeOutCnt = FMC_TIMEOUT_WRITE;
+
         while (FMC->ISPTRG)
-            ;
+        {
+            if (--u32TimeOutCnt == 0)
+            {
+                return ;
+            }
+        }
 
         bForceReset = TRUE;
     }
@@ -352,24 +377,39 @@ void FMC_NSCBA_Setup(void)
         FMC->ISPCMD = FMC_ISPCMD_READ;
         FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+        u32TimeOutCnt = FMC_TIMEOUT_READ;
+
         while (FMC->ISPTRG)
-            ;
+        {
+            if (--u32TimeOutCnt == 0)
+            {
+                return ;
+            }
+        }
 
         u32Config14 = FMC->ISPDAT;
-        //printf("CONFIG14 0x%08X\n", u32Config14);
 
         if ((u32Config14 & 0x0000006F) == ((DFMC_SECURE_EEPROM << 6) | ((!DFMC_ENABLE_EEPROM) << 5) | u32NSCBAConfig))
+        {
             return ;
+        }
 
         /* Setting NSCBA when it is empty */
-        if (u32Config14 != 0xFFFFFFFFul)
+        if (u32Config14 != 0xFFFFFFFFUL)
         {
             /* Erase old setting */
             FMC->ISPCMD = FMC_ISPCMD_CFG_ERASE;
             FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+            u32TimeOutCnt = FMC_TIMEOUT_ERASE;
+
             while (FMC->ISPTRG)
-                ;
+            {
+                if (--u32TimeOutCnt == 0)
+                {
+                    return ;
+                }
+            }
         }
 
         /* Set new base */
@@ -378,8 +418,15 @@ void FMC_NSCBA_Setup(void)
         FMC->ISPCMD = FMC_ISPCMD_PROGRAM;
         FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
 
+        u32TimeOutCnt = FMC_TIMEOUT_WRITE;
+
         while (FMC->ISPTRG)
-            ;
+        {
+            if (--u32TimeOutCnt == 0)
+            {
+                return ;
+            }
+        }
 
         bForceReset = TRUE;
     }
@@ -393,7 +440,7 @@ void FMC_NSCBA_Setup(void)
     }
 }
 
-#define NVIC_ITNS_CONF(IRQn)    (NVIC->ITNS[(IRQn / 32)] |= (uint32_t)(1 << (IRQn % 32)))
+#define NVIC_ITNS_CONF(IRQn)    (NVIC->ITNS[((IRQn) / 32)] |= (uint32_t)(1 << ((IRQn) % 32)))
 
 /**
  * @brief    Setup Security Configuration Unit
@@ -996,7 +1043,7 @@ void NSC_Init(uint32_t u32RegionIdx)
         SAU->RNR  = (u32RegionIdx & SAU_RNR_REGION_Msk);
         SAU->RBAR = (u32Base & SAU_RBAR_BADDR_Msk);
         SAU->RLAR = (u32Limit & SAU_RLAR_LADDR_Msk) |
-                    (SAU_RLAR_NSC_Msk | 1ul);
+                    (SAU_RLAR_NSC_Msk | 1UL);
     }
 }
 

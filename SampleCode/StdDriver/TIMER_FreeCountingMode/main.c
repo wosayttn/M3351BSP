@@ -11,11 +11,13 @@
 #include <stdlib.h>
 #include "NuMicro.h"
 
+void TIMER0_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
     static int cnt = 0;
-    static uint32_t t0, t1;
+    static uint32_t t0;
 
     TIMER_ClearCaptureIntFlag(TIMER0);
 
@@ -26,7 +28,7 @@ void TIMER0_IRQHandler(void)
     }
     else if (cnt == 1)
     {
-        t1 = TIMER_GetCaptureData(TIMER0);
+        uint32_t t1 = TIMER_GetCaptureData(TIMER0);
         cnt++;
 
         if (t0 >= t1)
@@ -35,7 +37,9 @@ void TIMER0_IRQHandler(void)
         }
         else
         {
-            printf("Input frequency is %dHz\n", 100000000 / (t1 - t0));
+            uint32_t u32CaptureDiff = t1 - t0;
+
+            printf("Input frequency is %u Hz\n", CLK_GetPCLK0Freq() / u32CaptureDiff);
         }
     }
     else
@@ -95,6 +99,7 @@ static void SYS_Init(void)
     SetDebugUartMFP();
     /* Set timer capture pin */
     SET_TM0_EXT_PA11();
+
     /* Lock protected registers */
     SYS_LockReg();
 }
@@ -110,7 +115,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nThis sample code demonstrate timer free counting mode.\n");
     printf("Please connect input source with Timer 0 capture pin PA.11, press any key to continue\n");
     getchar();
@@ -119,10 +124,10 @@ int main(void)
     TIMER_Open(TIMER0, TIMER_PERIODIC_MODE, 1000000);
 
     // Update prescale to set proper resolution.
-    TIMER_SET_PRESCALE_VALUE(TIMER0, 0);
+    TIMER_SET_PRESCALE_VALUE(TIMER0, 0U);
 
     // Set compare value as large as possible, so don't need to worry about counter overrun too frequently.
-    TIMER_SET_CMP_VALUE(TIMER0, 0xFFFFFF);
+    TIMER_SET_CMP_VALUE(TIMER0, 0xFFFFFFU);
 
     // Configure Timer 0 free counting mode, capture TDR value on rising edge
     TIMER_EnableCapture(TIMER0, TIMER_CAPTURE_FREE_COUNTING_MODE, TIMER_CAPTURE_EVENT_RISING);
@@ -135,7 +140,7 @@ int main(void)
     NVIC_EnableIRQ(TIMER0_IRQn);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

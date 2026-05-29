@@ -85,89 +85,89 @@ typedef struct
   @{
 */
 
-#define ELLSI_MAX_STRIP_CNT         (15)                            /*!< The max number of strips \hideinitializer */
+#define ELLSI_MAX_STRIP_CNT         (15U)                           /*!< The max number of strips \hideinitializer */
 
 #define ID(x)                       (x)                             /*!< Strip ID number  \hideinitializer */
 
-#define FB1                         (0)                             /*!< Feedback register 1  \hideinitializer */
-#define FB2                         (1)                             /*!< Feedback register 2  \hideinitializer */
-#define FB3                         (2)                             /*!< Feedback register 3  \hideinitializer */
-#define FB4                         (3)                             /*!< Feedback register 4  \hideinitializer */
-#define FB5                         (4)                             /*!< Feedback register 5  \hideinitializer */
-#define FB6                         (5)                             /*!< Feedback register 6  \hideinitializer */
-#define FB7                         (6)                             /*!< Feedback register 7  \hideinitializer */
-#define FB8                         (7)                             /*!< Feedback register 8  \hideinitializer */
-#define FB9                         (8)                             /*!< Feedback register 9  \hideinitializer */
-#define FB10                        (9)                             /*!< Feedback register 10  \hideinitializer */
-#define FB11                        (10)                            /*!< Feedback register 11  \hideinitializer */
-#define FB12                        (11)                            /*!< Feedback register 12  \hideinitializer */
-#define FB13                        (12)                            /*!< Feedback register 13  \hideinitializer */
-#define FB14                        (13)                            /*!< Feedback register 14  \hideinitializer */
-#define FB15                        (14)                            /*!< Feedback register 15  \hideinitializer */
+#define FB1                         (0U)                            /*!< Feedback register 1  \hideinitializer */
+#define FB2                         (1U)                            /*!< Feedback register 2  \hideinitializer */
+#define FB3                         (2U)                            /*!< Feedback register 3  \hideinitializer */
+#define FB4                         (3U)                            /*!< Feedback register 4  \hideinitializer */
+#define FB5                         (4U)                            /*!< Feedback register 5  \hideinitializer */
+#define FB6                         (5U)                            /*!< Feedback register 6  \hideinitializer */
+#define FB7                         (6U)                            /*!< Feedback register 7  \hideinitializer */
+#define FB8                         (7U)                            /*!< Feedback register 8  \hideinitializer */
+#define FB9                         (8U)                            /*!< Feedback register 9  \hideinitializer */
+#define FB10                        (9U)                            /*!< Feedback register 10  \hideinitializer */
+#define FB11                        (10U)                           /*!< Feedback register 11  \hideinitializer */
+#define FB12                        (11U)                           /*!< Feedback register 12  \hideinitializer */
+#define FB13                        (12U)                           /*!< Feedback register 13  \hideinitializer */
+#define FB14                        (13U)                           /*!< Feedback register 14  \hideinitializer */
+#define FB15                        (14U)                           /*!< Feedback register 15  \hideinitializer */
 
 /* ELLSI Mode */
-#define ELLSI_MODE_SW               (0 << ELLSI_CTL_ELLSIMODE_Pos)  /*!< Software mode \hideinitializer */
-#define ELLSI_MODE_PDMA             (1 << ELLSI_CTL_ELLSIMODE_Pos)  /*!< PDMA mode \hideinitializer */
+#define ELLSI_MODE_SW               (0U)                            /*!< Software mode \hideinitializer */
+#define ELLSI_MODE_PDMA             ((uint32_t)1U << (uint32_t)ELLSI_CTL_ELLSIMODE_Pos) /*!< PDMA mode \hideinitializer */
 
 /* ELLSI Output Format */
-#define ELLSI_FORMAT_RGB            (0 << ELLSI_CTL_OFDEF_Pos)      /*!< Output RGB format \hideinitializer */
-#define ELLSI_FORMAT_GRB            (1 << ELLSI_CTL_OFDEF_Pos)      /*!< Output GRB format \hideinitializer */
+#define ELLSI_FORMAT_RGB            (0U)                            /*!< Output RGB format \hideinitializer */
+#define ELLSI_FORMAT_GRB            ((uint32_t)1U << (uint32_t)ELLSI_CTL_OFDEF_Pos) /*!< Output GRB format \hideinitializer */
 
 /* ELLSI Idle Output State */
-#define ELLSI_IDLE_LOW              (0 << ELLSI_OCTL_IDOS_Pos)      /*!< Idle output low \hideinitializer */
-#define ELLSI_IDLE_HIGH             (1 << ELLSI_OCTL_IDOS_Pos)      /*!< Idle output high \hideinitializer */
+#define ELLSI_IDLE_LOW              (0U)                            /*!< Idle output low \hideinitializer */
+#define ELLSI_IDLE_HIGH             ((uint32_t)1U << (uint32_t)ELLSI_OCTL_IDOS_Pos) /*!< Idle output high \hideinitializer */
 
 /* ELLSI Interrupt Mask */
-#define ELLSI_UNDFL_INT_MASK        (0x001)                         /*!< Underflow interrupt mask \hideinitializer */
-#define ELLSI_FEND_INT_MASK         (0x002)                         /*!< Frame end interrupt mask \hideinitializer */
-#define ELLSI_RSTC_INT_MASK         (0x004)                         /*!< Reset command interrupt mask \hideinitializer */
-#define ELLSI_EMP_INT_MASK          (0x008)                         /*!< FIFO empty interrupt mask \hideinitializer */
-#define ELLSI_FUL_INT_MASK          (0x010)                         /*!< FIFO full interrupt mask \hideinitializer */
-#define ELLSI_TXTH_INT_MASK         (0x020)                         /*!< TX threshold interrupt mask \hideinitializer */
+#define ELLSI_UNDFL_INT_MASK        (0x001U)                        /*!< Underflow interrupt mask \hideinitializer */
+#define ELLSI_FEND_INT_MASK         (0x002U)                        /*!< Frame end interrupt mask \hideinitializer */
+#define ELLSI_RSTC_INT_MASK         (0x004U)                        /*!< Reset command interrupt mask \hideinitializer */
+#define ELLSI_EMP_INT_MASK          (0x008U)                        /*!< FIFO empty interrupt mask \hideinitializer */
+#define ELLSI_FUL_INT_MASK          (0x010U)                        /*!< FIFO full interrupt mask \hideinitializer */
+#define ELLSI_TXTH_INT_MASK         (0x020U)                        /*!< TX threshold interrupt mask \hideinitializer */
 
 /* ELLSI Command Interrupt Mask */
-#define ELLSI_CMDDONE_MASK          (0x000001)                      /*!< Normal command done interrupt mask \hideinitializer */
-#define ELLSI_FBDONE_MASK           (0x000002)                      /*!< Feedback command done interrupt mask \hideinitializer */
-#define ELLSI_TH20DONE_MASK         (0x000004)                      /*!< TH20 command done interrupt mask \hideinitializer */
-#define ELLSI_SETIDLONG_MASK        (0x000008)                      /*!< Set ID get pulse long interrupt mask \hideinitializer */
-#define ELLSI_CHKIDLONG_MASK        (0x000010)                      /*!< Check ID get pulse long interrupt mask \hideinitializer */
-#define ELLSI_SETIDSHORT_MASK       (0x000020)                      /*!< Set ID get pulse short interrupt mask \hideinitializer */
-#define ELLSI_CHKIDSHORT_MASK       (0x000040)                      /*!< Check ID get pulse short interrupt mask \hideinitializer */
-#define ELLSI_SETGETOV_MASK         (0x000080)                      /*!< Set ID get pulse overflow interrupt mask \hideinitializer */
-#define ELLSI_CHKGETOV_MASK         (0x000100)                      /*!< Check ID get pulse overflow interrupt mask \hideinitializer */
-#define ELLSI_SETGETUN_MASK         (0x000200)                      /*!< Set ID Get pulse underflow interrupt mask \hideinitializer */
-#define ELLSI_CHKGETUN_MASK         (0x000400)                      /*!< Check ID get pulse underflow interrupt mask \hideinitializer */
-#define ELLSI_FBC0LONG_MASK         (0x000800)                      /*!< Feedback count 0 pulse long interrupt mask \hideinitializer */
-#define ELLSI_FBC0SHORT_MASK        (0x001000)                      /*!< Feedback count 0 pulse short interrupt mask \hideinitializer */
-#define ELLSI_FBC1LONG_MASK         (0x002000)                      /*!< Feedback count 1 pulse long interrupt mask \hideinitializer */
-#define ELLSI_FBC1SHORT_MASK        (0x004000)                      /*!< Feedback count 1 pulse short interrupt mask \hideinitializer */
-#define ELLSI_FBID0LONG_MASK        (0x008000)                      /*!< Feedback ID 0 pulse long interrupt mask \hideinitializer */
-#define ELLSI_FBID0SHORT_MASK       (0x010000)                      /*!< Feedback ID 0 pulse short interrupt mask \hideinitializer */
-#define ELLSI_FBID1LONG_MASK        (0x020000)                      /*!< Feedback ID 1 pulse long interrupt mask \hideinitializer */
-#define ELLSI_FBID1SHORT_MASK       (0x040000)                      /*!< Feedback ID 1 pulse short interrupt mask \hideinitializer */
-#define ELLSI_ASETIDOV_MASK         (0x080000)                      /*!< AUTO SET mode feedback ID overflow interrupt mask \hideinitializer */
-#define ELLSI_ASETDONE_MASK         (0x100000)                      /*!< AUTO SET mode done interrupt mask \hideinitializer */
-#define ELLSI_ATHDONE_MASK          (0x200000)                      /*!< AUTO TH20 SET mode done interrupt mask \hideinitializer */
-#define ELLSI_FBPOV_MASK            (0x400000)                      /*!< Feedback pixel count overflow interrupt mask \hideinitializer */
+#define ELLSI_CMDDONE_MASK          (0x000001U)                     /*!< Normal command done interrupt mask \hideinitializer */
+#define ELLSI_FBDONE_MASK           (0x000002U)                     /*!< Feedback command done interrupt mask \hideinitializer */
+#define ELLSI_TH20DONE_MASK         (0x000004U)                     /*!< TH20 command done interrupt mask \hideinitializer */
+#define ELLSI_SETIDLONG_MASK        (0x000008U)                     /*!< Set ID get pulse long interrupt mask \hideinitializer */
+#define ELLSI_CHKIDLONG_MASK        (0x000010U)                     /*!< Check ID get pulse long interrupt mask \hideinitializer */
+#define ELLSI_SETIDSHORT_MASK       (0x000020U)                     /*!< Set ID get pulse short interrupt mask \hideinitializer */
+#define ELLSI_CHKIDSHORT_MASK       (0x000040U)                     /*!< Check ID get pulse short interrupt mask \hideinitializer */
+#define ELLSI_SETGETOV_MASK         (0x000080U)                     /*!< Set ID get pulse overflow interrupt mask \hideinitializer */
+#define ELLSI_CHKGETOV_MASK         (0x000100U)                     /*!< Check ID get pulse overflow interrupt mask \hideinitializer */
+#define ELLSI_SETGETUN_MASK         (0x000200U)                     /*!< Set ID Get pulse underflow interrupt mask \hideinitializer */
+#define ELLSI_CHKGETUN_MASK         (0x000400U)                     /*!< Check ID get pulse underflow interrupt mask \hideinitializer */
+#define ELLSI_FBC0LONG_MASK         (0x000800U)                     /*!< Feedback count 0 pulse long interrupt mask \hideinitializer */
+#define ELLSI_FBC0SHORT_MASK        (0x001000U)                     /*!< Feedback count 0 pulse short interrupt mask \hideinitializer */
+#define ELLSI_FBC1LONG_MASK         (0x002000U)                     /*!< Feedback count 1 pulse long interrupt mask \hideinitializer */
+#define ELLSI_FBC1SHORT_MASK        (0x004000U)                     /*!< Feedback count 1 pulse short interrupt mask \hideinitializer */
+#define ELLSI_FBID0LONG_MASK        (0x008000U)                     /*!< Feedback ID 0 pulse long interrupt mask \hideinitializer */
+#define ELLSI_FBID0SHORT_MASK       (0x010000U)                     /*!< Feedback ID 0 pulse short interrupt mask \hideinitializer */
+#define ELLSI_FBID1LONG_MASK        (0x020000U)                     /*!< Feedback ID 1 pulse long interrupt mask \hideinitializer */
+#define ELLSI_FBID1SHORT_MASK       (0x040000U)                     /*!< Feedback ID 1 pulse short interrupt mask \hideinitializer */
+#define ELLSI_ASETIDOV_MASK         (0x080000U)                     /*!< AUTO SET mode feedback ID overflow interrupt mask \hideinitializer */
+#define ELLSI_ASETDONE_MASK         (0x100000U)                     /*!< AUTO SET mode done interrupt mask \hideinitializer */
+#define ELLSI_ATHDONE_MASK          (0x200000U)                     /*!< AUTO TH20 SET mode done interrupt mask \hideinitializer */
+#define ELLSI_FBPOV_MASK            (0x400000U)                     /*!< Feedback pixel count overflow interrupt mask \hideinitializer */
 
 /* ELLSI Command Mode */
-#define ELLSI_CMDMODE_LLSI          (0x0 << ELLSI_CTL_CMDMODE_Pos)  /*!< LLSI mode \hideinitializer */
-#define ELLSI_CMDMODE_NORMAL_CMD    (0x1 << ELLSI_CTL_CMDMODE_Pos)  /*!< Normal command mode \hideinitializer */
-#define ELLSI_CMDMODE_AUTO_SET      (0x2 << ELLSI_CTL_CMDMODE_Pos)  /*!< AUTO SET mode \hideinitializer */
-#define ELLSI_CMDMODE_AUTO_TH20SET  (0x3 << ELLSI_CTL_CMDMODE_Pos)  /*!< AUTO TH20 SET mode \hideinitializer */
+#define ELLSI_CMDMODE_LLSI          (0U)                             /*!< LLSI mode \hideinitializer */
+#define ELLSI_CMDMODE_NORMAL_CMD    ((uint32_t)0x1U << (uint32_t)ELLSI_CTL_CMDMODE_Pos) /*!< Normal command mode \hideinitializer */
+#define ELLSI_CMDMODE_AUTO_SET      ((uint32_t)0x2U << (uint32_t)ELLSI_CTL_CMDMODE_Pos) /*!< AUTO SET mode \hideinitializer */
+#define ELLSI_CMDMODE_AUTO_TH20SET  ((uint32_t)0x3U << (uint32_t)ELLSI_CTL_CMDMODE_Pos) /*!< AUTO TH20 SET mode \hideinitializer */
 
 /* ELLSI Special Command */
-#define ELLSI_SPECMD_NORMAL_CMD     (0x0 << ELLSI_CMD_SPECMD_Pos)   /*!< Normal command or no command \hideinitializer */
-#define ELLSI_SPECMD_FB_COUNT_CMD   (0x1 << ELLSI_CMD_SPECMD_Pos)   /*!< Feedback count command \hideinitializer */
-#define ELLSI_SPECMD_FB_ID_CMD      (0x2 << ELLSI_CMD_SPECMD_Pos)   /*!< Feedback ID command \hideinitializer */
-#define ELLSI_SPECMD_TH20SET_CMD    (0x3 << ELLSI_CMD_SPECMD_Pos)   /*!< TH20 SET command \hideinitializer */
-#define ELLSI_SPECMD_SEND_DATA      (0x4 << ELLSI_CMD_SPECMD_Pos)   /*!< Send Data \hideinitializer */
+#define ELLSI_SPECMD_NORMAL_CMD     (0U)                             /*!< Normal command or no command \hideinitializer */
+#define ELLSI_SPECMD_FB_COUNT_CMD   ((uint32_t)0x1U << (uint32_t)ELLSI_CMD_SPECMD_Pos) /*!< Feedback count command \hideinitializer */
+#define ELLSI_SPECMD_FB_ID_CMD      ((uint32_t)0x2U << (uint32_t)ELLSI_CMD_SPECMD_Pos) /*!< Feedback ID command \hideinitializer */
+#define ELLSI_SPECMD_TH20SET_CMD    ((uint32_t)0x3U << (uint32_t)ELLSI_CMD_SPECMD_Pos) /*!< TH20 SET command \hideinitializer */
+#define ELLSI_SPECMD_SEND_DATA      ((uint32_t)0x4U << (uint32_t)ELLSI_CMD_SPECMD_Pos) /*!< Send Data \hideinitializer */
 
 /* ELLSI Normal Command Mode */
-#define ELLSI_CMD_SET_ID            (0x1 << ELLSI_CMD_CMD_Pos)      /*!< Set ID command \hideinitializer */
-#define ELLSI_CMD_CLR_ID            (0x2 << ELLSI_CMD_CMD_Pos)      /*!< Clear ID command \hideinitializer */
-#define ELLSI_CMD_CHK_ID            (0x3 << ELLSI_CMD_CMD_Pos)      /*!< Check ID command \hideinitializer */
-#define ELLSI_CMD_SPE_ID            (0x4 << ELLSI_CMD_CMD_Pos)      /*!< Specify ID command \hideinitializer */
+#define ELLSI_CMD_SET_ID            ((uint32_t)0x1U << (uint32_t)ELLSI_CMD_CMD_Pos) /*!< Set ID command \hideinitializer */
+#define ELLSI_CMD_CLR_ID            ((uint32_t)0x2U << (uint32_t)ELLSI_CMD_CMD_Pos) /*!< Clear ID command \hideinitializer */
+#define ELLSI_CMD_CHK_ID            ((uint32_t)0x3U << (uint32_t)ELLSI_CMD_CMD_Pos) /*!< Check ID command \hideinitializer */
+#define ELLSI_CMD_SPE_ID            ((uint32_t)0x4U << (uint32_t)ELLSI_CMD_CMD_Pos) /*!< Specify ID command \hideinitializer */
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* ELLSI Define Error Code                                                                                */
@@ -309,7 +309,7 @@ typedef struct
   * @return     None.
   * @details    Set CMDMODE (ELLSI_CTL[25:24]) to set ELLSI command mode.
   */
-#define ELLSI_SET_CMD_MODE(ellsi, u32CmdMode)   ((ellsi)->CTL = (ellsi)->CTL & ~ELLSI_CTL_CMDMODE_Msk | (u32CmdMode))
+#define ELLSI_SET_CMD_MODE(ellsi, u32CmdMode)   ((ellsi)->CTL = (((ellsi)->CTL & ~ELLSI_CTL_CMDMODE_Msk) | ((u32CmdMode) & ELLSI_CTL_CMDMODE_Msk)))
 
 /**
   * @brief      Set ELLSI special command.
@@ -323,7 +323,7 @@ typedef struct
   * @return     None.
   * @details    Set SPECMD (ELLSI_CMD[15:12]) to set ELLSI special command.
   */
-#define ELLSI_SET_SPECMD(ellsi, u32SpeCmd)   ((ellsi)->CMD = (ellsi)->CMD & ~ELLSI_CMD_SPECMD_Msk | (u32SpeCmd))
+#define ELLSI_SET_SPECMD(ellsi, u32SpeCmd)   ((ellsi)->CMD = (((ellsi)->CMD & ~ELLSI_CMD_SPECMD_Msk) | ((u32SpeCmd) & ELLSI_CMD_SPECMD_Msk)))
 
 /**
   * @brief      Set ELLSI ID command.
@@ -336,7 +336,7 @@ typedef struct
   * @return     None.
   * @details    Set CMD (ELLSI_CMD[7:4]) to set ELLSI ID command.
   */
-#define ELLSI_SET_CMD(ellsi, u32Cmd)   ((ellsi)->CMD = (ellsi)->CMD & ~ELLSI_CMD_CMD_Msk | (u32Cmd))
+#define ELLSI_SET_CMD(ellsi, u32Cmd)   ((ellsi)->CMD = (((ellsi)->CMD & ~ELLSI_CMD_CMD_Msk) | ((u32Cmd) & ELLSI_CMD_CMD_Msk)))
 
 /**
   * @brief      Set ELLSI ID.
@@ -345,7 +345,7 @@ typedef struct
   * @return     None.
   * @details    The strip ID can be 1 ~ 15.
   */
-#define ELLSI_SET_ID(ellsi, u32ID)   ((ellsi)->CMD = (ellsi)->CMD & ~ELLSI_CMD_ID_Msk | ((u32ID) << ELLSI_CMD_ID_Pos))
+#define ELLSI_SET_ID(ellsi, u32ID)   ((ellsi)->CMD = (((ellsi)->CMD & ~ELLSI_CMD_ID_Msk) | (((uint32_t)(u32ID)) & ELLSI_CMD_ID_Msk)))
 #define ELLSI_SET_CMD_ID ELLSI_SET_ID
 /**
   * @brief      Set ELLSI normal command of specified ID.
@@ -359,7 +359,7 @@ typedef struct
   * @return     None.
   * @details    Set CMD (ELLSI_CMD[7:4]) and ID (ELLSI_CMD[3:0]) to set ELLSI normal command of specified ID.
   */
-#define ELLSI_SET_NORMAL_CMD(ellsi, u32Cmd, u32ID)   ((ellsi)->CMD = ((ellsi)->CMD & ~(ELLSI_CMD_SPECMD_Msk | ELLSI_CMD_CMD_Msk | ELLSI_CMD_ID_Msk)) | ELLSI_SPECMD_NORMAL_CMD | (u32Cmd) | (u32ID))
+#define ELLSI_SET_NORMAL_CMD(ellsi, u32Cmd, u32ID)   ((ellsi)->CMD = (((ellsi)->CMD & ~(ELLSI_CMD_SPECMD_Msk | ELLSI_CMD_CMD_Msk | ELLSI_CMD_ID_Msk)) | ELLSI_SPECMD_NORMAL_CMD | ((u32Cmd) & ELLSI_CMD_CMD_Msk) | (((uint32_t)(u32ID)) & ELLSI_CMD_ID_Msk)))
 
 /**
   * @brief      Set ELLSI command go bit to start the command.
@@ -478,121 +478,99 @@ typedef struct
   * @retval     None.
   * @details    Set IDCNT (ELLSI_CMDSTS[31:28]) to set the ID count.
   */
-#define ELLSI_SET_ID_COUNT(ellsi, u32IDCnt)   ((ellsi)->CMDSTS = ((ellsi)->CMDSTS & ~ELLSI_CMDSTS_IDCNT_Msk) | (u32IDCnt << ELLSI_CMDSTS_IDCNT_Pos))
+#define ELLSI_SET_ID_COUNT(ellsi, u32IDCnt)   ((ellsi)->CMDSTS = ((ellsi)->CMDSTS & ~ELLSI_CMDSTS_IDCNT_Msk) | (((uint32_t)(u32IDCnt)) << (uint32_t)ELLSI_CMDSTS_IDCNT_Pos))
 
 /**
   * @brief      Get the feedback pixel count.
   * @param[in]  ellsi The pointer of the specified ELLSI module.
   * @param[in]  u32ID The 4-bit strip ID. It can be 1 ~ 15.
-  * @retval     The number of feedback pixel count. It can be 1 ~ 1023.
-  * @retval     -1 Unknown strip ID number.
+  * @retval     >=0   The number of feedback pixel count (1 ~ 1023).
+  * @retval     -1    Unknown strip ID number or out of range.
   * @details    Read FBPCNT bit of ELLSI_FBPCNTn register to get the feedback pixel count of IDn.
   */
 __STATIC_INLINE int32_t ELLSI_GET_FB_COUNT(ELLSI_T *ellsi, uint32_t u32ID)
 {
-    uint32_t i;
-    uint32_t u32FBPCNT;
+    uint32_t u32Idx;
+    uint32_t u32Reg;
 
-    if ((u32ID == 0) || (u32ID >= 16))
-        return -1;
-
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U))
     {
-        u32FBPCNT = ellsi->FB[i].FBPCNT;
-
-        if (i == (u32ID - 1))
-            break;
+        return -1;
     }
 
-    return u32FBPCNT & ELLSI_FBPCNT_FBPCNT_Msk;
+    u32Idx = u32ID - 1U;
+    u32Reg = ellsi->FB[u32Idx].FBPCNT & ELLSI_FBPCNT_FBPCNT_Msk;
+
+    return (int32_t)u32Reg;
 }
 
 /**
   * @brief      Set the feedback pixel count.
-  * @param[in]  ellsi The pointer of the specified ELLSI module.
-  * @param[in]  u32ID The 4-bit strip ID. It can be 1 ~ 15.
+  * @param[in]  ellsi    The pointer of the specified ELLSI module.
+  * @param[in]  u32ID    The 4-bit strip ID. It can be 1 ~ 15.
   * @param[in]  u32IDCnt The number of feedback pixel count.
-  * @retval     The number of feedback pixel count. It can be 1 ~ 1023.
-  * @retval     -1 Set strip ID number failed.
+  * @retval     >=0      The number of feedback pixel count (1 ~ 1023).
+  * @retval     -1       Set strip ID number failed or ID out of range.
   * @details    Set FBPCNT (ELLSI_FBPCNTn[9:0]) to set the feedback pixel count of IDn.
   */
 __STATIC_INLINE int32_t ELLSI_SET_FB_COUNT(ELLSI_T *ellsi, uint32_t u32ID, uint32_t u32IDCnt)
 {
-    uint32_t i;
-    uint32_t *u32FBPCNT;
+    uint32_t u32Idx;
+    uint32_t u32Reg;
 
-    if ((u32ID == 0) || (u32ID >= 16))
-        return -1;
-
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U))
     {
-        u32FBPCNT = (uint32_t *)((uint32_t)&ellsi->FB[i].FBPCNT);
-
-        if (i == (u32ID - 1))
-        {
-            *u32FBPCNT = u32IDCnt;
-            break;
-        }
+        return -1;
     }
 
-    return *u32FBPCNT & ELLSI_FBPCNT_FBPCNT_Msk;
+    u32Idx = u32ID - 1U;
+
+    ellsi->FB[u32Idx].FBPCNT = (u32IDCnt & ELLSI_FBPCNT_FBPCNT_Msk);
+
+    u32Reg = ellsi->FB[u32Idx].FBPCNT & ELLSI_FBPCNT_FBPCNT_Msk;
+    return (int32_t)u32Reg;
 }
 
 /**
   * @brief      Get the feedback pixel current.
   * @param[in]  ellsi The pointer of the specified ELLSI module.
   * @param[in]  u32ID The 4-bit strip ID. It can be 1 ~ 15.
-  * @retval     0  The current feedback from the LED is 5mA.
-  * @retval     1  The current feedback from the LED is 12mA.
-  * @retval     -1 Unknown strip ID number.
+  * @retval     0     The current feedback from the LED is 5mA.
+  * @retval     1     The current feedback from the LED is 12mA.
+  * @retval     -1    Unknown strip ID number or out of range.
   * @details    Read FBPCUR bit of ELLSI_FBPCNTn register to get the feedback pixel current of IDn.
   */
 __STATIC_INLINE int32_t ELLSI_GET_FB_CURRENT(ELLSI_T *ellsi, uint32_t u32ID)
 {
-    uint32_t i;
-    uint32_t u32FBPCUR;
+    uint32_t u32Idx;
 
-    if ((u32ID == 0) || (u32ID >= 16))
-        return -1;
-
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U))
     {
-        u32FBPCUR = ellsi->FB[i].FBPCNT;
-
-        if (i == (u32ID - 1))
-            break;
+        return -1;
     }
 
-    return (u32FBPCUR & ELLSI_FBPCNT_FBPCUR_Msk) >> ELLSI_FBPCNT_FBPCUR_Pos;
+    u32Idx = u32ID - 1U;
+
+    return (int32_t)((ellsi->FB[u32Idx].FBPCNT & ELLSI_FBPCNT_FBPCUR_Msk) >> ELLSI_FBPCNT_FBPCUR_Pos);
 }
 
 /**
   * @brief      Get the feedback strip ID.
   * @param[in]  ellsi The pointer of the specified ELLSI module.
   * @param[in]  u32ID The 4-bit strip ID. It can be 1 ~ 15.
-  * @retval     0  The 32-bit feedback strip ID.
-  * @retval     -1 Unknown strip ID number.
+  * @retval     >=0   The 32-bit feedback strip ID.
+  * @retval     -1    Unknown strip ID number or out of range.
   * @details    Read FBSID bit of ELLSI_FBSIDn register to get the feedback strip ID of IDn.
   */
 __STATIC_INLINE int32_t ELLSI_GET_FB_ID(ELLSI_T *ellsi, uint32_t u32ID)
 {
-    uint32_t i;
-    uint32_t u32FBSID;
-
-    if ((u32ID == 0) || (u32ID >= 16))
-        return -1;
-
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U) || ((u32ID - 1U) >= (uint32_t)ELLSI_MAX_STRIP_CNT))
     {
-        u32FBSID = ellsi->FB[i].FBSID;
-
-        if (i == (u32ID - 1))
-            break;
+        return -1;
     }
 
-    return u32FBSID;
+    return (int32_t)(ellsi->FB[u32ID - 1U].FBSID);
 }
-
 /**
   * @brief      Enable force TH20 command.
   * @param[in]  ellsi The pointer of the specified ELLSI module.
@@ -644,20 +622,20 @@ __STATIC_INLINE int32_t ELLSI_GET_FB_ID(ELLSI_T *ellsi, uint32_t u32ID)
 /* Function prototype declaration */
 void ELLSI_Open(ELLSI_T *ellsi, uint32_t u32ELLSIMode, uint32_t u32OutputFormat, uint32_t u32BusClock, uint32_t u32TransferTimeNsec, uint32_t u32T0HTimeNsec, uint32_t u32T1HTimeNsec,
                 uint32_t u32ResetTimeNsec, uint32_t u32PCNT, uint32_t u32IDOS);
-void ELLSI_OpenbyConfig(ELLSI_T *ellsi, S_ELLSI_CONFIG_T *sELLSIConfig);
-void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt);
-void ELLSI_SetTH20Data(ELLSI_T *ellsi, S_ELLSI_TH20SET_DATA_T *sPt);
+void ELLSI_OpenbyConfig(ELLSI_T *ellsi, const S_ELLSI_CONFIG_T *sELLSIConfig);
+void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, const S_ELLSI_TIME_INFO_T *sPt);
+void ELLSI_SetTH20Data(ELLSI_T *ellsi, const S_ELLSI_TH20SET_DATA_T *sPt);
 int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_Close(ELLSI_T *ellsi);
-void ELLSI_GetTimeInfo(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt);
+void ELLSI_GetTimeInfo(const ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt);
 void ELLSI_SetFIFO(ELLSI_T *ellsi, uint32_t u32TxThreshold);
 void ELLSI_EnableInt(ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_DisableInt(ELLSI_T *ellsi, uint32_t u32Mask);
-uint32_t ELLSI_GetIntFlag(ELLSI_T *ellsi, uint32_t u32Mask);
+uint32_t ELLSI_GetIntFlag(const ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_ClearIntFlag(ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_EnableCmdInt(ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_DisableCmdInt(ELLSI_T *ellsi, uint32_t u32Mask);
-uint32_t ELLSI_GetCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask);
+uint32_t ELLSI_GetCmdIntFlag(const ELLSI_T *ellsi, uint32_t u32Mask);
 void ELLSI_ClearCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask);
 int32_t ELLSI_GetOverflowFlag(ELLSI_T *ellsi, uint32_t u32ID);
 void ELLSI_ClearOverflowFlag(ELLSI_T *ellsi, uint32_t u32ID);

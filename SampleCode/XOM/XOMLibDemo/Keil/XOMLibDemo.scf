@@ -23,7 +23,7 @@
 ;   <o1> Flash Size (in Bytes)  <0x0-0xFFFFFFFF:8>
 ; </h>
  *----------------------------------------------------------------------------*/
-#define FLASH_START         0x00000000
+#define FLASH_START         0x00008000
 #define FLASH_SIZE          0x00004000
 
 /*--------------------- Embedded SRAM Configuration --------------------------

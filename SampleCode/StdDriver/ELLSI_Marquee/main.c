@@ -10,32 +10,22 @@
 #include <stdio.h>
 #include "NuMicro.h"
 
-#define TEST_COUNT  1
+#define TEST_COUNT  1U
 
-volatile uint32_t g_au32RED_Marquee[TEST_COUNT] = {0x00000000};
-volatile uint32_t g_u32PatternToggle = 0;
-volatile uint32_t g_u32DataCount = 0;
+void ELLSI0_IRQHandler(void);
 
-void ELLSI0_IRQHandler()
+static volatile uint32_t g_u32IsrDataReady = 0;
+
+void ELLSI0_IRQHandler(void)
 {
     if (ELLSI_GetIntFlag(ELLSI0, ELLSI_TXTH_INT_MASK))
     {
-        while (g_u32DataCount < TEST_COUNT)
-        {
-            if (g_u32DataCount == (TEST_COUNT - 1))
-                ELLSI_SET_LAST_DATA(ELLSI0);
-
-            ELLSI_WRITE_DATA(ELLSI0, g_au32RED_Marquee[g_u32DataCount++]);
-        }
-
-        if (g_u32DataCount >= TEST_COUNT)
-        {
-            ELLSI_DisableInt(ELLSI0, ELLSI_TXTH_INT_MASK);
-        }
+        g_u32IsrDataReady = 1;
+        ELLSI_DisableInt(ELLSI0, ELLSI_TXTH_INT_MASK);
     }
 }
 
-void SYS_Init(void)
+static void SYS_Init(void)
 {
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -80,7 +70,7 @@ void SYS_Init(void)
     SYS_LockReg();
 }
 
-void ELLSI_Init(void)
+static void ELLSI_Init(void)
 {
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init ELLSI                                                                                               */
@@ -106,6 +96,10 @@ void ELLSI_Init(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
+    static const uint32_t g_au32RED_Marquee[TEST_COUNT] = {0x00000000U};
+    uint32_t g_u32PatternToggle = 0U;
+    uint32_t g_u32DataCount;
+
     /* Init System, IP clock and multi-function I/O. */
     SYS_Init();
     /* Init Debug UART to 115200-8N1 for print message */
@@ -115,68 +109,67 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %d Hz\n", SystemCoreClock);
+    printf("\n\nCPU @ %u Hz\n", CLK_GetHCLKFreq());
     printf("+-------------------------------------------------+\n");
     printf("|    ELLSI Marquee Sample Code (Software Mode)    |\n");
     printf("+-------------------------------------------------+\n");
+    printf("Please connect LED strips with PB.9.\n");
     printf("The first to sixth LEDs will flash red in sequence.\n\n");
 
     /* Init ELLSI */
     ELLSI_Init();
 
-    g_u32PatternToggle = 0;
-
     /*Enable ELLSI Tx*/
     ELLSI_ENABLE(ELLSI0);
 
-    while (g_u32PatternToggle < 7)
+    while (g_u32PatternToggle < 7U)
     {
         g_u32DataCount = 0;
 
         /* Write 4 word data to ELLSI_DATA */
-        if (g_u32PatternToggle == 0)
+        if (g_u32PatternToggle == 0U)
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x000000FF);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 1)
+        else if (g_u32PatternToggle == 1U)
         {
-            ELLSI_WRITE_DATA(ELLSI0, 0xFF000000);
+            ELLSI_WRITE_DATA(ELLSI0, 0xFF000000U);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 2)
+        else if (g_u32PatternToggle == 2U)
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00FF0000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 3)
+        else if (g_u32PatternToggle == 3U)
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x0000FF00);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 4)
+        else if (g_u32PatternToggle == 4U)
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x000000FF);
         }
-        else if (g_u32PatternToggle == 5)
+        else if (g_u32PatternToggle == 5U)
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
-            ELLSI_WRITE_DATA(ELLSI0, 0xFF000000);
+            ELLSI_WRITE_DATA(ELLSI0, 0xFF000000U);
         }
-        else if (g_u32PatternToggle == 6)
+        else
         {
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
             ELLSI_WRITE_DATA(ELLSI0, 0x00000000);
@@ -186,6 +179,24 @@ int main(void)
 
         /* Enable TX FIFO threshold interrupt */
         ELLSI_EnableInt(ELLSI0, ELLSI_TXTH_INT_MASK);
+
+        while (g_u32IsrDataReady == 0U)
+        {
+            /* Do nothing */
+        }
+
+        g_u32IsrDataReady = 0;
+
+        while (g_u32DataCount < TEST_COUNT)
+        {
+            if (g_u32DataCount == (TEST_COUNT - 1U))
+            {
+                ELLSI_SET_LAST_DATA(ELLSI0);
+            }
+
+            ELLSI_WRITE_DATA(ELLSI0, g_au32RED_Marquee[g_u32DataCount]);
+            g_u32DataCount++;
+        }
 
         CLK_SysTickDelay(50000);
 
@@ -197,7 +208,10 @@ int main(void)
 
     printf("Exit ELLSI sample code.\n");
 
-    while (1);
+    while (1)
+    {
+        /* Do nothing */
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

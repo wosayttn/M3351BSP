@@ -217,8 +217,8 @@ void PRNG_Read(CRYPTO_T *crypto, uint32_t u32RandKey[]);
 
 void AES_Open(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t u32EncDec, uint32_t u32OpMode, uint32_t u32KeySize, uint32_t u32SwapType);
 void AES_Start(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t u32DMAMode);
-void AES_SetKey(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32Keys[], uint32_t u32KeySize);
-void AES_SetInitVect(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32IV[]);
+void AES_SetKey(CRYPTO_T *crypto, uint32_t u32Channel, const uint32_t au32Keys[], uint32_t u32KeySize);
+void AES_SetInitVect(CRYPTO_T *crypto, uint32_t u32Channel, const uint32_t au32IV[]);
 void AES_SetDMATransfer(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t u32SrcAddr, uint32_t u32DstAddr, uint32_t u32TransCnt);
 
 void SHA_Open(CRYPTO_T *crypto, uint32_t u32OpMode, uint32_t u32SwapType, uint32_t hmac_key_len);

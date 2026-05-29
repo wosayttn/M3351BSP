@@ -49,10 +49,10 @@ extern "C"
 #define ECAP_CNT_CLR_BY_CAPTURE               (ECAP_CTL1_CAP0CLREN_Msk|ECAP_CTL1_CAP1CLREN_Msk|ECAP_CTL1_CAP2CLREN_Msk)    /*!< Input channel counter cleared by Capture                 */
 #define ECAP_CNT_CLR_BY_CAMCMPF               (ECAP_CTL0_CMPCLREN_Msk|ECAP_CTL1_CAP0CLREN_Msk|ECAP_CTL1_CAP1CLREN_Msk|ECAP_CTL1_CAP2CLREN_Msk)    /*!< Input channel counter cleared by Compare-Match & capture */
 
-#define ECAP_DISABLE_COMPARE_RELOAD           0x00     /*!< Input capture compare and reload function disable*/
-#define ECAP_RELOAD_FUNCTION                  0x01     /*!< Input capture reload function                    */
-#define ECAP_COMPARE_FUNCTION                 0x02     /*!< Input capture compare function                   */
-#define ECAP_RELOAD_COMPARE_FUNCTION          0x03     /*!< Input capture reload & compare function          */
+#define ECAP_DISABLE_COMPARE_RELOAD           0x00UL   /*!< Input capture compare and reload function disable*/
+#define ECAP_RELOAD_FUNCTION                  0x01UL   /*!< Input capture reload function                    */
+#define ECAP_COMPARE_FUNCTION                 0x02UL   /*!< Input capture compare function                   */
+#define ECAP_RELOAD_COMPARE_FUNCTION          0x03UL   /*!< Input capture reload & compare function          */
 #define ECAP_DISABLE_COMPARE                  (ECAP_DISABLE_COMPARE_RELOAD)    /*!< Input capture compare and reload function disable \hideinitializer */
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -81,6 +81,11 @@ extern "C"
 #define ECAP_CAPTURE_TIMER_CLK_SRC_CAP1        (2UL<<ECAP_CTL1_CNTSRCSEL_Pos)    /*!< ECAP capture timer/clock source from CAP1    \hideinitializer */
 #define ECAP_CAPTURE_TIMER_CLK_SRC_CAP2        (3UL<<ECAP_CTL1_CNTSRCSEL_Pos)    /*!< ECAP capture timer/clock source from CAP2    \hideinitializer */
 
+#define ECAP_INPUT_MASK                (ECAP_CTL0_IC0EN_Msk | ECAP_CTL0_IC1EN_Msk | ECAP_CTL0_IC2EN_Msk) /*!< ECAP capture input channel enable mask \hideinitializer */
+#define ECAP_INTEN_MASK                (ECAP_CTL0_CAPIEN0_Msk | ECAP_CTL0_CAPIEN1_Msk | ECAP_CTL0_CAPIEN2_Msk | ECAP_CTL0_OVIEN_Msk | ECAP_CTL0_CMPIEN_Msk) /*!< ECAP capture interrupt enable mask \hideinitializer */
+#define ECAP_RLDEN_MASK                (ECAP_CTL1_CAP0RLDEN_Msk | ECAP_CTL1_CAP1RLDEN_Msk | ECAP_CTL1_CAP2RLDEN_Msk | ECAP_CTL1_OVRLDEN_Msk) /*!< ECAP capture reload enable mask \hideinitializer */
+#define ECAP_STATUS_FLAG_MASK          (ECAP_STATUS_CAPTF0_Msk | ECAP_STATUS_CAPTF1_Msk | ECAP_STATUS_CAPTF2_Msk | ECAP_STATUS_CAPCMPF_Msk | ECAP_STATUS_CAPOVF_Msk) /*!< ECAP capture status flag mask \hideinitializer */
+
 /** @} end of group ECAP_EXPORTED_CONSTANTS */
 
 /** @addtogroup ECAP_EXPORTED_FUNCTIONS ECAP Exported Functions
@@ -101,7 +106,7 @@ extern "C"
   * @details This macro will set the sampling frequency of the noise filter clock.
   * \hideinitializer
   */
-#define ECAP_SET_NOISE_FILTER_CLKDIV(ecap, u32ClkSel) ((ecap)->CTL0 = ((ecap)->CTL0 & ~ECAP_CTL0_NFCLKSEL_Msk)|(u32ClkSel))
+#define ECAP_SET_NOISE_FILTER_CLKDIV(ecap, u32ClkSel) ((ecap)->CTL0 = ((ecap)->CTL0 & ~ECAP_CTL0_NFCLKSEL_Msk) | (u32ClkSel & ECAP_CTL0_NFCLKSEL_Msk))
 
 /**
   * @brief This macro is used to disable noise filter
@@ -126,7 +131,7 @@ extern "C"
   * @details This macro will enable the noise filter of input capture and set noise filter clock divide.
   * \hideinitializer
   */
-#define ECAP_NOISE_FILTER_ENABLE(ecap, u32ClkSel) ((ecap)->CTL0 = ((ecap)->CTL0 & ~(ECAP_CTL0_CAPNFDIS_Msk|ECAP_CTL0_NFCLKSEL_Msk))|(u32ClkSel))
+#define ECAP_NOISE_FILTER_ENABLE(ecap, u32ClkSel) ((ecap)->CTL0 = ((ecap)->CTL0 & ~(ECAP_CTL0_CAPNFDIS_Msk | ECAP_CTL0_NFCLKSEL_Msk)) | (u32ClkSel & ECAP_CTL0_NFCLKSEL_Msk))
 
 /**
   * @brief This macro is used to enable input channel unit
@@ -139,7 +144,7 @@ extern "C"
   * @details This macro will enable the input channel_n to input capture.
   * \hideinitializer
   */
-#define ECAP_ENABLE_INPUT_CHANNEL(ecap, u32Mask) ((ecap)->CTL0 |= (u32Mask))
+#define ECAP_ENABLE_INPUT_CHANNEL(ecap, u32Mask) ((ecap)->CTL0 |= ((uint32_t)(u32Mask) & ECAP_INPUT_MASK))
 
 /**
   * @brief This macro is used to disable input channel unit
@@ -152,7 +157,7 @@ extern "C"
   * @details This macro will disable the input channel_n to input capture.
   * \hideinitializer
   */
-#define ECAP_DISABLE_INPUT_CHANNEL(ecap, u32Mask) ((ecap)->CTL0 &= ~(u32Mask))
+#define ECAP_DISABLE_INPUT_CHANNEL(ecap, u32Mask) ((ecap)->CTL0 &= ~((uint32_t)(u32Mask) & ECAP_INPUT_MASK))
 
 /**
   * @brief This macro is used to select input channel source
@@ -182,7 +187,7 @@ extern "C"
   * @details This macro will enable the input channel_n interrupt.
   * \hideinitializer
   */
-#define ECAP_ENABLE_INT(ecap, u32Mask) ((ecap)->CTL0 |= (u32Mask))
+#define ECAP_ENABLE_INT(ecap, u32Mask) ((ecap)->CTL0 |= ((uint32_t)(u32Mask) & ECAP_INTEN_MASK))
 
 /**
   * @brief This macro is used to disable input channel interrupt
@@ -195,7 +200,11 @@ extern "C"
   * @details This macro will disable the input channel_n interrupt.
   * \hideinitializer
   */
-#define ECAP_DISABLE_INT(ecap, u32Mask) ((ecap)->CTL0 &= ~(u32Mask))
+#define ECAP_DISABLE_INT(ecap, u32Mask) ((ecap)->CTL0 &= ~((uint32_t)(u32Mask) & ECAP_INTEN_MASK))
+
+#define ECAP_CNT_CLR_EVENT_MASK               (ECAP_CTL1_CAP0CLREN_Msk | ECAP_CTL1_CAP1CLREN_Msk | ECAP_CTL1_CAP2CLREN_Msk | \
+                                               ECAP_CTL1_CAP0RLDEN_Msk | ECAP_CTL1_CAP1RLDEN_Msk | ECAP_CTL1_CAP2RLDEN_Msk | \
+                                               ECAP_CTL1_OVRLDEN_Msk)
 
 /**
   * @brief This macro is used to enable input channel overflow interrupt
@@ -270,10 +279,14 @@ extern "C"
   */
 #define ECAP_SET_CNT_CLEAR_EVENT(ecap, u32Event) do{ \
         if((u32Event) & ECAP_CTL0_CMPCLREN_Msk) \
+        { \
             (ecap)->CTL0 |= ECAP_CTL0_CMPCLREN_Msk; \
+        } \
         else \
+        { \
             (ecap)->CTL0 &= ~ECAP_CTL0_CMPCLREN_Msk; \
-        (ecap)->CTL1 = ((ecap)->CTL1 &~0x00700F00) | ((u32Event) & 0x00700F00); \
+        } \
+        (ecap)->CTL1 = ((ecap)->CTL1 &~ECAP_CNT_CLR_EVENT_MASK) | ((u32Event) & ECAP_CNT_CLR_EVENT_MASK); \
     }while(0);
 #define ECAP_SET_CNT_CLRRLD_EVENT  ECAP_SET_CNT_CLEAR_EVENT
 
@@ -361,7 +374,7 @@ extern "C"
   * @details This macro will select capture counter reload trigger source.
   * \hideinitializer
   */
-#define ECAP_SEL_RELOAD_TRIG_SRC(ecap, u32TrigSrc) ((ecap)->CTL1 = ((ecap)->CTL1 & ~0xF00)|(u32TrigSrc))
+#define ECAP_SEL_RELOAD_TRIG_SRC(ecap, u32TrigSrc) ((ecap)->CTL1 = ((ecap)->CTL1 & ~ECAP_RLDEN_MASK) | ((uint32_t)(u32TrigSrc) & ECAP_RLDEN_MASK))
 
 /**
   * @brief This macro is used to select ECAP counter reload trigger source from Overflow
@@ -388,7 +401,7 @@ extern "C"
   * @details This macro will select capture timer clock has a pre-divider with eight divided option.
   * \hideinitializer
   */
-#define ECAP_SEL_TIMER_CLK_DIV(ecap, u32Clkdiv) ((ecap)->CTL1 = ((ecap)->CTL1 & ~ECAP_CTL1_CLKSEL_Msk)|(u32Clkdiv))
+#define ECAP_SEL_TIMER_CLK_DIV(ecap, u32Clkdiv) ((ecap)->CTL1 = ((ecap)->CTL1 & ~ECAP_CTL1_CLKSEL_Msk) | ((uint32_t)(u32Clkdiv) & ECAP_CTL1_CLKSEL_Msk))
 
 /**
   * @brief This macro is used to select capture timer/counter clock source
@@ -402,7 +415,7 @@ extern "C"
   * @details This macro will select capture timer/clock clock source.
   * \hideinitializer
   */
-#define ECAP_SEL_TIMER_CLK_SRC(ecap, u32ClkSrc) ((ecap)->CTL1 = ((ecap)->CTL1 & ~ECAP_CTL1_CNTSRCSEL_Msk)|(u32ClkSrc))
+#define ECAP_SEL_TIMER_CLK_SRC(ecap, u32ClkSrc) ((ecap)->CTL1 = ((ecap)->CTL1 & ~ECAP_CTL1_CNTSRCSEL_Msk) | ((uint32_t)(u32ClkSrc) & ECAP_CTL1_CNTSRCSEL_Msk))
 
 /**
   * @brief This macro is used to read input capture status
@@ -426,7 +439,7 @@ extern "C"
   * @details This macro will write 1 to get the input channel_n interrupt flag.
   * \hideinitializer
   */
-#define ECAP_GET_CAPTURE_FLAG(ecap, u32Mask) (((ecap)->STATUS & (u32Mask))?1:0)
+#define ECAP_GET_CAPTURE_FLAG(ecap, u32Mask) ((((ecap)->STATUS & ((uint32_t)(u32Mask) & ECAP_STATUS_FLAG_MASK)) != 0U) ? 1UL : 0UL)
 
 /**
   * @brief This macro is used to clear input channel interrupt flag
@@ -441,7 +454,7 @@ extern "C"
   * @details This macro will write 1 to clear the input channel_n interrupt flag.
   * \hideinitializer
   */
-#define ECAP_CLR_CAPTURE_FLAG(ecap, u32Mask) ((ecap)->STATUS = (u32Mask))
+#define ECAP_CLR_CAPTURE_FLAG(ecap, u32Mask) ((ecap)->STATUS = ((uint32_t)(u32Mask) & ECAP_STATUS_FLAG_MASK))
 
 /**
   * @brief This macro is used to clear input capture-match interrupt flag
@@ -467,7 +480,7 @@ extern "C"
   * @details This macro will set a counter value of input capture.
   * \hideinitializer
   */
-#define ECAP_SET_CNT_VALUE(ecap, u32Val) ((ecap)->CNT = (u32Val))
+#define ECAP_SET_CNT_VALUE(ecap, u32Val) ((ecap)->CNT = ((uint32_t)(u32Val) & ECAP_CNT_CNT_Msk))
 
 /**
   * @brief This macro is used to get input capture counter value
@@ -499,7 +512,7 @@ extern "C"
   * @details This macro will set a compare value of input capture counter.
   * \hideinitializer
   */
-#define ECAP_SET_CNT_CMP(ecap, u32Val) ((ecap)->CNTCMP = (u32Val))
+#define ECAP_SET_CNT_CMP(ecap, u32Val) ((ecap)->CNTCMP = ((uint32_t)(u32Val) & ECAP_CNTCMP_CNTCMP_Msk))
 
 void ECAP_Open(ECAP_T *ecap, uint32_t u32FuncMask);
 void ECAP_Close(ECAP_T *ecap);

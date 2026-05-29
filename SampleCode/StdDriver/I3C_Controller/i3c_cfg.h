@@ -32,7 +32,7 @@
 //      <10000000=> 10M
 //      <12500000=> 12.5M
 // <i> Select the SDR SCL frequency
-#define DEVICE_SDR_FREQ         (8000000)
+#define DEVICE_SDR_FREQ         (6000000)
 
 
 // <o> Set DMA Function ON/OFF

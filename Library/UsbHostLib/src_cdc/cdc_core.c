@@ -7,7 +7,6 @@
  * @copyright Copyright (c) 2025 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -31,7 +30,7 @@
 
 /// @cond HIDDEN_SYMBOLS
 #define USB_XFER_TIMEOUT             100
-/// @endcond /* HIDDEN_SYMBOLS */
+/// @endcond HIDDEN_SYMBOLS
 
 /**
  *  @brief  GET_LINE_CODING  request
@@ -47,11 +46,15 @@ int32_t  usbh_cdc_get_line_coding(CDC_DEV_T *cdev, LINE_CODING_T *line_code)
     uint32_t  xfer_len;
     int       ret;
 
-    if (cdev == NULL)
+    if (cdev == USBNULL)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
-    if (cdev->iface_cdc == NULL)
+    if (cdev->iface_cdc == USBNULL)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     ret = usbh_ctrl_xfer(cdev->udev,
                          REQ_TYPE_IN | REQ_TYPE_CLASS_DEV | REQ_TYPE_TO_IFACE,  /* bmRequestType */
@@ -62,7 +65,7 @@ int32_t  usbh_cdc_get_line_coding(CDC_DEV_T *cdev, LINE_CODING_T *line_code)
                          (uint8_t *)line_code,          /* data buffer                           */
                          &xfer_len, CDC_CMD_TIMEOUT);
 
-    if ((ret < 0) || (xfer_len != 7))
+    if ((ret < 0) || (xfer_len != 7U))
     {
         CDC_DBGMSG("GET_LINE_CODIN command failed. %d, %d\n", ret, xfer_len);
         return ret;
@@ -85,23 +88,33 @@ int32_t  usbh_cdc_set_line_coding(CDC_DEV_T *cdev, LINE_CODING_T *line_code)
     uint32_t  xfer_len;
     int       ret;
 
-    if (cdev == NULL)
+    if (cdev == USBNULL)
+    {
         return USBH_ERR_NOT_FOUND;
+    }
 
-    if (cdev->iface_cdc == NULL)
+    if (cdev->iface_cdc == USBNULL)
+    {
         return USBH_ERR_NOT_FOUND;
+    }
 
     if ((line_code->stop_bits != 0) && (line_code->stop_bits != 1) &&
             (line_code->stop_bits != 2))
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     if (line_code->parity > 4)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     if ((line_code->data_bits != 5) && (line_code->data_bits != 6) &&
             (line_code->data_bits != 7) && (line_code->data_bits != 8) &&
             (line_code->data_bits != 16))
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     ret = usbh_ctrl_xfer(cdev->udev,
                          REQ_TYPE_OUT | REQ_TYPE_CLASS_DEV | REQ_TYPE_TO_IFACE, /* bmRequestType */
@@ -137,17 +150,25 @@ int32_t  usbh_cdc_set_control_line_state(CDC_DEV_T *cdev, int active_carrier, in
     int        ret;
     uint16_t   ctrl_bitmap = 0;
 
-    if (cdev == NULL)
+    if (cdev == USBNULL)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
-    if (cdev->iface_cdc == NULL)
+    if (cdev->iface_cdc == USBNULL)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     if (active_carrier)
+    {
         ctrl_bitmap |= 0x02;
+    }
 
     if (DTE_present)
+    {
         ctrl_bitmap |= 0x01;
+    }
 
     ret = usbh_ctrl_xfer(cdev->udev,
                          REQ_TYPE_OUT | REQ_TYPE_CLASS_DEV | REQ_TYPE_TO_IFACE, /* bmRequestType */
@@ -155,7 +176,7 @@ int32_t  usbh_cdc_set_control_line_state(CDC_DEV_T *cdev, int active_carrier, in
                          ctrl_bitmap,                   /* wValue                                */
                          cdev->iface_cdc->if_num,       /* wIndex                                */
                          0,                             /* wLength                               */
-                         NULL,                          /* data buffer                           */
+                         USBNULL,                          /* data buffer                           */
                          &xfer_len, CDC_CMD_TIMEOUT);
 
     if (ret)
@@ -188,7 +209,9 @@ static void  cdc_int_in_irq(UTR_T *utr)
     }
 
     if (cdev->sts_func && utr->xfer_len)
+    {
         cdev->sts_func(cdev, utr->buff, utr->xfer_len);
+    }
 
     utr->xfer_len = 0;
     ret = usbh_int_xfer(utr);
@@ -197,7 +220,7 @@ static void  cdc_int_in_irq(UTR_T *utr)
     {
         CDC_DBGMSG("cdc_int_in_irq - failed to submit interrupt-in request (%d)", ret);
         free_utr(utr);
-        cdev->utr_sts = NULL;
+        cdev->utr_sts = USBNULL;
     }
 }
 
@@ -217,19 +240,23 @@ int32_t usbh_cdc_start_polling_status(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     UTR_T       *utr;
     int         ret;
 
-    if ((cdev == NULL) || (cdev->iface_cdc == NULL))
+    if ((cdev == USBNULL) || (cdev->iface_cdc == USBNULL))
+    {
         return USBH_ERR_NOT_FOUND;
+    }
 
     if (!func || cdev->utr_sts)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     ep = cdev->ep_sts;
 
-    if (ep == NULL)
+    if (ep == USBNULL)
     {
         ep = usbh_iface_find_ep(cdev->iface_cdc, 0, EP_ADDR_DIR_IN | EP_ATTR_TT_INT);
 
-        if (ep == NULL)
+        if (ep == USBNULL)
         {
             CDC_DBGMSG("Interrupt-in endpoint not found in this CDC device!\n");
             return USBH_ERR_EP_NOT_FOUND;
@@ -240,7 +267,7 @@ int32_t usbh_cdc_start_polling_status(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
 
     utr = alloc_utr(cdev->udev);
 
-    if (utr == NULL)
+    if (utr == USBNULL)
     {
         CDC_DBGMSG("Failed to allocated UTR!\n");
         return USBH_ERR_MEMORY_OUT;
@@ -251,7 +278,7 @@ int32_t usbh_cdc_start_polling_status(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     utr->ep = ep;
     utr->data_len = ep->wMaxPacketSize;
 
-    if (utr->data_len > CDC_STATUS_BUFF_SIZE)
+    if (utr->data_len > (uint32_t)CDC_STATUS_BUFF_SIZE)
     {
         CDC_DBGMSG("Warning! CDC_STATUS_BUFF_SIZE %d is smaller than max. packet size %d!\n", CDC_STATUS_BUFF_SIZE, ep->wMaxPacketSize);
         utr->data_len = CDC_STATUS_BUFF_SIZE;
@@ -269,7 +296,7 @@ int32_t usbh_cdc_start_polling_status(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     {
         CDC_DBGMSG("Error - failed to submit interrupt read request (%d)", ret);
         free_utr(utr);
-        cdev->utr_sts = NULL;
+        cdev->utr_sts = USBNULL;
         return ret;
     }
 
@@ -296,10 +323,12 @@ static void  cdc_bulk_in_irq(UTR_T *utr)
     }
 
     if (cdev->rx_func)
+    {
         cdev->rx_func(cdev, utr->buff, utr->xfer_len);
+    }
 
     free_utr(utr);
-    cdev->utr_rx = NULL;
+    cdev->utr_rx = USBNULL;
     cdev->rx_busy = 0;
 }
 
@@ -319,19 +348,23 @@ int32_t usbh_cdc_start_to_receive_data(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     UTR_T       *utr;
     int         ret;
 
-    if ((cdev == NULL) || (cdev->iface_data == NULL))
+    if ((cdev == USBNULL) || (cdev->iface_data == USBNULL))
+    {
         return USBH_ERR_NOT_FOUND;
+    }
 
     if (!func)
+    {
         return USBH_ERR_INVALID_PARAM;
+    }
 
     ep = cdev->ep_rx;
 
-    if (ep == NULL)
+    if (ep == USBNULL)
     {
         ep = usbh_iface_find_ep(cdev->iface_data, 0, EP_ADDR_DIR_IN | EP_ATTR_TT_BULK);
 
-        if (ep == NULL)
+        if (ep == USBNULL)
         {
             CDC_DBGMSG("Bulk-in endpoint not found in this CDC device!\n");
             return USBH_ERR_EP_NOT_FOUND;
@@ -342,7 +375,7 @@ int32_t usbh_cdc_start_to_receive_data(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
 
     utr = alloc_utr(cdev->udev);
 
-    if (utr == NULL)
+    if (utr == USBNULL)
     {
         CDC_DBGMSG("Failed to allocated UTR!\n");
         return USBH_ERR_MEMORY_OUT;
@@ -353,7 +386,7 @@ int32_t usbh_cdc_start_to_receive_data(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     utr->ep = ep;
     utr->data_len = ep->wMaxPacketSize;
 
-    if (utr->data_len > CDC_RX_BUFF_SIZE)
+    if (utr->data_len > (uint32_t)CDC_RX_BUFF_SIZE)
     {
         CDC_DBGMSG("Warning! CDC_RX_BUFF_SIZE %d is smaller than max. packet size %d!\n", CDC_RX_BUFF_SIZE, ep->wMaxPacketSize);
         utr->data_len = CDC_RX_BUFF_SIZE;
@@ -372,7 +405,7 @@ int32_t usbh_cdc_start_to_receive_data(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
     {
         CDC_DBGMSG("Error - failed to submit bulk in request (%d)", ret);
         free_utr(utr);
-        cdev->utr_rx = NULL;
+        cdev->utr_rx = USBNULL;
         cdev->rx_busy = 0;
         return ret;
     }
@@ -388,12 +421,12 @@ int32_t usbh_cdc_start_to_receive_data(CDC_DEV_T *cdev, CDC_CB_FUNC *func)
 static volatile int  bulk_out_done;
 static void  cdc_bulk_out_irq(UTR_T *utr)
 {
-    NVT_UNUSED(utr);
+    (void)NVT_UNUSED(utr);
 
     bulk_out_done = 1;
 }
 
-/// @endcond /* HIDDEN_SYMBOLS */
+/// @endcond HIDDEN_SYMBOLS
 
 
 
@@ -413,16 +446,18 @@ int32_t usbh_cdc_send_data(CDC_DEV_T *cdev, uint8_t *buff, int buff_len)
     uint32_t    t0;
     int         ret;
 
-    if ((cdev == NULL) || (cdev->iface_data == NULL))
+    if ((cdev == USBNULL) || (cdev->iface_data == USBNULL))
+    {
         return USBH_ERR_NOT_FOUND;
+    }
 
     ep = cdev->ep_tx;
 
-    if (ep == NULL)
+    if (ep == USBNULL)
     {
         ep = usbh_iface_find_ep(cdev->iface_data, 0, EP_ADDR_DIR_OUT | EP_ATTR_TT_BULK);
 
-        if (ep == NULL)
+        if (ep == USBNULL)
         {
             CDC_DBGMSG("Bulk-out endpoint not found in this CDC device!\n");
             return USBH_ERR_EP_NOT_FOUND;
@@ -433,7 +468,7 @@ int32_t usbh_cdc_send_data(CDC_DEV_T *cdev, uint8_t *buff, int buff_len)
 
     utr = alloc_utr(cdev->udev);
 
-    if (utr == NULL)
+    if (utr == USBNULL)
     {
         CDC_DBGMSG("Failed to allocated UTR!\n");
         return USBH_ERR_MEMORY_OUT;
@@ -460,9 +495,9 @@ int32_t usbh_cdc_send_data(CDC_DEV_T *cdev, uint8_t *buff, int buff_len)
 
     while (bulk_out_done == 0)
     {
-        if (get_ticks() - t0 > USB_XFER_TIMEOUT)
+        if ((get_ticks() - t0) > (uint32_t)USB_XFER_TIMEOUT)
         {
-            usbh_quit_utr(utr);
+            (void)usbh_quit_utr(utr);
             free_utr(utr);
             return USBH_ERR_TIMEOUT;
         }

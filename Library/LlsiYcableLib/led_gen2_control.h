@@ -26,7 +26,7 @@
 #define LED_GEN2_CAPTURE_BPWM       1
 #define CAPTURE_BPWM            BPWM0
 #define CAPTURE_BPWM_MODULE     BPWM0_MODULE
-#define CAPTURE_BPWM_PRESCALER  (CLK_GetPCLK0Freq() / 1000000)
+#define CAPTURE_BPWM_PRESCALER  (CLK_GetPCLK0Freq() / 1000000U)
 #define CAPTURE_BPWM_IRQN       BPWM0_IRQn
 #define CAPTURE_BPWM_HANDLER    BPWM0_IRQHandler
 #define LED_GEN2_CAPTURE_SOURCE     LED_GEN2_CAPTURE_BPWM
@@ -110,13 +110,27 @@ void LED_Gen2_Initial_Setting(uint8_t target_port);
 void LED_Gen2_Default_Setting(uint8_t target_port, uint8_t id);
 void LED_Effect_Setting(uint8_t LightingMode, uint8_t Color_R, uint8_t Color_G, uint8_t Color_B, uint8_t Brightness);
 void LED_Gen2_ReadStoredSetting(uint8_t target_port, uint8_t id);
-void LED_Gen2_Set_Setting(uint8_t target_port, uint8_t *setting);
+void LED_Gen2_Set_Setting(uint8_t target_port, const uint8_t *setting);
 void LED_Gen2_Control(uint8_t target_port);
 void LED_Gen2_Disable_Mode(uint8_t target_port);
 void LED_Gen2_Enable_Control(uint8_t target_port, uint8_t enable);
 void LED_Gen2_ACK(void);
 
-#define LED_GEN2_PDMA_DESC_NUM    8    // Total dexcriptior table for single strip conctrol
+/* Descriptor table */
+#define LED_GEN2_PDMA_DESC_NUM    11    // Total dexcriptior table for single strip conctrol
+/* 0: Set Setup_LLSI_PERIOD_DUTY to LLSI_PERIOD and LLSI_DUTY
+   1: Set LLSI_PCNT
+   2: Transfer Y_Cable data (Burst 3 words)
+   3: Transfer Y_Cable data (Single 20 words)
+   4: Set LLSI_PCNT
+   5: Transfer command + ID data (Burst 3 words)
+   6: Transfer command + ID data (Single 1 word)
+   7: Set Data_LLSI_PERIOD_DUTY to LLSI_PERIOD and LLSI_DUTY
+   8: Set LLSI_PCNT
+   9: Transfer LED data (Burst 3 words)
+   10: Transfer LED data (Single mode)
+*/
+
 extern volatile DSCT_T *LED_Gen2_PDMA_DESC[LED_GEN2_MAX_SUPPORT_PORT];
 
 #endif  /* __LED_GEN2_CONTROL_H__ */

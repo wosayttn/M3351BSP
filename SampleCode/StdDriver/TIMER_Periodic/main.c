@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "NuMicro.h"
 
+void TIMER0_IRQHandler(void);
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -18,7 +19,7 @@ void TIMER0_IRQHandler(void)
     // clear timer interrupt flag
     TIMER_ClearIntFlag(TIMER0);
 
-    printf("%d sec\n", sec++);
+    printf("%u sec\n", sec++);
 
     while (TIMER_GetIntFlag(TIMER0))
     {
@@ -81,7 +82,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nThis sample code use timer to generate interrupt every 1 second \n");
 
     // Set timer frequency to 1HZ
@@ -95,7 +96,7 @@ int main(void)
     TIMER_Start(TIMER0);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

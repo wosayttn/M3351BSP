@@ -13,10 +13,10 @@
 #define PWM_CH01_DZ_CH    0UL
 #define PWM_CH23_DZ_CH    2UL
 
+void PWM0P0_IRQHandler(void);
 void PWM0P0_IRQHandler(void)
 {
     static uint32_t cnt;
-    static uint32_t out;
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
     /* Clear channel 0 period interrupt flag */
@@ -25,10 +25,16 @@ void PWM0P0_IRQHandler(void)
     /* Channel 0 frequency is 100Hz, every 1 second enter this IRQ handler 100 times. */
     if (++cnt == 100)
     {
+        static uint32_t out;
+
         if (out)
+        {
             PWM_EnableOutput(PWM0, PWM_CH_0_MASK | PWM_CH_1_MASK | PWM_CH_2_MASK | PWM_CH_3_MASK);
+        }
         else
+        {
             PWM_DisableOutput(PWM0, PWM_CH_0_MASK | PWM_CH_1_MASK | PWM_CH_2_MASK | PWM_CH_3_MASK);
+        }
 
         out ^= 1;
         cnt = 0;
@@ -104,7 +110,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|                        PWM DeadTime Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -141,7 +147,7 @@ int main(void)
     PWM_Start(PWM0, 0xF);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

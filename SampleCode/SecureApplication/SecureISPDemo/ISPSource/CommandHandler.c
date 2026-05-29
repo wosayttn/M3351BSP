@@ -16,7 +16,14 @@
     #include "crypto_mbedtls.h"
 #endif
 
+//#define DBG             printf
+//#define DUMP_PACKET     1
 #define CMD_DBG         printf
+
+#ifndef DBG
+    #define DBG(...)
+#endif
+
 #define LIB_VERSION     (0x23551171UL) // 2355 + 'M' + 'DD' + IDX ... 1st released
 
 uint32_t CMDLIB_VERSION(void)
@@ -94,7 +101,8 @@ void BytesSwap(char *buf, int32_t len)
 int32_t CalculateSHA256(uint32_t start, uint32_t end, uint32_t digest[], E_SHA_OP_MODE mode, E_SHA_SRC src)
 {
     volatile int32_t    i, bytes;
-    uint32_t            *ptr, u32Addr, data, Hash[8];
+    uint32_t            *ptr, u32Addr, Hash[8];
+    uint32_t            data = 0;
 
     bytes   = end - start;
     ptr     = (uint32_t *)start;
@@ -196,8 +204,8 @@ int32_t CalculateSHA256(uint32_t start, uint32_t end, uint32_t digest[], E_SHA_O
 */
 static uint16_t PACKET_ExecCCITT(uint32_t *pu32buf, uint16_t u32ByteCnt, uint8_t u8Mode)
 {
-    uint16_t   i;
-    uint16_t   *pu16buf, u16OrgSum, u16CalSum;
+    uint32_t i;
+    uint16_t *pu16buf, u16OrgSum, u16CalSum;
 
     if (u32ByteCnt > 56)   // Invalid data byte count
         return -1;
@@ -212,19 +220,18 @@ static uint16_t PACKET_ExecCCITT(uint32_t *pu32buf, uint16_t u32ByteCnt, uint8_t
 #if (0)
         DBG("idx-%d: 0x%04x (CCITT)\n", i, pu16buf[i]);
 #endif
-        CRC->DAT = *(pu16buf + i);
+        CRC_WRITE_DATA(pu16buf[i]);
     }
 
     u16OrgSum = pu16buf[0];
-    u16CalSum = (CRC->CHECKSUM & 0xFFFFul);
+    u16CalSum = CRC_GetChecksum();
 
-    /* Clear CRC checksum */
-    CRC->SEED = 0xFFFFul;
-    CRC->CTL |= CRC_CTL_CHKSINIT_Msk;
+    /* Clear CRC checksum and reset seed */
+    CRC_SET_SEED(0xFFFF);
 
     if (u8Mode == 0)
     {
-        *(pu16buf + 0) = u16CalSum;
+        pu16buf[0] = u16CalSum;
         return u16CalSum;
     }
     else if (u8Mode == 1)
@@ -262,21 +269,20 @@ static uint32_t PACKET_ExecCRC32(uint32_t *pu32buf, uint16_t len, uint8_t mode)
     for (i = 0; i < (len / 4) - 1; i++)
     {
 #if (0)
-        DBG("idx-%d: 0x%08x. (CRC32)\n", i, *(pu32buf + i));
+        DBG("idx-%d: 0x%08x. (CRC32)\n", i, pu32buf[i]);
 #endif
-        CRC->DAT = *(pu32buf + i);
+        CRC_WRITE_DATA(pu32buf[i]);
     }
 
-    u32OrgSum = *(pu32buf + i);
-    u32CalSum = (CRC->CHECKSUM & 0xFFFFFFFFul);
+    u32OrgSum = pu32buf[i];
+    u32CalSum = CRC_GetChecksum();
 
-    /* Clear CRC checksum */
-    CRC->SEED = 0xFFFFFFFFul;
-    CRC->CTL |= CRC_CTL_CHKSINIT_Msk;
+    /* Clear CRC checksum and reset seed */
+    CRC_SET_SEED(0xFFFFFFFF);
 
     if (mode == 0)
     {
-        *(pu32buf + i) = u32CalSum;
+        pu32buf[i] = u32CalSum;
         return u32CalSum;
     }
     else if (mode == 1)
@@ -300,6 +306,7 @@ static int32_t PACKET_AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, u
 {
     int32_t i32TimeOutCnt;
 
+    AES_CLR_INT_FLAG(CRYPTO);
     AES_Open(CRYPTO, 0, 1, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
     AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
     AES_SetInitVect(CRYPTO, 0, IV);
@@ -308,12 +315,19 @@ static int32_t PACKET_AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, u
 
     i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
-    while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
+    while (AES_GET_INT_FLAG(CRYPTO) == 0)
     {
         if (i32TimeOutCnt-- < 0)
             return -1;
     }
 
+    if (AES_GET_INT_FLAG(CRYPTO) & CRYPTO_INTSTS_AESEIF_Msk)
+    {
+        AES_CLR_INT_FLAG(CRYPTO);
+        return -2;
+    }
+
+    AES_CLR_INT_FLAG(CRYPTO);
     return 0;
 }
 
@@ -324,6 +338,7 @@ static int32_t PACKET_AES256Decrypt(uint32_t *in, uint32_t *out, uint32_t len, u
 {
     int32_t i32TimeOutCnt;
 
+    AES_CLR_INT_FLAG(CRYPTO);
     AES_Open(CRYPTO, 0, 0, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
     AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
     AES_SetInitVect(CRYPTO, 0, IV);
@@ -332,12 +347,19 @@ static int32_t PACKET_AES256Decrypt(uint32_t *in, uint32_t *out, uint32_t len, u
 
     i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
-    while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
+    while (AES_GET_INT_FLAG(CRYPTO) == 0)
     {
         if (i32TimeOutCnt-- < 0)
             return -1;
     }
 
+    if (AES_GET_INT_FLAG(CRYPTO) & CRYPTO_INTSTS_AESEIF_Msk)
+    {
+        AES_CLR_INT_FLAG(CRYPTO);
+        return -2;
+    }
+
+    AES_CLR_INT_FLAG(CRYPTO);
     return 0;
 }
 
@@ -358,7 +380,7 @@ int32_t CMD_GenRspPacket(CMD_PACKET_T *pCMD, ISP_INFO_T *pISPInfo)
     if (i != 8)
         PACKET_AES256Encrypt(pCMD->au32Data, pCMD->au32Data, sizeof(pCMD->au32Data), pISPInfo->au32AESKey, pISPInfo->au32AESIV);
 
-#if (0)
+#if (DUMP_PACKET == 1)
     {
         uint32_t *pu32;
         pu32 = (uint32_t *)pCMD;
@@ -392,7 +414,7 @@ int32_t CMD_GenRspPacket(CMD_PACKET_T *pCMD, ISP_INFO_T *pISPInfo)
     /* Generate CRC32 */
     PACKET_ExecCRC32((uint32_t *)pCMD, sizeof(CMD_PACKET_T) - 4, 0);
 
-#if (1)
+#if (DUMP_PACKET == 1)
     {
         uint32_t *pu32 = (uint32_t *)pCMD;
 
@@ -437,7 +459,7 @@ int32_t CMD_ParseReqPacket(CMD_PACKET_T *pCMD, ISP_INFO_T *pISPInfo)
 {
     uint32_t i;
 
-#if (0)
+#if (DUMP_PACKET == 1)
     {
         uint32_t *pu32 = (uint32_t *)pCMD;
         printf("Get REQ data:\n");
@@ -474,7 +496,7 @@ int32_t CMD_ParseReqPacket(CMD_PACKET_T *pCMD, ISP_INFO_T *pISPInfo)
     if (i != 8)
         PACKET_AES256Decrypt(pCMD->au32Data, pCMD->au32Data, sizeof(pCMD->au32Data), pISPInfo->au32AESKey, pISPInfo->au32AESIV);
 
-#if (1)
+#if (DUMP_PACKET == 1)
     {
         uint32_t *pu32 = (uint32_t *)pCMD;
 
@@ -1225,40 +1247,21 @@ static int32_t _IsValidFlashRegion(uint32_t u32Addr, uint32_t size, uint32_t u32
 
 static int32_t _ISPWrite(uint32_t u32Addr, uint32_t u32Data0, uint32_t u32Data1)
 {
-    FMC->ISPCMD  = FMC_ISPCMD_PROGRAM_64;
-    FMC->ISPADDR = u32Addr;
-    FMC->MPDAT0  = u32Data0;
-    FMC->MPDAT1  = u32Data1;
-    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
-
-    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk) ;
-
-    /* Clear ISPFF if cmd FAIL */
-    if (FMC->ISPCTL & FMC_ISPCTL_ISPFF_Msk)
-    {
-        FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
-        return -1;
-    }
-
-    return 0;
+    return FMC_Write8Bytes(u32Addr, u32Data0, u32Data1);
 }
 
 static uint32_t _ISPRead(uint32_t u32Addr)
 {
-    FMC->ISPCMD  = FMC_ISPCMD_READ;
-    FMC->ISPADDR = u32Addr;
-    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
+    uint32_t u32Data = FMC_Read(u32Addr);
 
-    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk) { }
-
-    /* Clear ISPFF if cmd FAIL */
-    if (FMC->ISPSTS & FMC_ISPSTS_ISPFF_Msk)
+    if (FMC_GET_FAIL_FLAG())
     {
-        FMC->ISPSTS |= FMC_ISPSTS_ISPFF_Msk;
+        /* Clear ISPFF if cmd FAIL */
+        FMC_CLR_FAIL_FLAG();
         return -1;
     }
 
-    return FMC->ISPDAT;
+    return u32Data;
 }
 
 static int32_t _WriteFlash(uint32_t u32Addr, uint32_t u32Size, uint32_t *pu32Data, uint32_t u32CmdMask)

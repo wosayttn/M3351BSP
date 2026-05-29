@@ -65,7 +65,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nThis sample code use timer 0 to generate 500Hz toggle output to PB.5\n");
 
     /* To generate 500HZ toggle output, timer frequency must set to 1000Hz.
@@ -74,7 +74,7 @@ int main(void)
     TIMER_Start(TIMER0);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

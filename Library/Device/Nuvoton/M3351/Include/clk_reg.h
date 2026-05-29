@@ -70,7 +70,7 @@ typedef struct
      * |        |          |Note 1: The interrupt will occur when both PDWKIF and PDWKIEN are high.
      * |        |          |Note 2: This bit is write protected. Refer to the SYS_REGLCTL register.
      * |[6]     |PDWKIF    |Power-down Mode Wake-up Interrupt Status
-     * |        |          |Set by u201CPower-down wake-up eventu201D, it indicates that resume from Power-down mode.
+     * |        |          |Set by "Power-down wake-up event", it indicates that resume from Power-down mode.
      * |        |          |The flag is set if any wake-up source occurred. Refer Power Modes and Wake-up Sources chapter.
      * |        |          |Note 1: Write 1 to clear the bit to 0.
      * |        |          |Note 2: This bit works only if PDWKIEN (CLK_PWRCTL[5]) set to 1.
@@ -685,7 +685,7 @@ typedef struct
      * |        |          |1 = 4~32 MHz external high speed crystal oscillator (HXT) clock is stable and enabled.
      * |[1]     |LXTSTB    |LXT Clock Source Stable Flag (Read Only)
      * |        |          |0 = 32.768 kHz external low speed crystal oscillator (LXT) clock is not stable or disabled.
-     * |        |          |1 = 32.768 kHz external low speed crystal oscillator (LXT) clock is stabled and enabled.
+     * |        |          |1 = 32.768 kHz external low speed crystal oscillator (LXT) clock is stable and enabled.
      * |[2]     |PLLSTB    |Internal PLL Clock Source Stable Flag (Read Only)
      * |        |          |0 = Internal PLL clock is not stable or disabled.
      * |        |          |1 = Internal PLL clock is stable and enabled.
@@ -703,6 +703,17 @@ typedef struct
      * |        |          |1 = Clock switching failure.
      * |        |          |Note: This bit is read only
      * |        |          |After selected clock source is stable, hardware will switch system clock to selected clock automatically, and CLKSFAIL will be cleared automatically by hardware.
+     * @var CLK_T::I3CHDRSCLEXT
+     * Offset: 0x54  I3C Controller HDR mode SCL Extended Register
+     * ---------------------------------------------------------------------------------------------------
+     * |Bits    |Field     |Descriptions
+     * | :----: | :----:   | :---- |
+     * |[7]     |HDRSCLEXTEN|HDR Mode SCL Extended Function Enable Bit (Write Protect)
+     * |        |          |Extended preamble[1:0] SCL period for I3C Controller HDR-DDR read transfer.
+     * |        |          |Extended transition[0:1] SCL period for I3C Controller HDR-BT write/read transfer.
+     * |        |          |0 = Disable. (default)
+     * |        |          |1 = SCL period: PPHCNT(I3C_SCLPP[23:16]) + TERMCNT(I3C_SCLEXTTB[3:0).
+     * |        |          |Note: These bits are write protected. Refer to the SYS_REGLCTL register.
      * @var CLK_T::CLKOCTL
      * Offset: 0x60  Clock Output Control Register
      * ---------------------------------------------------------------------------------------------------
@@ -865,7 +876,7 @@ typedef struct
      * |        |          |Note: These bits are write protected. Refer to the SYS_REGLCTL register.
      * |[13]    |WKTMRMOD  |Wake-up Timer Mode (Write Protect)
      * |        |          |0 = Wake-up timer started when entering Power-down mode.
-     * |        |          |1 = Wake-up timer started immedially when WKTMREN (CLK_PMUCTL[8]) =1.
+     * |        |          |1 = Wake-up timer started immediately when WKTMREN (CLK_PMUCTL[8]) =1.
      * |        |          |Note: This bit is write protected. Refer to the SYS_REGLCTL register.
      * |[18]    |ACMPSPWK  |ACMP Standby Power-down Mode Wake-up Enable Bit (Write Protect)
      * |        |          |0 = ACMP wake-up disabled at Standby Power-down mode.
@@ -1342,7 +1353,8 @@ typedef struct
     __IO uint32_t PLLCTL;                /*!< [0x0040] PLL Control Register                                             */
     __I  uint32_t RESERVE2[3];
     __I  uint32_t STATUS;                /*!< [0x0050] Clock Status Monitor Register                                    */
-    __I  uint32_t RESERVE3[3];
+    __IO uint32_t I3CHDRSCLEXT;          /*!< [0x0054] I3C Controller HDR mode SCL Extended Register                    */
+    __I  uint32_t RESERVE3[2];
     __IO uint32_t CLKOCTL;               /*!< [0x0060] Clock Output Control Register                                    */
     __I  uint32_t RESERVE4[3];
     __IO uint32_t CLKDCTL;               /*!< [0x0070] Clock Fail Detector Control Register                             */
@@ -1830,6 +1842,9 @@ typedef struct
 
 #define CLK_STATUS_CLKSFAIL_Pos          (7)                                               /*!< CLK_T::STATUS: CLKSFAIL Position       */
 #define CLK_STATUS_CLKSFAIL_Msk          (0x1ul << CLK_STATUS_CLKSFAIL_Pos)                /*!< CLK_T::STATUS: CLKSFAIL Mask           */
+
+#define CLK_I3CHDRSCLEXT_HDRSCLEXTEN_Pos (7)                                               /*!< CLK_T::I3CHDRSCLEXT: HDRSCLEXTEN Position*/
+#define CLK_I3CHDRSCLEXT_HDRSCLEXTEN_Msk (0x1ul << CLK_I3CHDRSCLEXT_HDRSCLEXTEN_Pos)       /*!< CLK_T::I3CHDRSCLEXT: HDRSCLEXTEN Mask  */
 
 #define CLK_CLKOCTL_FREQSEL_Pos          (0)                                               /*!< CLK_T::CLKOCTL: FREQSEL Position       */
 #define CLK_CLKOCTL_FREQSEL_Msk          (0xful << CLK_CLKOCTL_FREQSEL_Pos)                /*!< CLK_T::CLKOCTL: FREQSEL Mask           */

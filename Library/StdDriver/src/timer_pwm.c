@@ -34,12 +34,17 @@
   */
 uint32_t TPWM_ConfigOutputFreqAndDuty(TIMER_T *timer, uint32_t u32Frequency, uint32_t u32DutyCycle)
 {
-    uint32_t u32Src = 2UL, u32PWMClockFreq, u32TargetFreq;
-    uint32_t u32Prescaler = 0x100UL, u32Period;
+    uint32_t u32Src = 2UL;
+    uint32_t u32PWMClockFreq;
+    uint32_t u32TargetFreq;
+    uint32_t u32Prescaler = 0x100UL;
+    uint32_t u32Period = 1UL;
     const uint32_t au32Clk[] = {__HXT, __LXT, 0UL, 0UL, 0UL, __LIRC, 0UL, __HIRC};
 
-    if (u32Frequency == 0)
+    if (u32Frequency == 0UL)
+    {
         return u32Frequency;
+    }
 
     if (timer == TIMER0)
     {
@@ -74,14 +79,21 @@ uint32_t TPWM_ConfigOutputFreqAndDuty(TIMER_T *timer, uint32_t u32Frequency, uin
         u32PWMClockFreq = au32Clk[u32Src];
     }
 
-    /* Calculate u16PERIOD and u8PSC */
+    if (u32Frequency > u32PWMClockFreq)
+    {
+        return 0UL;
+    }
+
+    /* Calculate u32Period and u32Prescaler */
     for (u32Prescaler = 1UL; u32Prescaler <= 0x100UL; u32Prescaler++)
     {
         u32Period = (u32PWMClockFreq / u32Prescaler) / u32Frequency;
 
         /* If target u32Period is larger than 0x10000, need to use a larger prescaler */
         if (u32Period > 0x10000UL)
+        {
             continue;
+        }
 
         break;
     }
@@ -147,8 +159,13 @@ void TPWM_DisableCounter(TIMER_T *timer)
   */
 void TPWM_EnableTrigger(TIMER_T *timer, uint32_t u32TargetMask, uint32_t u32Condition)
 {
+    if ((u32TargetMask == 0UL) || ((u32TargetMask & ~(TIMER_PWMTRGCTL_PWMTRGDAC_Msk | TIMER_PWMTRGCTL_PWMTRGEADC_Msk | TIMER_PWMTRGCTL_PWMTRGPDMA_Msk)) != 0UL))
+    {
+        return;
+    }
+
     timer->PWMTRGCTL &= ~(TIMER_PWMTRGCTL_PWMTRGDAC_Msk | TIMER_PWMTRGCTL_PWMTRGEADC_Msk | TIMER_PWMTRGCTL_PWMTRGPDMA_Msk | TIMER_PWMTRGCTL_TRGSEL_Msk);
-    timer->PWMTRGCTL |= (u32TargetMask) | (u32Condition);
+    timer->PWMTRGCTL |= (u32TargetMask) | ((u32Condition) & TIMER_PWMTRGCTL_TRGSEL_Msk);
 }
 
 /**
@@ -166,6 +183,11 @@ void TPWM_EnableTrigger(TIMER_T *timer, uint32_t u32TargetMask, uint32_t u32Cond
   */
 void TPWM_DisableTrigger(TIMER_T *timer, uint32_t u32TargetMask)
 {
+    if ((u32TargetMask & ~(TIMER_PWMTRGCTL_PWMTRGDAC_Msk | TIMER_PWMTRGCTL_PWMTRGEADC_Msk | TIMER_PWMTRGCTL_PWMTRGPDMA_Msk)) != 0UL)
+    {
+        return;
+    }
+
     timer->PWMTRGCTL &= ~(u32TargetMask);
 }
 
@@ -182,7 +204,7 @@ void TPWM_DisableTrigger(TIMER_T *timer, uint32_t u32TargetMask)
 void TPWM_EnableAcc(TIMER_T *timer, uint32_t u32IntFlagCnt, uint32_t u32IntAccSrc)
 {
     timer->PWMIFA = (((timer)->PWMIFA & ~(TIMER_PWMIFA_IFACNT_Msk | TIMER_PWMIFA_IFASEL_Msk | TIMER_PWMIFA_STPMOD_Msk))
-                     | (TIMER_PWMIFA_IFAEN_Msk | (u32IntFlagCnt << TIMER_PWMIFA_IFACNT_Pos) | (u32IntAccSrc << TIMER_PWMIFA_IFASEL_Pos)));
+                     | (TIMER_PWMIFA_IFAEN_Msk | (u32IntFlagCnt & TIMER_PWMIFA_IFACNT_Msk) | ((u32IntAccSrc & 0x3UL) << TIMER_PWMIFA_IFASEL_Pos)));
 }
 
 /**
@@ -236,7 +258,7 @@ void TPWM_ClearAccInt(TIMER_T *timer)
   * @retval     1   Accumulator interrupt occurred
   * @details    This function is used to get interrupt flag accumulator interrupt.
   */
-uint32_t TPWM_GetAccInt(TIMER_T *timer)
+uint32_t TPWM_GetAccInt(const TIMER_T *timer)
 {
     return (((timer)->PWMAINTSTS & TIMER_PWMAINTSTS_IFAIF_Msk) ? 1UL : 0UL);
 }

@@ -160,7 +160,7 @@ void Reg2Hex(int32_t count, uint32_t volatile reg[], char output[])
   * @return  -1   "eECC_Curve" value is invalid.
   * @return  -2   Verification failed.
   */
-int32_t ECC_VerifySignature(CRYPTO_T *psCRYPTO, E_ECC_CURVE eECC_Curve, char *message, char *public_k1, char *public_k2, char *R, char *S)
+int32_t ECC_VerifySignature(CRYPTO_T *psCRYPTO, E_ECC_CURVE eECC_Curve, char *message, const char *public_k1, const char *public_k2, char *R, char *S)
 {
     int32_t ret;
     mbedtls_ecp_group grp;

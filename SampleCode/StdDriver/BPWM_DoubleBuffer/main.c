@@ -12,6 +12,8 @@
 
 #define BPWM_OUT_CH    0UL
 
+void BPWM0_IRQHandler(void);
+
 /*
     BPWM0 channel 0 waveform of this sample shown below(up counter type):
 
@@ -31,7 +33,7 @@ void BPWM0_IRQHandler(void)
     BPWM_ClearPeriodIntFlag(BPWM0, BPWM_OUT_CH);
 
     // Update BPWM0 channel 0 period and duty
-    if (u32Toggle == 0)
+    if (u32Toggle == 0U)
     {
         BPWM_SET_CNR(BPWM0, BPWM_OUT_CH, 399);
         BPWM_SET_CMR(BPWM0, BPWM_OUT_CH, 300);
@@ -110,7 +112,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|                    BPWM DoubleBuffer Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -127,7 +129,7 @@ int main(void)
       Duty ratio = (225) / (449 + 1) = 50%
     */
     /* BPWM0 channel 0 frequency is 160000Hz, duty 50% */
-    printf("\nSet 160000Hz frequency.real is %d\n", BPWM_ConfigOutputChannel(BPWM0, BPWM_OUT_CH, 160000, 50));
+    printf("\nSet 160000Hz frequency.real is %u\n", BPWM_ConfigOutputChannel(BPWM0, BPWM_OUT_CH, 160000, 50));
 
     /* Enable output of BPWM0 channel 0 */
     BPWM_EnableOutput(BPWM0, BPWM_CH_0_MASK);
@@ -140,7 +142,7 @@ int main(void)
     BPWM_Start(BPWM0, BPWM_CH_0_MASK);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

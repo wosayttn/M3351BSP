@@ -18,12 +18,29 @@ if ((ENABLE_SRAM2 != 0) && (ENABLE_SRAM2 != 1)) {
     error "ENABLE_SRAM2 must be 0 (disable) or 1 (enable)";
 }
 
+/* The default flash and SRAM sizes are defined for the largest part number.
+ * Please revise the flash and SRAM sizes according to your target part number.
+ */
 /*-Memory Regions-*/
 define symbol __ICFEDIT_region_ROM_start__ = 0x00000000;
 define symbol __ICFEDIT_region_ROM_end__   = ( 0x00100000 - 1 );
 
 define symbol __ICFEDIT_region_RAM_start__ = 0x20000000;
 define symbol __ICFEDIT_region_RAM_end__   = ( 0x20020000 + (ENABLE_SRAM2 * 0x8000) - 1 );
+
+/* Validate memory ranges to avoid wrapped regions caused by end < start */
+if (__ICFEDIT_region_ROM_end__ < __ICFEDIT_region_ROM_start__) {
+    error "Invalid ROM region: __ICFEDIT_region_ROM_end__ must be >= __ICFEDIT_region_ROM_start__";
+}
+
+if (__ICFEDIT_region_RAM_end__ < __ICFEDIT_region_RAM_start__) {
+    error "Invalid RAM region: __ICFEDIT_region_RAM_end__ must be >= __ICFEDIT_region_RAM_start__";
+}
+
+/* Validate vector table location is inside ROM range */
+if ((__ICFEDIT_intvec_start__ < __ICFEDIT_region_ROM_start__) || (__ICFEDIT_intvec_start__ > __ICFEDIT_region_ROM_end__)) {
+    error "Invalid vector table location: __ICFEDIT_intvec_start__ must be inside ROM region";
+}
 
 /*-Sizes-*/
 if (!isdefinedsymbol(__ICFEDIT_size_cstack__)) {

@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>M3351KJCAE</Device>
           <Vendor>Nuvoton</Vendor>
-          <PackID>Nuvoton.NuMicroM33_DFP.1.0.2</PackID>
+          <PackID>Nuvoton.NuMicroM33_DFP.1.0.3</PackID>
           <PackURL>https://github.com/OpenNuvoton/cmsis-packs/raw/master/Nuvoton_DFP/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x30000000,0x20000) IROM(0x00000000,0x100000) IROM2(0x10000000,0x100000) IROM3(0x0F100000,0x4000) CPUTYPE("Cortex-M33") FPU3(SFPU) DSP TZ CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -193,7 +193,7 @@
             <useUlib>1</useUlib>
             <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
-            <nSecure>0</nSecure>
+            <nSecure>2</nSecure>
             <RoSelD>4</RoSelD>
             <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
@@ -207,12 +207,12 @@
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
             <Ir1Chk>1</Ir1Chk>
-            <Ir2Chk>1</Ir2Chk>
+            <Ir2Chk>0</Ir2Chk>
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
-            <Im2Chk>1</Im2Chk>
+            <Im2Chk>0</Im2Chk>
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -277,12 +277,12 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x200000</Size>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
-                <StartAddress>0x200000</StartAddress>
-                <Size>0x200000</Size>
+                <StartAddress>0x10000000</StartAddress>
+                <Size>0x100000</Size>
               </OCR_RVCT5>
               <OCR_RVCT6>
                 <Type>0</Type>
@@ -306,7 +306,7 @@
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x20200000</StartAddress>
+                <StartAddress>0x30000000</StartAddress>
                 <Size>0x20000</Size>
               </OCR_RVCT10>
             </OnChipMemories>
@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>-Wconditional-uninitialized -mno-unaligned-access</MiscControls>
               <Define>STDIN_ECHO=0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\Library\CMSIS\Core\Include;..\..\..\..\Library\CMSIS\compiler\include;..\..\..\..\Library\Device\Nuvoton\M3351\Include;..\..\..\..\Library\StdDriver\inc;..\..\..\..\Library\UsbHostLib\inc;..\..\..\..\Library\UsbHostLib\src_core;..\..\..\..\Library\UsbHostLib\src_hid</IncludePath>
@@ -473,6 +473,11 @@
               <FileName>hid_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\Library\UsbHostLib\src_hid\hid_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hid_parser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\Library\UsbHostLib\src_hid\hid_parser.c</FilePath>
             </File>
           </Files>
         </Group>

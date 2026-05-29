@@ -25,7 +25,7 @@ I3C_DEVICE_T g_I3CDev =
     .main_controller_da = I3C0_CTR_DA,
 
     .target_index = 0,
-    .target_count = 7,
+    .target_count = 0,
 #else
     .device_role        = I3C_TARGET,
     .main_target_sa     = I3C0_TGT_SA,
@@ -428,41 +428,18 @@ uint32_t I3C_FuncDAAssign(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt, uint8_t 
                     I3C_SetDeviceAddr(dev->port, i, I3C_DEVTYPE_I2C, dev->target_da[i], dev->target_sa[i]);
                 }
             }
+            else if ((dev->cmd_response & I3C_CTRRESP_ERRSTS_Msk) == I3C_CTRRESP_BRD_ADDR_NACK_ERR)
+            {
+                // Do Nothing ...
+            }
             else
             {
                 dev->target_count = (sTotalAddrCnt == 0xFF) ? 0 : sTotalAddrCnt;
             }
 
             printf("Current Target info after RSTDAA CCC. (DA count: %d)\n", dev->target_count);
-
             /* Dump all Targets info. */
-            for (i = 0; i < 7; i++)
-            {
-                if (dev->port->TGTCFG[i] & I3C_TGTCFG_DEVTYPE_Msk)
-                {
-                    // Target at I2C mode
-                    dev->target_sa[i] = ((dev->port->TGTCFG[i] & I3C_TGTCFG_SADDR_Msk) >> I3C_TGTCFG_SADDR_Pos);
-
-                    if (dev->target_sa[i] == 0x0)
-                    {
-                        continue;
-                    }
-
-                    printf("\tTarget #%d:\n", i);
-                    printf("\t - SADDR          = 0x%02x \n", dev->target_sa[i]);
-                }
-                else
-                {
-                    // Target at I3C mode
-                    dev->target_da[i] = ((dev->port->TGTCHAR[i].DADDR & I3C_TGTCHAR4_DADDR_Msk) >> I3C_TGTCHAR4_DADDR_Pos);
-                    printf("\tTarget #%d:\n", i);
-                    printf("\t - Provisional ID = 0x%08x%02x \n", dev->port->TGTCHAR[i].PIDMSB, dev->port->TGTCHAR[i].PIDLSB);
-                    printf("\t - BCR, DCR       = 0x%08x \n", dev->port->TGTCHAR[i].BCRDCR);
-                    printf("\t - DADDR          = 0x%02x \n", dev->target_da[i]);
-                }
-            }
-
-            printf("\n");
+            I3C_DumpAllTargetInfo(dev);
             break;
 
         case I3C_CCC_ENTDAA:
@@ -503,50 +480,8 @@ uint32_t I3C_FuncDAAssign(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt, uint8_t 
             }
 
             printf("Total I3C Target x%d after ENTDAA CCC.\n", dev->target_count);
-
             /* Dump all Targets info. */
-            if (dev->target_count == 0)
-            {
-                for (i = 0; i < 7; i++)
-                {
-                    dev->target_da[i] = 0x0;
-                    I3C_SetDeviceAddr(dev->port, i, I3C_DEVTYPE_I2C, dev->target_da[i], dev->target_sa[i]);
-                }
-
-                printf("\tNo valid I3C Target on the bus\n");
-            }
-            else
-            {
-                for (i = 0; i < 7; i++)
-                {
-                    if (dev->target_count >  i)
-                    {
-                        // Target at I3C mode
-                        dev->target_da[i] = ((dev->port->TGTCHAR[i].DADDR & I3C_TGTCHAR4_DADDR_Msk) >> I3C_TGTCHAR4_DADDR_Pos);
-                        printf("\tTarget #%d:\n", i);
-                        printf("\t - Provisional ID = 0x%08x%02x \n", dev->port->TGTCHAR[i].PIDMSB, dev->port->TGTCHAR[i].PIDLSB);
-                        printf("\t - BCR, DCR       = 0x%08x \n", dev->port->TGTCHAR[i].BCRDCR);
-                        printf("\t - DADDR          = 0x%02x \n", dev->target_da[i]);
-                    }
-                    else
-                    {
-                        // Target at I2C mode
-                        dev->target_da[i] = 0x0;
-                        I3C_SetDeviceAddr(dev->port, i, I3C_DEVTYPE_I2C, dev->target_da[i], dev->target_sa[i]);
-                        dev->target_sa[i] = ((dev->port->TGTCFG[i] & I3C_TGTCFG_SADDR_Msk) >> I3C_TGTCFG_SADDR_Pos);
-
-                        if (dev->target_sa[i] == 0x0)
-                        {
-                            continue;
-                        }
-
-                        printf("\tTarget #%d:\n", i);
-                        printf("\t - SADDR          = 0x%02x \n", dev->target_sa[i]);
-                    }
-                }
-            }
-
-            printf("\n");
+            I3C_DumpAllTargetInfo(dev);
             break;
 
         default:
@@ -598,16 +533,7 @@ int32_t I3C_FuncIBIReceived(I3C_DEVICE_T *dev)
                 iRet = I3C_IBI_TYPE_HJ;
                 printf("#IBI: Process Hot-Join request ... %s.\n", (dev->ibi_id == 0x2) ? "PASS" : "FAIL");
                 printf("Total I3C Target x%d after Hot-Join reguest:\n", dev->target_count);
-
-                for (i = 0; i < dev->target_count; i++)
-                {
-                    printf("\tTarget #%d:\n", i);
-                    dev->target_da[i] = ((dev->port->TGTCHAR[i].DADDR & I3C_TGTCHAR4_DADDR_Msk) >> I3C_TGTCHAR4_DADDR_Pos);
-                    printf("\t - Provisional ID = 0x%08x%02x \n", dev->port->TGTCHAR[i].PIDMSB, dev->port->TGTCHAR[i].PIDLSB);
-                    printf("\t - BCR, DCR       = 0x%08x \n", dev->port->TGTCHAR[i].BCRDCR);
-                    printf("\t - DADDR          = 0x%02x \n", dev->target_da[i]);
-                }
-
+                I3C_FuncDAAssign(dev, I3C_CCC_ENTDAA, 7, 0);
                 break;
 
             default:
@@ -1285,6 +1211,57 @@ int32_t I3C_FuncSETCCC(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt)
         while ((dev->port->INTSTS & I3C_INTSTS_RESPRDY_Msk) == 0) {}
 
         printf("\n[ TODO: Users need to manually parse the RespQ status 0x%08x ]\n", dev->port->RESPQUE);
+    }
+
+    printf("\n");
+    return I3C_STS_NO_ERR;
+}
+
+int32_t  I3C_DumpAllTargetInfo(I3C_DEVICE_T *dev)
+{
+    volatile uint32_t i, j;
+
+    /* Dump all Targets info. */
+    if (dev->target_count == 0)
+    {
+        for (i = 0; i < 7; i++)
+        {
+            dev->target_da[i] = 0x0;
+            I3C_SetDeviceAddr(dev->port, i, I3C_DEVTYPE_I2C, dev->target_da[i], dev->target_sa[i]);
+        }
+
+        printf("\tNo valid I3C Target on the bus\n");
+    }
+    else
+    {
+        for (i = 0; i < 7; i++)
+        {
+            if (dev->target_count >  i)
+            {
+                j = (((dev->port->CHRTBP & I3C_CHRTBP_CHRINDEX_Msk) >> I3C_CHRTBP_CHRINDEX_Pos) + 7UL - dev->target_count + i) % 7UL;
+                // Target at I3C mode
+                dev->target_da[i] = ((dev->port->TGTCHAR[j].DADDR & I3C_TGTCHAR4_DADDR_Msk) >> I3C_TGTCHAR4_DADDR_Pos);
+                printf("\tTarget #%d, Idx = %d:\n", i, j);
+                printf("\t - Provisional ID = 0x%08x%02x \n", dev->port->TGTCHAR[j].PIDMSB, dev->port->TGTCHAR[j].PIDLSB);
+                printf("\t - BCR, DCR       = 0x%08x \n", dev->port->TGTCHAR[j].BCRDCR);
+                printf("\t - DADDR          = 0x%02x \n", dev->target_da[i]);
+            }
+            else
+            {
+                // Target at I2C mode
+                dev->target_da[i] = 0x0;
+                I3C_SetDeviceAddr(dev->port, i, I3C_DEVTYPE_I2C, dev->target_da[i], dev->target_sa[i]);
+                dev->target_sa[i] = ((dev->port->TGTCFG[i] & I3C_TGTCFG_SADDR_Msk) >> I3C_TGTCFG_SADDR_Pos);
+
+                if (dev->target_sa[i] == 0x0)
+                {
+                    continue;
+                }
+
+                printf("\tTarget #%d:\n", i);
+                printf("\t - SADDR          = 0x%02x \n", dev->target_sa[i]);
+            }
+        }
     }
 
     printf("\n");

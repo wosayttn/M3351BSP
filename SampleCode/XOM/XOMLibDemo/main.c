@@ -1,7 +1,7 @@
 /******************************************************************************
  * @file     main.c
  * @version  V1.00
- * @brief    Demo how to use XOM library
+ * @brief    Demo how to use XOM library in dual bank.
  *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.
@@ -67,29 +67,28 @@ int32_t main(void)
 
     InitDebugUart();
     /*
-        This sample code is used to show how to call XOM libary.
+        This sample code is used to show how to call XOM libary in dual bank.
 
         The XOM libary is build by XOMLib project.
-        User need to add include path of xomlib.h and add object file xomlib.lib(Keil)/xomlib.a(IAR)/libXOMLib.a(GCC)
+        Users need to add include path of xomlib.h and add object file xomlib.lib(Keil)/xomlib.a(IAR)/libXOMLib.a(GCC)
         to using XOM library built by XOMLib project.
     */
 
-    printf("\n\n");
-    printf("+-------------------------------------------+\n");
-    printf("|  Demo how to use XOM library Sample Code  |\n");
-    printf("+-------------------------------------------+\n");
+    printf("+----------------------------------------+\n");
+    printf("|  Demo how to use XOM library in Bank%d  |\n", DL_BANK);
+    printf("+----------------------------------------+\n");
 
-    XOM_CALL(XOM_Add, u32Data, 100, 200);
-    printf(" 100 + 200 = %u\n", u32Data);
+    XOM_CALL(XOM_Add, u32Data, 100, (200 + DL_BANK));
+    printf(" 100 + %d = %d\n", (200 + DL_BANK), u32Data);
 
-    XOM_CALL(XOM_Sub, u32Data, 500, 100);
-    printf(" 500 - 100 = %u\n", u32Data);
+    XOM_CALL(XOM_Sub, u32Data, 500, (100 + DL_BANK));
+    printf(" 500 - %d = %d\n", (100 + DL_BANK), u32Data);
 
-    XOM_CALL(XOM_Mul, u32Data, 200, 100);
-    printf(" 200 * 100 = %u\n", u32Data);
+    XOM_CALL(XOM_Mul, u32Data, 200, (100 + DL_BANK));
+    printf(" 200 * %d = %d\n", (100 + DL_BANK), u32Data);
 
-    XOM_CALL(XOM_Div, u32Data, 1000, 250);
-    printf("1000 / 250 = %u\n", u32Data);
+    XOM_CALL(XOM_Div, u32Data, 1000, ((DL_BANK == 0) ? 250 : 500));
+    printf("1000 / %d = %d\n", ((DL_BANK == 0) ? 250 : 500), u32Data);
 
     u32Data = XOM_Sum(ai32NumArray, sizeof(ai32NumArray) / sizeof(ai32NumArray[0]));
     printf("Sum of ai32NumArray = %d\n", u32Data);

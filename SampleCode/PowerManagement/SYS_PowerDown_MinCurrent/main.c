@@ -25,21 +25,21 @@
 #define SET_PDMSEL    0
 
 /*
-// <o0> SPD mode SRAM bnak0 retention
+// <o0> SPD mode SRAM Bank0 retention
 //      <0=> SPD no retention
 //      <1=> SPD retention
 */
 #define SET_SRETSEL_BANK0   (1 << 0)
 
 /*
-// <o0> SPD mode SRAM bnak1 retention
+// <o0> SPD mode SRAM Bank1 retention
 //      <0=> SPD no retention
 //      <1=> SPD retention
 */
 #define SET_SRETSEL_BANK1   (1 << 1)
 
 /*
-// <o0> SPD mode SRAM bnak2 retention
+// <o0> SPD mode SRAM Bank2 retention
 //      <0=> SPD no retention
 //      <1=> SPD retention
 */

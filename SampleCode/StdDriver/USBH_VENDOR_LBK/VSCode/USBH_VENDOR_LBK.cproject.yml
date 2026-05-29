@@ -25,6 +25,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -41,10 +43,12 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--defsym="__STACK_SIZE=0x00000800"
-            - -Wl,--defsym="__HEAP_SIZE=0x00000800"            
+            - -Wl,--defsym="__HEAP_SIZE=0x00000800"
             - -Wl,--gc-sections,-Map="$elf()$.map"
             - -Wl,--no-warn-rwx-segments
   linker:
@@ -56,7 +60,7 @@ project:
     - group: CMSIS
       files:
         - file: ../../../../Library/Device/Nuvoton/M3351/Source/system_M3351.c
-        - file: ../../../../Library/Device/Nuvoton/M3351/Source/startup_M3351.c         
+        - file: ../../../../Library/Device/Nuvoton/M3351/Source/startup_M3351.c
     - group: Driver
       files:
         - file: ../../../../Library/StdDriver/src/clk.c

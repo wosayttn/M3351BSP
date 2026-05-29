@@ -1252,12 +1252,6 @@ void CLK_DisableSysTick(void)
   */
 void CLK_SetPowerDownMode(uint32_t u32PDMode)
 {
-    /* WORKAROUND */
-    if (u32PDMode == CLK_PMUCTL_PDMSEL_NPD2)
-    {
-        outp32(CLK_BASE + 0xD4, inp32(CLK_BASE + 0xD4) | BIT2);
-    }
-
     CLK->PMUCTL = (CLK->PMUCTL & ~(CLK_PMUCTL_PDMSEL_Msk)) | u32PDMode;
 }
 
@@ -1480,15 +1474,15 @@ uint32_t CLK_GetModuleClockDivider(uint32_t u32ModuleIdx)
   */
 void CLK_SysTickDelay(uint32_t us)
 {
-    uint32_t u32TargetValue;
-    uint32_t u32TargetInt;
-    uint32_t u32TargetRem;
-    uint32_t u32DelayCycles;
-    uint32_t SysTickValue;
-
     /* Systick function is using and clock source is core clock */
     if ((SysTick->CTRL & (SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk)) == (SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk))
     {
+        uint32_t u32TargetValue;
+        uint32_t u32TargetInt;
+        uint32_t u32TargetRem;
+        uint32_t u32DelayCycles;
+        uint32_t SysTickValue;
+
         u32DelayCycles = us * CyclesPerUs;
 
         if (u32DelayCycles > SysTick->LOAD)
@@ -1518,7 +1512,7 @@ void CLK_SysTickDelay(uint32_t us)
             u32TargetValue = SysTickValue - u32TargetRem;
         }
 
-        while (u32TargetInt > 0)
+        while (u32TargetInt > 0UL)
         {
             /* Wait for the countdown to reach zero */
             while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0UL)
@@ -1532,8 +1526,10 @@ void CLK_SysTickDelay(uint32_t us)
         while (SysTick->VAL > u32TargetValue)
         {
             /* Current value has been reloaded */
-            if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
+            if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0UL)
+            {
                 break;
+            }
         }
     }
     else
@@ -1585,7 +1581,9 @@ void CLK_SysTickLongDelay(uint32_t us)
         SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk;
 
         /* Waiting for down-count to zero */
-        while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0UL);
+        while ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) == 0UL)
+        {
+        }
 
         /* Disable SysTick counter */
         SysTick->CTRL = 0UL;

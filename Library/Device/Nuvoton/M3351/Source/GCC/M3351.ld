@@ -13,6 +13,9 @@ PROVIDE(ENABLE_SRAM2 = 0);
 /* Validate ENABLE_SRAM2 value - must be 0 or 1 */
 ASSERT(ENABLE_SRAM2 == 0 || ENABLE_SRAM2 == 1, "ENABLE_SRAM2 must be 0 or 1")
 
+/* The default flash and SRAM sizes are defined for the largest part number.
+ * Please revise the flash and SRAM sizes according to your target part number.
+ */
 /* Linker script to configure memory regions. */
 MEMORY
 {

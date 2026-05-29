@@ -329,7 +329,7 @@ typedef enum NSATTR
  *
  * @details     This macro returns CPU is in secure or non-secure state.
  */
-#define SCU_IS_CPU_NS(psSCU)        ((psSCU->NSMSTS & SCU_NSMSTS_CURRNS_Msk) >> SCU_NSMSTS_CURRNS_Pos)
+#define SCU_IS_CPU_NS(psSCU)        (((psSCU)->NSMSTS & SCU_NSMSTS_CURRNS_Msk) >> SCU_NSMSTS_CURRNS_Pos)
 
 /**
  * @brief Retrieve the non-secure flash base address.

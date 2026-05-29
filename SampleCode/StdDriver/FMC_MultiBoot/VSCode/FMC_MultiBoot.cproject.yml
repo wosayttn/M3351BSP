@@ -21,6 +21,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -35,6 +37,8 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--gc-sections,-Map="$elf()$.map"
@@ -47,9 +51,15 @@ project:
         - for-compiler: AC6
           Link:
             - --pd="-DVECMAP_BASE=0x0"
+          C-CPP:
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
         - for-compiler: GCC
           Link:
             - -Wl,--defsym="VECMAP_BASE=0x0"
+          C-CPP:
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
     - setup: Options for FMC_MultiBoot_0x40000
       for-context: .FMC_MultiBoot_0x40000
       output:
@@ -58,9 +68,15 @@ project:
         - for-compiler: AC6
           Link:
             - --pd="-DVECMAP_BASE=0x40000"
+          C-CPP:
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
         - for-compiler: GCC
           Link:
             - -Wl,--defsym="VECMAP_BASE=0x40000"
+          C-CPP:
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
     - setup: Options for FMC_MultiBoot_0x80000
       for-context: .FMC_MultiBoot_0x80000
       output:
@@ -69,9 +85,15 @@ project:
         - for-compiler: AC6
           Link:
             - --pd="-DVECMAP_BASE=0x80000"
+          C-CPP:
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
         - for-compiler: GCC
           Link:
             - -Wl,--defsym="VECMAP_BASE=0x80000"
+          C-CPP:
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
     - setup: Options for FMC_MultiBoot_0xC0000
       for-context: .FMC_MultiBoot_0xC0000
       output:
@@ -80,9 +102,15 @@ project:
         - for-compiler: AC6
           Link:
             - --pd="-DVECMAP_BASE=0xC0000"
+          C-CPP:
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
         - for-compiler: GCC
           Link:
             - -Wl,--defsym="VECMAP_BASE=0xC0000"
+          C-CPP:
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
     - setup: Options for FMC_MultiBoot_LDROM
       for-context: .FMC_MultiBoot_LDROM
       output:

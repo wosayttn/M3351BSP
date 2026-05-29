@@ -16,9 +16,9 @@
 /*
  * Debug message
  */
-#define UAC_ERRMSG     printf
+#define UAC_ERRMSG     (void)usbh_printf
 #ifdef UAC_DEBUG
-    #define UAC_DBGMSG      printf
+    #define UAC_DBGMSG      (void)usbh_printf
 #else
     #define UAC_DBGMSG(...)
 #endif

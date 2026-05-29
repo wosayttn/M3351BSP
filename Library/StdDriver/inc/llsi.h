@@ -50,24 +50,24 @@ typedef struct
 */
 
 /* LLSI Mode */
-#define LLSI_MODE_SW                (0 << LLSI_CTL_LLSIMODE_Pos)    /*!< Software mode \hideinitializer */
-#define LLSI_MODE_PDMA              (1 << LLSI_CTL_LLSIMODE_Pos)    /*!< PDMA mode \hideinitializer */
+#define LLSI_MODE_SW                (0U)                             /*!< Software mode \hideinitializer */
+#define LLSI_MODE_PDMA              ((uint32_t)1U << (uint32_t)LLSI_CTL_LLSIMODE_Pos) /*!< PDMA mode \hideinitializer */
 
 /* LLSI Output Format */
-#define LLSI_FORMAT_RGB             (0 << LLSI_CTL_OFDEF_Pos)       /*!< Output RGB format \hideinitializer */
-#define LLSI_FORMAT_GRB             (1 << LLSI_CTL_OFDEF_Pos)       /*!< Output GRB format \hideinitializer */
+#define LLSI_FORMAT_RGB             (0U)                             /*!< Output RGB format \hideinitializer */
+#define LLSI_FORMAT_GRB             ((uint32_t)1U << (uint32_t)LLSI_CTL_OFDEF_Pos) /*!< Output GRB format \hideinitializer */
 
 /* LLSI Idle Output State */
-#define LLSI_IDLE_LOW               (0 << LLSI_OCTL_IDOS_Pos)       /*!< Idle output low \hideinitializer */
-#define LLSI_IDLE_HIGH              (1 << LLSI_OCTL_IDOS_Pos)       /*!< Idle output high \hideinitializer */
+#define LLSI_IDLE_LOW               (0U)                             /*!< Idle output low \hideinitializer */
+#define LLSI_IDLE_HIGH              ((uint32_t)1U << (uint32_t)LLSI_OCTL_IDOS_Pos) /*!< Idle output high \hideinitializer */
 
 /* LLSI Interrupt Mask */
-#define LLSI_UNDFL_INT_MASK         (0x001)                         /*!< Underflow interrupt mask \hideinitializer */
-#define LLSI_FEND_INT_MASK          (0x002)                         /*!< Frame end interrupt mask \hideinitializer */
-#define LLSI_RSTC_INT_MASK          (0x004)                         /*!< Reset command interrupt mask \hideinitializer */
-#define LLSI_EMP_INT_MASK           (0x008)                         /*!< FIFO empty interrupt mask \hideinitializer */
-#define LLSI_FUL_INT_MASK           (0x010)                         /*!< FIFO full interrupt mask \hideinitializer */
-#define LLSI_TXTH_INT_MASK          (0x020)                         /*!< TX threshold interrupt mask \hideinitializer */
+#define LLSI_UNDFL_INT_MASK         (0x001U)                        /*!< Underflow interrupt mask \hideinitializer */
+#define LLSI_FEND_INT_MASK          (0x002U)                        /*!< Frame end interrupt mask \hideinitializer */
+#define LLSI_RSTC_INT_MASK          (0x004U)                        /*!< Reset command interrupt mask \hideinitializer */
+#define LLSI_EMP_INT_MASK           (0x008U)                        /*!< FIFO empty interrupt mask \hideinitializer */
+#define LLSI_FUL_INT_MASK           (0x010U)                        /*!< FIFO full interrupt mask \hideinitializer */
+#define LLSI_TXTH_INT_MASK          (0x020U)                        /*!< TX threshold interrupt mask \hideinitializer */
 
 /** @} end of group LLSI_EXPORTED_CONSTANTS */
 
@@ -194,13 +194,13 @@ typedef struct
 /* Function prototype declaration */
 void LLSI_Open(LLSI_T *llsi, uint32_t u32LLSIMode, uint32_t u32OutputFormat, uint32_t u32BusClock, uint32_t u32TransferTimeNsec, uint32_t u32T0HTimeNsec, uint32_t u32T1HTimeNsec,
                uint32_t u32ResetTimeNsec, uint32_t u32PCNT, uint32_t u32IDOS);
-void LLSI_OpenbyConfig(LLSI_T *llsi, S_LLSI_CONFIG_T *sLLSIConfig);
+void LLSI_OpenbyConfig(LLSI_T *llsi, const S_LLSI_CONFIG_T *sLLSIConfig);
 void LLSI_Close(LLSI_T *llsi);
-void LLSI_GetTimeInfo(LLSI_T *llsi, S_LLSI_TIME_INFO_T *sPt);
+void LLSI_GetTimeInfo(const LLSI_T *llsi, S_LLSI_TIME_INFO_T *sPt);
 void LLSI_SetFIFO(LLSI_T *llsi, uint32_t u32TxThreshold);
 void LLSI_EnableInt(LLSI_T *llsi, uint32_t u32Mask);
 void LLSI_DisableInt(LLSI_T *llsi, uint32_t u32Mask);
-uint32_t LLSI_GetIntFlag(LLSI_T *llsi, uint32_t u32Mask);
+uint32_t LLSI_GetIntFlag(const LLSI_T *llsi, uint32_t u32Mask);
 void LLSI_ClearIntFlag(LLSI_T *llsi, uint32_t u32Mask);
 
 /** @} end of group LLSI_EXPORTED_FUNCTIONS */

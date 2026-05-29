@@ -19,7 +19,7 @@
 #define REQ_SET_DATA                   0x01
 #define REQ_GET_DATA                   0x12
 
-#define ISO_UTR_NUM       2
+#define ISO_UTR_NUM                    2U
 
 typedef int (INT_CB_FUNC)(int status, uint8_t *rdata, int data_len);
 typedef int (ISO_CB_FUNC)(uint8_t *rdata, int data_len);

@@ -24,19 +24,51 @@
 */
 
 int32_t g_FMC_i32ErrCode = FMC_OK; /*!< FMC global error code */
-/* MISRA Rule 8.9 Deviation: static buffer due to limited stack size */
-static uint8_t s_au8FMC_ECC_ErrorBit[72] =
+
+/**
+  * @brief Get the APROM size.
+  * @return The APROM size in bytes.
+  * @retval   0: APROM size cannot be determined (read DID failed or invalid DID value).
+  * @retval   Non-zero: APROM size in bytes.
+  */
+static uint32_t FMC_GetAPROMSize(void)
 {
-    0x23, 0x43, 0x83, 0x3d, 0x45, 0x85, 0x89, 0x49,
-    0x46, 0x86, 0x07, 0x7a, 0x8a, 0x0b, 0x13, 0x92,
-    0x8c, 0x0d, 0x0e, 0xf4, 0x15, 0x16, 0x26, 0x25,
-    0x19, 0x1a, 0x1c, 0xe9, 0x2a, 0x2c, 0x4c, 0x4a,
-    0x32, 0x34, 0x38, 0xd3, 0x54, 0x58, 0x98, 0x94,
-    0x64, 0x68, 0x70, 0xa7, 0xa8, 0xb0, 0x31, 0x29,
-    0xc8, 0xd0, 0xe0, 0x4f, 0x51, 0x61, 0x62, 0x52,
-    0x91, 0xa1, 0xc1, 0x9e, 0xa2, 0xc2, 0xc4, 0xa4,
-    0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
-};
+    uint32_t u32DID;
+    uint32_t u32DID_N1;
+    uint32_t u32Idx;
+    static const uint32_t au32FMC_APROM_SIZE[4] =
+    {
+        0x20000U,    /* DID bits[7:4] N1 field: 0x5 */
+        0x40000U,    /* DID bits[7:4] N1 field: 0x7 */
+        0x80000U,    /* DID bits[7:4] N1 field: 0x9 */
+        0x100000U    /* DID bits[7:4] N1 field: 0xB */
+    };
+
+    u32DID = FMC_ReadDID();
+
+    if (u32DID == 0xFFFFFFFFU)
+    {
+        /* Read DID failed, cannot determine APROM size. */
+        return 0U;
+    }
+
+    u32DID_N1 = (u32DID & 0x000000F0U) >> 4U;
+
+    if ((u32DID_N1 < 0x5U) || (u32DID_N1 > 0xBU) || ((u32DID_N1 & 0x1U) == 0U))
+    {
+        /* Invalid DID N1 value, cannot determine APROM size. */
+        return 0U;
+    }
+
+    u32Idx = (u32DID_N1 - 5U) / 2U;
+
+    if (u32Idx < (sizeof(au32FMC_APROM_SIZE) / sizeof(au32FMC_APROM_SIZE[0])))
+    {
+        return au32FMC_APROM_SIZE[u32Idx];
+    }
+
+    return 0U;
+}
 
 /**
   * @brief Get the current boot source.
@@ -59,9 +91,9 @@ int32_t FMC_GetBootSource(void)
   * @param    None
   * @return   None
   * @details  ISPEN bit of FMC_ISPCTL must be set before we can use ISP commands.
-  *           Therefore, To use all FMC function APIs, user needs to call FMC_Open() first to enable ISP functions.
+  *           Therefore, to use all FMC function APIs, user needs to call FMC_Open() first to enable ISP functions.
   *
-  * @note     ISP functions are write-protected. user also needs to unlock it by calling SYS_UnlockReg() before using all ISP functions.
+  * @note     ISP functions are write-protected. User also needs to unlock it by calling SYS_UnlockReg() before using all ISP functions.
   */
 void FMC_Open(void)
 {
@@ -85,11 +117,11 @@ void FMC_Close(void)
   *             It must be a 8192 bytes aligned address.
   * @return ISP page erase success or not.
   * @retval   FMC_OK:         Success
-  * @retval   FMC_ERR_TIMEOUT: Erase time-out.
+  * @retval   FMC_ERR_TIMEOUT: Erase timed out.
   * @retval   FMC_ERR_FAIL:    Erase failed.
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           FMC_ERR_TIMEOUT: Erase time-out.
+  *           FMC_ERR_TIMEOUT: Erase timed out.
   *           FMC_ERR_FAIL:    Erase failed.
   */
 int32_t FMC_Erase(uint32_t u32PageAddr)
@@ -126,21 +158,19 @@ int32_t FMC_Erase(uint32_t u32PageAddr)
 }
 
 /**
-  * @brief  Execute Erase XOM Region
+  * @brief  Execute FMC_ISPCMD_PAGE_ERASE command to erase XOM region.
   *
-  * @param[in]  u32XomNum  The XOM number (0~1).
+  * @param[in]  u32XomNum  The XOM number (0 or 1).
   *
   * @return   XOM erase success or not.
   * @retval   FMC_OK:                Success
   * @retval   FMC_ERR_FAIL:          Erase failed.
-  * @retval   FMC_ERR_TIMEOUT:       Erase time-out.
+  * @retval   FMC_ERR_TIMEOUT:       Erase timed out.
   * @retval   FMC_ERR_INVALID_PARAM: Invalid XOM number.
-  *
-  * @details Execute FMC_ISPCMD_PAGE_ERASE command to erase XOM.
   *
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:          Erase failed.
-  *           FMC_ERR_TIMEOUT:       Erase time-out.
+  *           FMC_ERR_TIMEOUT:       Erase timed out.
   *           FMC_ERR_INVALID_PARAM: Invalid XOM number.
   */
 int32_t FMC_EraseXOM(uint32_t u32XomNum)
@@ -155,61 +185,56 @@ int32_t FMC_EraseXOM(uint32_t u32XomNum)
     if (u32XomNum >= XOMR_CNT)
     {
         i32RetCode = FMC_ERR_INVALID_PARAM;
+        g_FMC_i32ErrCode = i32RetCode;
+        return i32RetCode;
+    }
+
+    i32Active = FMC_GetXOMState(u32XomNum);
+
+    if (i32Active)
+    {
+        switch (u32XomNum)
+        {
+            case 0u:
+                u32Addr = (FMC->XOMR0STS & 0xFFFFFF00U) >> 8U;
+                break;
+
+            default:
+                u32Addr = (FMC->XOMR1STS & 0xFFFFFF00U) >> 8U;
+                break;
+        }
+
+        if (i32RetCode == FMC_OK)
+        {
+            FMC->ISPCMD  = FMC_ISPCMD_PAGE_ERASE;
+            FMC->ISPADDR = u32Addr;
+            FMC->ISPDAT  = 0x55aa03U;
+            FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
+#if defined (ISBEN) && (ISBEN == 1)
+            __ISB();
+#endif
+            i32TimeOutCnt = FMC_TIMEOUT_ERASE;
+
+            while (FMC->ISPTRG)
+            {
+                if (i32TimeOutCnt-- <= 0)
+                {
+                    i32RetCode = FMC_ERR_TIMEOUT;
+                    break;
+                }
+            }
+
+            /* Check ISPFF flag to know whether erase OK or fail. */
+            if (FMC->ISPCTL & FMC_ISPCTL_ISPFF_Msk)
+            {
+                FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
+                i32RetCode = FMC_ERR_FAIL;
+            }
+        }
     }
     else
     {
-        i32Active = FMC_GetXOMState(u32XomNum);
-
-        if (i32Active)
-        {
-            switch (u32XomNum)
-            {
-                case 0u:
-                    u32Addr = (FMC->XOMR0STS & 0xFFFFFF00U) >> 8U;
-                    break;
-
-                case 1u:
-                    u32Addr = (FMC->XOMR1STS & 0xFFFFFF00U) >> 8U;
-                    break;
-
-                default:
-                    /* Should not be here */
-                    i32RetCode = FMC_ERR_INVALID_PARAM;
-                    break;
-            }
-
-            if (i32RetCode == FMC_OK)
-            {
-                FMC->ISPCMD  = FMC_ISPCMD_PAGE_ERASE;
-                FMC->ISPADDR = u32Addr;
-                FMC->ISPDAT  = 0x55aa03U;
-                FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
-#if defined (ISBEN) && (ISBEN == 1)
-                __ISB();
-#endif
-                i32TimeOutCnt = FMC_TIMEOUT_ERASE;
-
-                while (FMC->ISPTRG)
-                {
-                    if (i32TimeOutCnt-- <= 0)
-                    {
-                        i32RetCode = FMC_ERR_TIMEOUT;
-                        break;
-                    }
-                }
-
-                /* Check ISPFF flag to know whether erase OK or fail. */
-                if (FMC->ISPCTL & FMC_ISPCTL_ISPFF_Msk)
-                {
-                    FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
-                    i32RetCode = FMC_ERR_FAIL;
-                }
-            }
-        }
-        else
-        {
-            i32RetCode = FMC_ERR_XOM_INACTIVE;
-        }
+        i32RetCode = FMC_ERR_XOM_INACTIVE;
     }
 
     g_FMC_i32ErrCode = i32RetCode;
@@ -217,15 +242,15 @@ int32_t FMC_EraseXOM(uint32_t u32XomNum)
 }
 
 /**
-  * @brief  Check the XOM is actived or not.
+  * @brief  Check whether the XOM is activated or not.
   *
-  * @param[in] u32XomNum    The XOM number (0~1).
+  * @param[in] u32XomNum    The XOM number (0 or 1).
   *
-  * @retval   XOMR_ACTIVE:           XOM is actived.
-  * @retval   XOMR_INACTIVE:         XOM is not actived.
+  * @retval   XOMR_ACTIVE:           XOM is activated.
+  * @retval   XOMR_INACTIVE:         XOM is not activated.
   * @retval   FMC_ERR_INVALID_PARAM: Invalid XOM number.
   *
-  * @details To get specify XOMRn(n=0~1) active status
+  * @details Returns the activation status of the specified XOMRn (n = 0 or 1).
   */
 int32_t FMC_GetXOMState(uint32_t u32XomNum)
 {
@@ -251,21 +276,22 @@ int32_t FMC_GetXOMState(uint32_t u32XomNum)
 }
 
 /**
-  * @brief     Config XOM Region
-  * @param[in] u32XomNum    The XOM number (0~1).
+  * @brief     Configure an XOM region.
+  * @param[in] u32XomNum    The XOM region number (0 or 1).
   * @param[in] u32XomBase   The XOM region base address.
-  * @param[in] u8XomPage    The XOM page number of region size.
+  * @param[in] u8XomPage    The XOM region size in pages.
   *
-  * @retval   FMC_OK:                Success
-  * @retval   XOMR_ACTIVE:           XOM has already actived.
+  * @retval   FMC_OK:                Success.
+  * @retval   XOMR_ACTIVE:           XOM region is already activated.
   * @retval   FMC_ERR_FAIL:          Program failed.
+  * @retval   FMC_ERR_TIMEOUT:       Program timed out.
   * @retval   FMC_ERR_INVALID_PARAM: Invalid XOM number.
   *
-  * @details  Program XOM base address and XOM size(page).
-  *           The CONFIG update enable bit CFGUEN(FMC_ISPCTL[4]) should be enabled before using this function.
+  * @details  Programs the XOM base address and region size (in pages).
+  *           The config update enable bit CFGUEN (FMC_ISPCTL[4]) must be set before calling this function.
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:          Program failed.
-  *           FMC_ERR_TIMEOUT:       Program time-out.
+  *           FMC_ERR_TIMEOUT:       Program timed out.
   *           FMC_ERR_INVALID_PARAM: Invalid XOM number.
   */
 int32_t FMC_ConfigXOM(uint32_t u32XomNum, uint32_t u32XomBase, uint8_t u8XomPage)
@@ -375,16 +401,16 @@ int32_t FMC_ConfigXOM(uint32_t u32XomNum, uint32_t u32XomBase, uint8_t u8XomPage
   *         Return 0xFFFFFFFF if read failed.
   * @note   Global error code g_FMC_i32ErrCode
   *         FMC_ERR_FAIL:     Read failed.
-  *         FMC_ERR_TIMEOUT:  Read time-out.
+  *         FMC_ERR_TIMEOUT:  Read timed out.
   */
 uint32_t FMC_Read(uint32_t u32Addr)
 {
     int32_t i32TimeOutCnt;
 
     g_FMC_i32ErrCode = FMC_OK;
-    FMC->ISPCMD = FMC_ISPCMD_READ;
+    FMC->ISPCMD  = FMC_ISPCMD_READ;
     FMC->ISPADDR = u32Addr;
-    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
     i32TimeOutCnt = FMC_TIMEOUT_READ;
 
@@ -413,12 +439,12 @@ uint32_t FMC_Read(uint32_t u32Addr)
   *             It must be a double-word aligned address.
   * @param[out] pu32Data0  holds data read from flash address u32Addr.
   * @param[out] pu32Data1  holds data read from flash address u32Addr + 4.
-  * @return   FMC_OK:          Success
-  * @return   FMC_ERR_TIMEOUT: Read time-out.
-  * @return   FMC_ERR_FAIL:    Read failed.
+  * @retval   FMC_OK:          Success
+  * @retval   FMC_ERR_TIMEOUT: Read timed out.
+  * @retval   FMC_ERR_FAIL:    Read failed.
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           FMC_ERR_TIMEOUT: Read time-out.
+  *           FMC_ERR_TIMEOUT: Read timed out.
   *           FMC_ERR_FAIL:    Read failed.
   */
 int32_t FMC_Read_64(uint32_t u32Addr, uint32_t *pu32Data0, uint32_t *pu32Data1)
@@ -429,7 +455,7 @@ int32_t FMC_Read_64(uint32_t u32Addr, uint32_t *pu32Data0, uint32_t *pu32Data1)
     g_FMC_i32ErrCode = FMC_OK;
     FMC->ISPCMD  = FMC_ISPCMD_READ_64;
     FMC->ISPADDR = u32Addr;
-    FMC->ISPDAT  = 0x0UL;
+    FMC->ISPDAT  = 0x0U;
     FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
     i32TimeOutCnt = FMC_TIMEOUT_READ;
@@ -475,13 +501,13 @@ int32_t FMC_Read8Bytes(uint32_t u32Addr, uint32_t *pu32Data0, uint32_t *pu32Data
   *                          - au32Data[0]: holds data read from flash address u32Addr.
   *                          - au32Data[1]: holds data read from flash address u32Addr + 4.
   *                          - au32Data[2]: If ECC error happened, au32Data[2] holds the bit number of error bit.
-  * @return   FMC_OK:          Success
-  * @return   FMC_ERR_TIMEOUT: Read time-out.
-  * @return   FMC_ERR_FAIL:    Read failed.
-  * @return   FMC_ERR_ECC:     ECC error is detected.
+  * @retval   FMC_OK:          Success
+  * @retval   FMC_ERR_TIMEOUT: Read timed out.
+  * @retval   FMC_ERR_FAIL:    Read failed.
+  * @retval   FMC_ERR_ECC:     ECC error is detected.
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           FMC_ERR_TIMEOUT: Read time-out.
+  *           FMC_ERR_TIMEOUT: Read timed out.
   *           FMC_ERR_FAIL:    Read failed.
   *           FMC_ERR_ECC:     ECC error is detected.
   */
@@ -489,6 +515,18 @@ int32_t FMC_Read_64_ECC(uint32_t u32Addr, uint32_t au32Data[])
 {
     int32_t i32RetCode = 0;
     int32_t i32TimeOutCnt;
+    static const uint8_t au8FMC_ECC_ErrorBit[72] =
+    {
+        0x23, 0x43, 0x83, 0x3d, 0x45, 0x85, 0x89, 0x49,
+        0x46, 0x86, 0x07, 0x7a, 0x8a, 0x0b, 0x13, 0x92,
+        0x8c, 0x0d, 0x0e, 0xf4, 0x15, 0x16, 0x26, 0x25,
+        0x19, 0x1a, 0x1c, 0xe9, 0x2a, 0x2c, 0x4c, 0x4a,
+        0x32, 0x34, 0x38, 0xd3, 0x54, 0x58, 0x98, 0x94,
+        0x64, 0x68, 0x70, 0xa7, 0xa8, 0xb0, 0x31, 0x29,
+        0xc8, 0xd0, 0xe0, 0x4f, 0x51, 0x61, 0x62, 0x52,
+        0x91, 0xa1, 0xc1, 0x9e, 0xa2, 0xc2, 0xc4, 0xa4,
+        0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+    };
 
     g_FMC_i32ErrCode = FMC_OK;
     FMC->ISPCMD  = FMC_ISPCMD_READ_64;
@@ -530,9 +568,9 @@ int32_t FMC_Read_64_ECC(uint32_t u32Addr, uint32_t au32Data[])
             {
                 uint32_t i;
 
-                for (i = 0; i < (sizeof(s_au8FMC_ECC_ErrorBit) / sizeof(s_au8FMC_ECC_ErrorBit[0])); i++)
+                for (i = 0; i < (sizeof(au8FMC_ECC_ErrorBit) / sizeof(au8FMC_ECC_ErrorBit[0])); i++)
                 {
-                    if (s_au8FMC_ECC_ErrorBit[i] == FMC->MPDATE)
+                    if (au8FMC_ECC_ErrorBit[i] == FMC->MPDATE)
                     {
                         au32Data[2] = i;
                         break;
@@ -552,28 +590,32 @@ int32_t FMC_Read8Bytes_ECC(uint32_t u32Addr, uint32_t au32Data[])
 {
     return FMC_Read_64_ECC(u32Addr, au32Data);
 }
+
 /**
-  * @brief Execute ISP FMC_ISPCMD_PROGRAM to program a word to flash.
-  * @param[in]  u32Addr Address of the flash location to be programmed.
+  * @brief Execute FMC_ISPCMD_PROGRAM to program a word to XOM or user config.
+  * @param[in]  u32Addr Address of the XOM or user config to be programmed.
   *             It must be a word aligned address.
   * @param[in]  u32Data The word data to be programmed.
   * @retval   FMC_OK:          Success
   * @retval   FMC_ERR_FAIL:    Program failed.
-  * @retval   FMC_ERR_TIMEOUT: Program time-out.
+  * @retval   FMC_ERR_TIMEOUT: Program timed out.
   *
+  * @details  This function is only used to program a word to XOM or user config.
+  *           The M3351 series introduces an ECC feature and therefore does not support word-write for normal flash programming.
+  *           For normal flash programming (APROM, LDROM, and data flash) on the M3351 series, use FMC_Write8Bytes() instead.
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:    Program failed.
-  *           FMC_ERR_TIMEOUT: Program time-out.
+  *           FMC_ERR_TIMEOUT: Program timed out.
   */
 int32_t FMC_Write(uint32_t u32Addr, uint32_t u32Data)
 {
     int32_t i32TimeOutCnt;
 
     g_FMC_i32ErrCode = FMC_OK;
-    FMC->ISPCMD = FMC_ISPCMD_PROGRAM;
+    FMC->ISPCMD  = FMC_ISPCMD_PROGRAM;
     FMC->ISPADDR = u32Addr;
-    FMC->ISPDAT = u32Data;
-    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
+    FMC->ISPDAT  = u32Data;
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
     i32TimeOutCnt = FMC_TIMEOUT_WRITE;
 
@@ -596,18 +638,18 @@ int32_t FMC_Write(uint32_t u32Addr, uint32_t u32Data)
 }
 
 /**
-  * @brief Execute ISP FMC_ISPCMD_PROGRAM_64 to program a double-word to flash.
+  * @brief Execute FMC_ISPCMD_PROGRAM_64 to program a double-word to flash.
   * @param[in]  u32Addr Address of the flash location to be programmed.
   *             It must be a double-word aligned address.
   * @param[in]  u32Data0   The word data to be programmed to flash address u32Addr.
   * @param[in]  u32Data1   The word data to be programmed to flash address u32Addr+4.
   * @retval   FMC_OK:          Success
   * @retval   FMC_ERR_FAIL:    Program failed.
-  * @retval   FMC_ERR_TIMEOUT: Program time-out.
+  * @retval   FMC_ERR_TIMEOUT: Program timed out.
   *
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:    Program failed.
-  *           FMC_ERR_TIMEOUT: Program time-out.
+  *           FMC_ERR_TIMEOUT: Program timed out.
   */
 int32_t FMC_Write8Bytes(uint32_t u32Addr, uint32_t u32Data0, uint32_t u32Data1)
 {
@@ -652,12 +694,12 @@ int32_t FMC_Write8Bytes(uint32_t u32Addr, uint32_t u32Data0, uint32_t u32Data1)
   * @retval   FMC_OK:                Success
   * @retval   FMC_ERR_FAIL:          Read failed.
   * @retval   FMC_ERR_INVALID_PARAM: Invalid parameter.
-  * @retval   FMC_ERR_TIMEOUT:       Read time-out.
+  * @retval   FMC_ERR_TIMEOUT:       Read timed out.
   *
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:          Read failed.
   *           FMC_ERR_INVALID_PARAM: Invalid parameter.
-  *           FMC_ERR_TIMEOUT:       Read time-out.
+  *           FMC_ERR_TIMEOUT:       Read timed out.
   */
 int32_t FMC_ReadConfig(uint32_t au32Config[], uint32_t u32Count)
 {
@@ -702,11 +744,11 @@ int32_t FMC_ReadConfig(uint32_t au32Config[], uint32_t u32Count)
   * @param[in] u32ConfigVal    New config value to be written.
   * @retval    FMC_OK:          Success
   * @retval    FMC_ERR_FAIL:    Erase/program/read config failed.
-  * @retval    FMC_ERR_TIMEOUT: Erase/program/read config time-out.
+  * @retval    FMC_ERR_TIMEOUT: Erase/program/read config timed out.
   *
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:    Erase/program/read config failed.
-  *           FMC_ERR_TIMEOUT: Erase/program/read config time-out.
+  *           FMC_ERR_TIMEOUT: Erase/program/read config timed out.
   */
 int32_t FMC_WriteConfig(uint32_t u32ConfigAddr, uint32_t u32ConfigVal)
 {
@@ -752,11 +794,11 @@ int32_t FMC_WriteConfig(uint32_t u32ConfigAddr, uint32_t u32ConfigVal)
   * @return     ISP config erase success or not.
   * @retval     FMC_OK:          Success
   * @retval     FMC_ERR_FAIL:    Erase failed.
-  * @retval     FMC_ERR_TIMEOUT: Erase time-out.
+  * @retval     FMC_ERR_TIMEOUT: Erase timed out.
   *
   * @note       Global error code g_FMC_i32ErrCode
   *             FMC_ERR_FAIL:    Erase failed.
-  *             FMC_ERR_TIMEOUT: Erase time-out.
+  *             FMC_ERR_TIMEOUT: Erase timed out.
   */
 int32_t FMC_EraseConfig(uint32_t u32ConfigAddr)
 {
@@ -800,7 +842,7 @@ int32_t FMC_EraseConfig(uint32_t u32ConfigAddr)
   * @retval   Otherwise:  The CRC32 checksum result.
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           FMC_ERR_TIMEOUT:       Run/Read check sum time-out failed.
+  *           FMC_ERR_TIMEOUT:       Run/Read checksum operation timed out.
   *           FMC_ERR_INVALID_PARAM: u32Addr or u32Count must be aligned with page size.
   */
 uint32_t  FMC_GetChkSum(uint32_t u32Addr, uint32_t u32Count)
@@ -866,7 +908,7 @@ uint32_t  FMC_GetChkSum(uint32_t u32Addr, uint32_t u32Count)
   *
   * @note     Global error code g_FMC_i32ErrCode
   *           FMC_ERR_FAIL:    RUN_ALL_ONE or CHECK_ALL_ONE command failed.
-  *           FMC_ERR_TIMEOUT: RUN_ALL_ONE or CHECK_ALL_ONE command time-out.
+  *           FMC_ERR_TIMEOUT: RUN_ALL_ONE or CHECK_ALL_ONE command timed out.
   */
 uint32_t  FMC_CheckAllOne(uint32_t u32Addr, uint32_t u32Count)
 {
@@ -899,9 +941,9 @@ uint32_t  FMC_CheckAllOne(uint32_t u32Addr, uint32_t u32Count)
 
         do
         {
-            FMC->ISPCMD = FMC_ISPCMD_READ_ALL1;
+            FMC->ISPCMD  = FMC_ISPCMD_READ_ALL1;
             FMC->ISPADDR = u32Addr;
-            FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
+            FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
             i32TimeOutCnt0 = FMC_TIMEOUT_CHKALLONE;
 
@@ -946,7 +988,7 @@ uint32_t  FMC_CheckAllOne(uint32_t u32Addr, uint32_t u32Count)
   * @return Bank remap operation success or not.
   * @retval   FMC_OK:          Success
   * @retval   FMC_ERR_FAIL:    Remap failed.
-  * @retval   FMC_ERR_TIMEOUT: Remap time-out.
+  * @retval   FMC_ERR_TIMEOUT: Remap timed out.
   *
   * @note     Global error code g_FMC_i32ErrCode as return value.
   */
@@ -959,7 +1001,7 @@ int32_t FMC_RemapBank(uint32_t u32Bank)
 
     FMC->ISPCMD  = FMC_ISPCMD_BANK_REMAP;
     FMC->ISPADDR = u32Bank;
-    FMC->ISPDAT  = 0x5AA55AA5UL;
+    FMC->ISPDAT  = 0x5AA55AA5U;
     FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
     i32TimeOutCnt = FMC_TIMEOUT_WRITE;
@@ -979,6 +1021,71 @@ int32_t FMC_RemapBank(uint32_t u32Bank)
         FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
         i32RetCode = FMC_ERR_FAIL;
         g_FMC_i32ErrCode = i32RetCode;
+    }
+
+    return i32RetCode;
+}
+
+/**
+  * @brief Execute FMC_ISPCMD_PAGE_ERASE command to erase specified APROM bank page by page.
+  * @param[in]  u32BankAddr Base address of the flash bank to be erased.
+  * @return ISP page erase success or not.
+  * @retval   FMC_OK:               Success
+  * @retval   FMC_ERR_TIMEOUT:      Command timed out
+  * @retval   FMC_ERR_ERASE_FAILED: Erase failed
+  *
+  * @note     Global error code g_FMC_i32ErrCode
+  *           FMC_ERR_TIMEOUT:      Command timed out
+  *           FMC_ERR_ERASE_FAILED: Erase failed
+  */
+int32_t FMC_EraseBank(uint32_t u32BankAddr)
+{
+    int32_t  i32RetCode = FMC_OK;
+    uint32_t u32Addr;
+    uint32_t u32APROMSize;
+
+    u32APROMSize = FMC_GetAPROMSize();
+
+    if (u32APROMSize == 0U)
+    {
+        g_FMC_i32ErrCode = FMC_ERR_INVALID_PARAM;
+        return FMC_ERR_INVALID_PARAM;
+    }
+
+    if ((u32BankAddr != FMC_APROM_BASE) && (u32BankAddr != (u32APROMSize / 2U)))
+    {
+        g_FMC_i32ErrCode = FMC_ERR_INVALID_PARAM;
+        return FMC_ERR_INVALID_PARAM;
+    }
+
+    g_FMC_i32ErrCode = FMC_OK;
+
+    for (u32Addr = u32BankAddr; u32Addr < (u32BankAddr + (u32APROMSize / 2U)); u32Addr += FMC_FLASH_PAGE_SIZE)
+    {
+        int32_t  i32TimeOutCnt;
+
+        FMC->ISPCMD  = FMC_ISPCMD_PAGE_ERASE;
+        FMC->ISPADDR = u32Addr;
+        FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
+
+        i32TimeOutCnt = FMC_TIMEOUT_ERASE;
+
+        while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)
+        {
+            if (i32TimeOutCnt-- <= 0)
+            {
+                g_FMC_i32ErrCode = FMC_ERR_TIMEOUT;
+                i32RetCode = FMC_ERR_TIMEOUT;
+                break;;
+            }
+        }
+
+        if ((i32RetCode == FMC_OK) && ((FMC->ISPCTL & FMC_ISPCTL_ISPFF_Msk) != 0U))
+        {
+            FMC->ISPCTL |= FMC_ISPCTL_ISPFF_Msk;
+            g_FMC_i32ErrCode = FMC_ERR_ERASE_FAILED;
+            i32RetCode = FMC_ERR_ERASE_FAILED;
+        }
     }
 
     return i32RetCode;

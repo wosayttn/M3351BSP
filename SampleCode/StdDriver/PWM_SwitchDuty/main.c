@@ -21,9 +21,9 @@
  * @param       u32CycleResolution   Target generator duty cycle resolution. The value in general is 100.
  * @return      The compatator value by new duty cycle
  */
-uint32_t CalNewDutyCMR(PWM_T *pwm, uint32_t u32ChannelNum, uint32_t u32DutyCycle, uint32_t u32CycleResolution)
+static uint32_t CalNewDutyCMR(PWM_T *pwm, uint32_t u32ChannelNum, uint32_t u32DutyCycle, uint32_t u32CycleResolution)
 {
-    return (u32DutyCycle * (PWM_GET_CNR(pwm, u32ChannelNum) + 1) / u32CycleResolution);
+    return (u32DutyCycle * (PWM_GET_CNR(pwm, u32ChannelNum) + 1U) / u32CycleResolution);
 }
 
 static void SYS_Init(void)
@@ -75,7 +75,8 @@ static void SYS_Init(void)
 int main(void)
 {
     uint8_t  u8Option;
-    uint32_t u32NewDutyCycle = 0, u32NewCMR = 0;
+    uint32_t u32NewDutyCycle = 0;
+    uint32_t u32NewCMR;
 
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -86,7 +87,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+-----------------------------------------------------------------------------------+\n");
     printf("|                     PWM SwitchDuty Sample Code                                   |\n");
     printf("+-----------------------------------------------------------------------------------+\n");
@@ -114,19 +115,19 @@ int main(void)
         printf("[Other] Exit \n");
         u8Option = (uint8_t)getchar();
 
-        if (u8Option == '1')
+        if (u8Option == (uint8_t)'1')
         {
             u32NewDutyCycle = 100;
         }
-        else if (u8Option == '2')
+        else if (u8Option == (uint8_t)'2')
         {
             u32NewDutyCycle = 75;
         }
-        else if (u8Option == '3')
+        else if (u8Option == (uint8_t)'3')
         {
             u32NewDutyCycle = 25;
         }
-        else if (u8Option == '4')
+        else if (u8Option == (uint8_t)'4')
         {
             u32NewDutyCycle = 0;
         }
@@ -148,7 +149,7 @@ int main(void)
     PWM_DisableOutput(PWM0, PWM_CH_0_MASK);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

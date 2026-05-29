@@ -111,7 +111,7 @@ extern "C"
 
 /* I2S Record Channel */
 #define SPII2S_MONO_RIGHT                 (0U)                              /*!< Record mono right channel \hideinitializer */
-#define SPII2S_MONO_LEFT                  SPI_I2SCTL_RXLCH_Msk              /*!< Record mono left channel \hideinitializer */
+#define SPII2S_MONO_LEFT                  (1U)                              /*!< Record mono left channel \hideinitializer */
 
 /* I2S Channel */
 #define SPII2S_RIGHT                      (0U)                              /*!< Select right channel \hideinitializer */
@@ -285,9 +285,20 @@ extern "C"
   * @details    Disable automatic slave selection function and set SPIx_SS pin to high state.
   * \hideinitializer
   */
-#define SPI_SET_SS_HIGH(spi)    \
-    ((spi)->SSCTL = ((spi)->SSCTL & ~(SPI_SSCTL_AUTOSS_Msk)) | \
-                    (SPI_SSCTL_SSACTPOL_Msk | SPI_SSCTL_SS_Msk))
+__STATIC_INLINE void SPI_SET_SS_HIGH(SPI_T *spi)
+{
+    uint32_t u32SSCtl = spi->SSCTL & ~SPI_SSCTL_AUTOSS_Msk;
+    uint32_t u32ActivePol = u32SSCtl & SPI_SSCTL_SSACTPOL_Msk;
+
+    if (u32ActivePol != 0UL)
+    {
+        spi->SSCTL = u32SSCtl | SPI_SSCTL_SS_Msk;
+    }
+    else
+    {
+        spi->SSCTL = u32SSCtl & ~SPI_SSCTL_SS_Msk;
+    }
+}
 
 /**
   * @brief      Set SPIx_SS pin to low state.
@@ -296,9 +307,20 @@ extern "C"
   * @details    Disable automatic slave selection function and set SPIx_SS pin to low state.
   * \hideinitializer
   */
-#define SPI_SET_SS_LOW(spi) \
-    ((spi)->SSCTL = ((spi)->SSCTL & ~(SPI_SSCTL_AUTOSS_Msk | SPI_SSCTL_SSACTPOL_Msk)) | \
-                    (SPI_SSCTL_SS_Msk))
+__STATIC_INLINE void SPI_SET_SS_LOW(SPI_T *spi)
+{
+    uint32_t u32SSCtl = spi->SSCTL & ~SPI_SSCTL_AUTOSS_Msk;
+    uint32_t u32ActivePol = u32SSCtl & SPI_SSCTL_SSACTPOL_Msk;
+
+    if (u32ActivePol != 0UL)
+    {
+        spi->SSCTL = u32SSCtl & ~SPI_SSCTL_SS_Msk;
+    }
+    else
+    {
+        spi->SSCTL = u32SSCtl | SPI_SSCTL_SS_Msk;
+    }
+}
 
 /**
   * @brief      Enable Byte Reorder function.
@@ -327,8 +349,11 @@ extern "C"
   *             The length of suspend interval is ((u32SuspCycle + 0.5) * the length of one SPI bus clock cycle).
   * \hideinitializer
   */
-#define SPI_SET_SUSPEND_CYCLE(spi, u32SuspCycle)    \
-    ((spi)->CTL = ((spi)->CTL & ~(SPI_CTL_SUSPITV_Msk)) | ((u32SuspCycle) << SPI_CTL_SUSPITV_Pos))
+__STATIC_INLINE void SPI_SET_SUSPEND_CYCLE(SPI_T *spi, uint32_t u32SuspCycle)
+{
+    spi->CTL = (spi->CTL & ~SPI_CTL_SUSPITV_Msk) |
+               ((u32SuspCycle & 0xFUL) << SPI_CTL_SUSPITV_Pos);
+}
 
 /**
   * @brief      Set the SPI transfer sequence with LSB first.
@@ -356,9 +381,26 @@ extern "C"
   * @details    The data width can be 8 ~ 32 bits.
   * \hideinitializer
   */
-#define SPI_SET_DATA_WIDTH(spi, u32Width)               \
-    ((spi)->CTL = ((spi)->CTL & ~(SPI_CTL_DWIDTH_Msk)) |    \
-                  (((u32Width) & 0x1F) << SPI_CTL_DWIDTH_Pos))
+__STATIC_INLINE void SPI_SET_DATA_WIDTH(SPI_T *spi, uint32_t u32Width)
+{
+    uint32_t u32WidthTmp = u32Width;
+
+    if ((u32WidthTmp > 0UL) && (u32WidthTmp < 4UL))
+    {
+        u32WidthTmp = 4UL;
+    }
+    else if (u32WidthTmp >= 32UL)
+    {
+        u32WidthTmp = 0UL;
+    }
+    else
+    {
+        u32WidthTmp &= 0x1FUL;
+    }
+
+    spi->CTL = (spi->CTL & ~SPI_CTL_DWIDTH_Msk) |
+               (u32WidthTmp << SPI_CTL_DWIDTH_Pos);
+}
 
 /**
   * @brief      Get the SPI busy state.
@@ -538,9 +580,14 @@ __STATIC_INLINE void SPII2S_DISABLE_TX_ZCD(SPI_T *i2s, uint32_t u32ChMask)
   */
 __STATIC_INLINE void SPII2S_SET_MONO_RX_CHANNEL(SPI_T *i2s, uint32_t u32Ch)
 {
-    u32Ch == SPII2S_MONO_LEFT ?
-    ((i2s)->I2SCTL |= SPI_I2SCTL_RXLCH_Msk) :
-    ((i2s)->I2SCTL &= ~SPI_I2SCTL_RXLCH_Msk);
+    if (u32Ch == SPII2S_MONO_LEFT)
+    {
+        i2s->I2SCTL |= SPI_I2SCTL_RXLCH_Msk;
+    }
+    else
+    {
+        i2s->I2SCTL &= ~SPI_I2SCTL_RXLCH_Msk;
+    }
 }
 
 /**

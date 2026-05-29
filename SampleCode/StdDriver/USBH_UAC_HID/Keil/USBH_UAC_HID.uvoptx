@@ -314,8 +314,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_core\usb_core.c</PathWithFileName>
-      <FilenameWithoutPath>usb_core.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_core\ohci.c</PathWithFileName>
+      <FilenameWithoutPath>ohci.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -326,8 +326,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_core\ohci.c</PathWithFileName>
-      <FilenameWithoutPath>ohci.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_core\usb_core.c</PathWithFileName>
+      <FilenameWithoutPath>usb_core.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -404,6 +404,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_hid\hid_driver.c</PathWithFileName>
       <FilenameWithoutPath>hid_driver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>17</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\Library\UsbHostLib\src_hid\hid_parser.c</PathWithFileName>
+      <FilenameWithoutPath>hid_parser.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

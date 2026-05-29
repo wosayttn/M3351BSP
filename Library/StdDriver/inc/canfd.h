@@ -86,7 +86,7 @@ extern "C"
 #define CANFD_RX_FIFO1_EXT_MASK_HIGH(mask)           ((2UL << 30) | ((mask) & 0x1FFFFFFF))
 
 /**
- *    @brief        Get Monitors the Module’s CAN Communication State Flag
+ *    @brief        Get Monitors the Module's CAN Communication State Flag
  *
  *    @param[in]    canfd    The pointer of the specified CANFD module
  *
@@ -95,7 +95,7 @@ extern "C"
  *    @retval       2 Receiver - node is operating as receiver.
  *    @retval       3 Transmitter - node is operating as transmitter.
  *
- *    @details      This macro get the module’s CANFD communication state.
+ *    @details      This macro get the module's CANFD communication state.
  *    \hideinitializer
  */
 #define CANFD_GET_COMMUNICATION_STATE(canfd)    (((canfd)->PSR  & CANFD_PSR_ACT_Msk) >> CANFD_PSR_ACT_Pos)
@@ -288,7 +288,7 @@ typedef struct
     uint16_t          u16RxTimestamp;                  /*! Rx Timestamp(CCCR.UTSU = 0)) */
     uint8_t           u8RxTimestampPointer;            /*! Rx Timestamp Pointer(CCCR.UTSU = 1))*/
     uint8_t           bTimestampCaptured;              /*! Timestamp Captured                             */
-    uint8_t           u8FilterIndex;                   /*! Filter Index(Index of matching Rx acceptance filter element (in valid if ANMF = ‘1’)*/
+    uint8_t           u8FilterIndex;                   /*! Filter Index(Index of matching Rx acceptance filter element (in valid if ANMF = '1')*/
     uint8_t           bNonMatchingFrame;               /*! Accepted Non-matching Frame                              */
     uint8_t           bFDFormat;                       /*! FD Format (1 = FD Format)                                */
     uint8_t           bBitRateSwitch;                  /*! Bit Rate Switch (1 = with Bit Rate Switch)               */
@@ -411,8 +411,8 @@ void CANFD_DisableInt(CANFD_T *psCanfd, uint32_t u32IntLine0, uint32_t u32IntLin
 uint32_t CANFD_TransmitTxMsg(CANFD_T *psCanfd, uint32_t u32TxBufIdx, CANFD_FD_MSG_T *psTxMsg);
 uint32_t CANFD_TransmitDMsg(CANFD_T *psCanfd, uint32_t u32TxBufIdx, CANFD_FD_MSG_T *psTxMsg);
 void CANFD_SetGFC(CANFD_T *psCanfd, E_CANFD_ACC_NON_MATCH_FRM eNMStdFrm, E_CANFD_ACC_NON_MATCH_FRM eEMExtFrm, uint32_t u32RejRmtStdFrm, uint32_t u32RejRmtExtFrm);
-void CANFD_SetSIDFltr(CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32Filter);
-void CANFD_SetXIDFltr(CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32FilterLow, uint32_t u32FilterHigh);
+void CANFD_SetSIDFltr(const CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32Filter);
+void CANFD_SetXIDFltr(const CANFD_T *psCanfd, uint32_t u32FltrIdx, uint32_t u32FilterLow, uint32_t u32FilterHigh);
 uint32_t CANFD_ReadRxBufMsg(CANFD_T *psCanfd, uint8_t u8MbIdx, CANFD_FD_MSG_T *psMsgBuf);
 uint32_t CANFD_ReadRxFifoMsg(CANFD_T *psCanfd, uint8_t u8FifoIdx, CANFD_FD_MSG_T *psMsgBuf);
 void CANFD_CopyDBufToMsgBuf(const CANFD_T *psCanfd, CANFD_BUF_T *psRxBuf, CANFD_FD_MSG_T *psMsgBuf);
@@ -423,7 +423,7 @@ void CANFD_TxBufCancelReq(CANFD_T *psCanfd, uint32_t u32TxBufIdx);
 uint32_t CANFD_IsTxBufCancelFin(const CANFD_T *psCanfd, uint32_t u32TxBufIdx);
 uint32_t CANFD_IsTxBufTransmitOccur(const CANFD_T *psCanfd, uint32_t u32TxBufIdx);
 uint32_t CANFD_GetTxEvntFifoWaterLvl(const CANFD_T *psCanfd);
-void CANFD_CopyTxEvntFifoToUsrBuf(CANFD_T *psCanfd, uint32_t u32TxEvntNum, CANFD_TX_EVNT_ELEM_T *psTxEvntElem);
+void CANFD_CopyTxEvntFifoToUsrBuf(const CANFD_T *psCanfd, uint32_t u32TxEvntNum, CANFD_TX_EVNT_ELEM_T *psTxEvntElem);
 void CANFD_GetBusErrCount(const CANFD_T *psCanfd, uint8_t *pu8TxErrBuf, uint8_t *pu8RxErrBuf);
 void CANFD_RunToNormal(CANFD_T *psCanfd, uint8_t u8Enable);
 void CANFD_GetDefaultConfig(CANFD_FD_T *psConfig, uint8_t u8OpMode);
@@ -435,7 +435,8 @@ void CANFD_InitTxDBuf(CANFD_T *psCanfd, const CANFD_RAM_PART_T *psRamConfig, CAN
 void CANFD_InitTxEvntFifo(CANFD_T *psCanfd, const CANFD_RAM_PART_T *psRamConfig, const CANFD_ELEM_SIZE_T *psElemSize, uint32_t u32FifoWaterLvl);
 void CANFD_ConfigSIDFC(CANFD_T *psCanfd, CANFD_RAM_PART_T *psRamConfig, const CANFD_ELEM_SIZE_T *psElemSize);
 void CANFD_ConfigXIDFC(CANFD_T *psCanfd, CANFD_RAM_PART_T *psRamConfig, const CANFD_ELEM_SIZE_T *psElemSize);
-
+uint32_t CANFD_GetNominalBitRate(const CANFD_T *psCanfd);
+uint32_t CANFD_GetDataBitRate(const CANFD_T *psCanfd);
 
 /** @} end of group CANFD_EXPORTED_FUNCTIONS */
 

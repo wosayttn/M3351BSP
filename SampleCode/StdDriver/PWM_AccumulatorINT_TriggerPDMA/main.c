@@ -16,9 +16,9 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
-__attribute__((aligned(4))) static uint16_t g_au16Period[2] = {31999, 15999};
 static volatile uint32_t g_u32IsTestOver = 0;
 
+void PDMA0_IRQHandler(void);
 void PDMA0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -27,19 +27,25 @@ void PDMA0_IRQHandler(void)
     if (u32Status & PDMA_INTSTS_ABTIF_Msk)   /* abort */
     {
         if (PDMA_GET_ABORT_STS(PDMA0) & (PDMA_ABTSTS_ABTIF0_Msk << PDMA_CH))
+        {
             g_u32IsTestOver = 2;
+        }
 
         PDMA_CLR_ABORT_FLAG(PDMA0, (PDMA_ABTSTS_ABTIF0_Msk << PDMA_CH));
     }
     else if (u32Status & PDMA_INTSTS_TDIF_Msk)     /* done */
     {
         if (PDMA_GET_TD_STS(PDMA0) & (PDMA_TDSTS_TDIF0_Msk << PDMA_CH))
+        {
             g_u32IsTestOver = 1;
+        }
 
         PDMA_CLR_TD_FLAG(PDMA0, (PDMA_TDSTS_TDIF0_Msk << PDMA_CH));
     }
     else
+    {
         printf("unknown interrupt %x !!\n", u32Status);
+    }
 
     while (PDMA_GET_INT_STATUS(PDMA0))
     {
@@ -101,7 +107,9 @@ static void SYS_Init(void)
 
 int main(void)
 {
-    uint32_t u32NewCNR = 0;
+    __attribute__((aligned(4))) static uint16_t g_au16Period[2] = {31999, 15999};
+    uint32_t u32NewCNR;
+    uint32_t u32WaitFailed = 0U;
     uint32_t u32TimeOutCnt = 0;
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -112,7 +120,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|              PWM AccumulatorINT TriggerPDMA Sample Code               |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -171,36 +179,37 @@ int main(void)
     /* Wait for PDMA transfer done */
     u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    while (g_u32IsTestOver != 1)
+    while ((g_u32IsTestOver != 1U) && (u32WaitFailed == 0U))
     {
-        if (--u32TimeOutCnt == 0)
+        if (--u32TimeOutCnt == 0U)
         {
             printf("Wait for PDMA transfer done time-out!\n");
-            goto lexit;
+            u32WaitFailed = 1U;
         }
     }
 
-    u32NewCNR = PWM_GET_CNR(PWM1, PWM_OUT_CH);
-    printf("\n\nPWM1 channel0 period register is updated to %d(0x%x)\n", u32NewCNR, u32NewCNR);
-    printf("Press any key to stop PWM1 channel 0.\n");
-    getchar();
-
-    /* Set PWM1 channel 0 loaded value as 0 */
-    PWM_Stop(PWM1, PWM_CH_0_MASK);
-
-    /* Wait until PWM1 channel 0 Timer Stop */
-    u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
-
-    while ((PWM1->CNT[PWM_OUT_CH] & PWM_CNT_CNT_Msk) != 0)
+    if (u32WaitFailed == 0U)
     {
-        if (--u32TimeOutCnt == 0)
+        u32NewCNR = PWM_GET_CNR(PWM1, PWM_OUT_CH);
+        printf("\n\nPWM1 channel0 period register is updated to %u(0x%x)\n", u32NewCNR, u32NewCNR);
+        printf("Press any key to stop PWM1 channel 0.\n");
+        getchar();
+
+        /* Set PWM1 channel 0 loaded value as 0 */
+        PWM_Stop(PWM1, PWM_CH_0_MASK);
+
+        /* Wait until PWM1 channel 0 Timer Stop */
+        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+
+        while ((PWM1->CNT[PWM_OUT_CH] & PWM_CNT_CNT_Msk) != 0U)
         {
-            printf("Wait for PWM stop time-out!\n");
-            break;
+            if (--u32TimeOutCnt == 0U)
+            {
+                printf("Wait for PWM stop time-out!\n");
+                break;
+            }
         }
     }
-
-lexit:
 
     /* Disable Timer for PWM1 channel 0 */
     PWM_ForceStop(PWM1, PWM_CH_0_MASK);
@@ -215,7 +224,9 @@ lexit:
     PDMA_Close(PDMA0);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

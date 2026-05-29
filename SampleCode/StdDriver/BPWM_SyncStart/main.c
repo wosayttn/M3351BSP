@@ -79,7 +79,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|                       BPWM SyncStart Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -117,7 +117,7 @@ int main(void)
     BPWM_TRIGGER_SYNC_START(BPWM0);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

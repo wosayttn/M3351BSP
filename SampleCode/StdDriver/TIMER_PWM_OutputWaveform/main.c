@@ -75,7 +75,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("+-------------------------------------------------+\n");
     printf("|    Timer0~Timer3 PWM Output Duty Sample Code    |\n");
     printf("+-------------------------------------------------+\n\n");
@@ -123,7 +123,7 @@ int main(void)
     printf("*** Check Timer0~Timer3 PWM_CH0 output waveform by oscilloscope ***\n");
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) { }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

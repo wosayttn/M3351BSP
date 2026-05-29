@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "NuMicro.h"
 /** @cond HIDDEN_SYMBOLS */
-#if ENABLE_DEBUG
+#if defined(ENABLE_DEBUG) && (ENABLE_DEBUG)
     #define TRNG_DBGMSG   printf
 #else
     #define TRNG_DBGMSG(...)   do { } while (0)       /* disable debug */
@@ -36,19 +36,16 @@
   */
 int32_t TRNG_Open(void)
 {
-    int i;
+    uint32_t i;
     SYS_ResetModule(TRNG_RST);
 
     TRNG->CTL |= TRNG_CTL_LDOEN_Msk;
-    /* Waiting for ready */
-#ifndef __PLDM_EMU__
 
-    while ((TRNG->STS & TRNG_STS_LDORDY_Msk) == 0)
+    /* Waiting for ready */
+    while ((TRNG->STS & TRNG_STS_LDORDY_Msk) == 0UL)
     {
         TRNG_DBGMSG("Waiting for ready\n");
     };
-
-#endif
 
     TRNG->CTL &= ~TRNG_CTL_NRST_Msk;
 
@@ -60,15 +57,15 @@ int32_t TRNG_Open(void)
 
     TRNG_DBGMSG("TRNG->STS0 0x%x \n", TRNG->STS);
 
-#ifndef __PLDM_EMU__
-
     /* Waiting for ready */
-    while ((TRNG->STS & TRNG_STS_TRNGRDY_Msk) == 0);
+    while ((TRNG->STS & TRNG_STS_TRNGRDY_Msk) == 0UL)
+    {
+    }
 
-#endif
-
-    for (i = 0; i < 3; i++)
+    for (i = 0UL; i < 3UL; i++)
+    {
         TRNG_DBGMSG("TRNG->STS: loop%d  0x%x \n", i, TRNG->STS);
+    }
 
     if ((TRNG->STS & (TRNG_STS_ESAPT_Msk | TRNG_STS_ESRCT_Msk | TRNG_STS_ESSUT_Msk)) \
             != (TRNG_STS_ESAPT_Msk | TRNG_STS_ESRCT_Msk | TRNG_STS_ESSUT_Msk))
@@ -91,30 +88,38 @@ int32_t TRNG_Open(void)
   */
 int32_t TRNG_GenWord(uint32_t *u32RndNum)
 {
-    uint32_t   i, u32Reg, timeout;
+    uint32_t i;
+    uint32_t u32Reg;
+    uint32_t timeout;
 
     *u32RndNum = 0;
     u32Reg = TRNG->CTL;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0UL; i < 4UL; i++)
     {
         TRNG->CTL = TRNG_CTL_START_Msk | u32Reg;
 
         /* TRNG should generate one byte per 125*8 us */
-        for (timeout = (CLK_GetHCLKFreq() / 100); timeout > 0; timeout--)
+        for (timeout = (CLK_GetHCLKFreq() / 100UL); timeout > 0UL; timeout--)
         {
-            if (TRNG->STS & TRNG_STS_DVIF_Msk)
+            if ((TRNG->STS & TRNG_STS_DVIF_Msk) != 0UL)
+            {
                 break;
+            }
 
-            if (TRNG->STS & TRNG_STS_ERRIF_Msk)
+            if ((TRNG->STS & TRNG_STS_ERRIF_Msk) != 0UL)
+            {
                 return -1;
+            }
 
         }
 
-        if (timeout == 0)
+        if (timeout == 0UL)
+        {
             return -1;
+        }
 
-        *u32RndNum |= ((TRNG->DATA_OUT[0] & 0xff) << i * 8);
+        *u32RndNum |= ((TRNG->DATA_OUT[0] & 0xFFUL) << (i * 8UL));
 
     }
 
@@ -132,28 +137,38 @@ int32_t TRNG_GenWord(uint32_t *u32RndNum)
   */
 int32_t TRNG_GenBignum(uint8_t u8BigNum[], int32_t i32Len)
 {
-    uint32_t   i, u32Reg, timeout;
+    uint32_t u32Reg;
+    uint32_t timeout;
+    int32_t i;
+    int32_t i32ByteLen;
 
     u32Reg = TRNG->CTL;
+    i32ByteLen = i32Len / 8;
 
-    for (i = 0; i < i32Len / 8; i++)
+    for (i = 0; i < i32ByteLen; i++)
     {
         TRNG->CTL = TRNG_CTL_START_Msk | u32Reg;
 
         /* TRNG should generate one byte per 125*8 us */
-        for (timeout = (CLK_GetHCLKFreq() / 100); timeout > 0; timeout--)
+        for (timeout = (CLK_GetHCLKFreq() / 100UL); timeout > 0UL; timeout--)
         {
-            if (TRNG->STS & TRNG_STS_DVIF_Msk)
+            if ((TRNG->STS & TRNG_STS_DVIF_Msk) != 0UL)
+            {
                 break;
+            }
 
-            if (TRNG->STS & TRNG_STS_ERRIF_Msk)
+            if ((TRNG->STS & TRNG_STS_ERRIF_Msk) != 0UL)
+            {
                 return -1;
+            }
         }
 
-        if (timeout == 0)
+        if (timeout == 0UL)
+        {
             return -1;
+        }
 
-        u8BigNum[i] = (TRNG->DATA_OUT[0] & 0xff);
+        u8BigNum[i] = (uint8_t)(TRNG->DATA_OUT[0] & 0xFFUL);
     }
 
     return 0;
@@ -170,45 +185,76 @@ int32_t TRNG_GenBignum(uint8_t u8BigNum[], int32_t i32Len)
   */
 int32_t TRNG_GenBignumHex(char cBigNumHex[], int32_t i32Len)
 {
-    uint32_t   i, idx, u32Reg, timeout;
-    uint32_t   data;
+    uint32_t idx;
+    uint32_t u32Reg;
+    uint32_t timeout;
+    int32_t i;
+    int32_t i32ByteLen;
 
     u32Reg = TRNG->CTL;
     idx = 0;
+    i32ByteLen = i32Len / 8;
 
-    for (i = 0; i < i32Len / 8; i++)
+    for (i = 0; i < i32ByteLen; i++)
     {
+        uint32_t data;
+        uint32_t u32CharCode;
+        uint32_t u32HighNibble;
+        uint32_t u32LowNibble;
+
         TRNG->CTL = TRNG_CTL_START_Msk | u32Reg;
 
         /* TRNG should generate one byte per 125*8 us */
-        for (timeout = (CLK_GetHCLKFreq() / 100); timeout > 0; timeout--)
+        for (timeout = (CLK_GetHCLKFreq() / 100UL); timeout > 0UL; timeout--)
         {
-            if (TRNG->STS & TRNG_STS_DVIF_Msk)
+            if ((TRNG->STS & TRNG_STS_DVIF_Msk) != 0UL)
+            {
                 break;
+            }
 
-            if (TRNG->STS & TRNG_STS_ERRIF_Msk)
+            if ((TRNG->STS & TRNG_STS_ERRIF_Msk) != 0UL)
+            {
                 return -1;
+            }
         }
 
-        if (timeout == 0)
+        if (timeout == 0UL)
+        {
             return -1;
+        }
 
-        data = (TRNG->DATA_OUT [0] & 0xff);
+        data = TRNG->DATA_OUT[0] & 0xFFUL;
+        u32HighNibble = (data >> 4UL) & 0xFUL;
+        u32LowNibble = data & 0xFUL;
 
-        if (data >= 0xA0)
-            cBigNumHex[idx++] = ((data >> 4) & 0xf) - 10 + 'A';
+        if (u32HighNibble >= 0xAUL)
+        {
+            u32CharCode = (u32HighNibble - 10UL) + (uint32_t)'A';
+            cBigNumHex[idx] = (char)u32CharCode;
+            idx++;
+        }
         else
-            cBigNumHex[idx++] = ((data >> 4) & 0xf) + '0';
+        {
+            u32CharCode = u32HighNibble + (uint32_t)'0';
+            cBigNumHex[idx] = (char)u32CharCode;
+            idx++;
+        }
 
-        data &= 0xf;
-
-        if (data >= 0xA)
-            cBigNumHex[idx++] = data - 10 + 'A';
+        if (u32LowNibble >= 0xAUL)
+        {
+            u32CharCode = (u32LowNibble - 10UL) + (uint32_t)'A';
+            cBigNumHex[idx] = (char)u32CharCode;
+            idx++;
+        }
         else
-            cBigNumHex[idx++] = data + '0';
+        {
+            u32CharCode = u32LowNibble + (uint32_t)'0';
+            cBigNumHex[idx] = (char)u32CharCode;
+            idx++;
+        }
     }
 
-    cBigNumHex[idx] = 0;
+    cBigNumHex[idx] = '\0';
     return 0;
 }
 

@@ -23,7 +23,7 @@ To experience the powerful features of M3351 series in few minutes, please selec
 ## .\Library\
 
 - CMSIS<br>
-	Cortex® Microcontroller Software Interface Standard (CMSIS) V6.1.0 definitions by Arm® Corp.<p>
+	Cortex® Microcontroller Software Interface Standard (CMSIS) V6.3.0 definitions by Arm® Corp.<p>
 	M3351 CMSIS-Drivers do not guarantee thread safety and Cache coherence. The source and RTE_Device header files are in the "Driver\Source" sub-folder. Please add source files and copy RTE_Device header files into your project. Projects can define PRJ_RTE_DEVICE_HEADER macro to include the private RTE_Device.h.
 
 - Commu<br>
@@ -101,8 +101,10 @@ To experience the powerful features of M3351 series in few minutes, please selec
 
 ## .\Tool\
 
-- imgtool.exe<br>
-	Used to perform the operations that are necessary to manage keys and sign images.
+- HIDTransferTest<br>
+	HID Transfer Test Tool supports two transfer modes: Interrupt Transfer Mode and Control Transfer Mode.
+- mcuboot<br>
+	MCUboot contains the imgtool Python script and sample artifacts provided as a reference implementation for firmware signing and management.
 
 
 # License

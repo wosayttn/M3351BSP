@@ -13,7 +13,7 @@ ASSERT(ENABLE_SRAM2 == 0 || ENABLE_SRAM2 == 1, "ENABLE_SRAM2 must be 0 or 1")
 /* Linker script to configure memory regions. */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 0x00100000                                 /* 1024 KB */
+  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 0x00080000                                 /* Signle bank size: 512 KB */
   RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = (0x00020000 + (ENABLE_SRAM2 * 0x8000))     /* 128 KB or 160 KB  */
   XOM (x)    : ORIGIN = 0x00010000, LENGTH = 0x00002000
 }

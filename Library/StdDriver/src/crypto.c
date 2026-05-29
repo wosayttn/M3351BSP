@@ -11,7 +11,7 @@
 #include "NuMicro.h"
 
 /** @cond HIDDEN_SYMBOLS */
-#if ENABLE_DEBUG
+#if defined(ENABLE_DEBUG) && (ENABLE_DEBUG)
     #define CRYPTO_DBGMSG   printf
 #else
     #define CRYPTO_DBGMSG(...)   do { } while (0)       /* disable debug */
@@ -82,13 +82,18 @@ void PRNG_Start(CRYPTO_T *crypto)
   */
 void PRNG_Read(CRYPTO_T *crypto, uint32_t u32RandKey[])
 {
-    uint32_t  i, wcnt;
-    uint32_t au32WcntTbl[7] = {4, 6, 6, 7, 8, 8, 8};
+    uint32_t i;
+    uint32_t wcnt;
+    static const uint32_t au32WcntTbl[7] = {4U, 6U, 6U, 7U, 8U, 8U, 8U};
 
     wcnt = (((crypto->PRNG_CTL & CRYPTO_PRNG_CTL_KEYSZ_Msk) >> CRYPTO_PRNG_CTL_KEYSZ_Pos));
 
-    if (wcnt > 6) return;
-    else wcnt = au32WcntTbl[wcnt];
+    if (wcnt > 6UL)
+    {
+        return;
+    }
+
+    wcnt = au32WcntTbl[wcnt];
 
     for (i = 0U; i < wcnt; i++)
     {
@@ -163,20 +168,20 @@ void AES_Start(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t u32DMAMode)
   *         - \ref AES_KEY_SIZE_256
   * @return None
   */
-void AES_SetKey(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32Keys[], uint32_t u32KeySize)
+void AES_SetKey(CRYPTO_T *crypto, uint32_t u32Channel, const uint32_t au32Keys[], uint32_t u32KeySize)
 {
-    uint32_t  i, wcnt;
-    void    *key_reg_addr;
-    uint32_t *u32p_key_reg;
+    uint32_t i;
+    uint32_t wcnt;
+    uint32_t u32KeyRegAddr;
 
-    key_reg_addr = (void *)((uint32_t)&crypto->AES_KEY[0] + (u32Channel * 0x3CUL));
-    wcnt = 4UL + u32KeySize * 2UL;
-    u32p_key_reg = (uint32_t *)key_reg_addr;
+    u32KeyRegAddr = (uint32_t)&crypto->AES_KEY[0];
+    u32KeyRegAddr += (u32Channel * 0x3CUL);
+    wcnt = 4UL + (u32KeySize * 2UL);
 
     for (i = 0U; i < wcnt; i++)
     {
-        outpw(u32p_key_reg, au32Keys[i]);
-        u32p_key_reg++;
+        outpw((uint32_t *)u32KeyRegAddr, au32Keys[i]);
+        u32KeyRegAddr += 4UL;
     }
 }
 
@@ -189,18 +194,17 @@ void AES_SetKey(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32Keys[], uint
   * @param[in]  au32IV        A four entry word array contains AES initial vectors.
   * @return None
   */
-void AES_SetInitVect(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32IV[])
+void AES_SetInitVect(CRYPTO_T *crypto, uint32_t u32Channel, const uint32_t au32IV[])
 {
-    uint32_t  i;
-    void   *iv_reg_addr;
-    uint32_t *u32p_iv_reg;
-    iv_reg_addr = (void *)((uint32_t)&crypto->AES_IV[0] + (u32Channel * 0x3CUL));
-    u32p_iv_reg = (uint32_t *)iv_reg_addr;
+    uint32_t i;
+    uint32_t u32IvRegAddr;
+
+    u32IvRegAddr = ((uint32_t)&crypto->AES_IV[0]) + (u32Channel * 0x3CUL);
 
     for (i = 0U; i < 4U; i++)
     {
-        outpw(u32p_iv_reg, au32IV[i]);
-        u32p_iv_reg++;
+        outpw((uint32_t *)u32IvRegAddr, au32IV[i]);
+        u32IvRegAddr += 4UL;
     }
 }
 
@@ -216,16 +220,16 @@ void AES_SetInitVect(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t au32IV[])
 void AES_SetDMATransfer(CRYPTO_T *crypto, uint32_t u32Channel, uint32_t u32SrcAddr,
                         uint32_t u32DstAddr, uint32_t u32TransCnt)
 {
-    void *reg_addr;
+    uint32_t u32RegAddr;
 
-    reg_addr = (void *)((uint32_t)&crypto->AES_SADDR + (u32Channel * 0x3CUL));
-    outpw(reg_addr, u32SrcAddr);
+    u32RegAddr = ((uint32_t)&crypto->AES_SADDR) + (u32Channel * 0x3CUL);
+    outpw((uint32_t *)u32RegAddr, u32SrcAddr);
 
-    reg_addr = (void *)((uint32_t)&crypto->AES_DADDR + (u32Channel * 0x3CUL));
-    outpw(reg_addr, u32DstAddr);
+    u32RegAddr = ((uint32_t)&crypto->AES_DADDR) + (u32Channel * 0x3CUL);
+    outpw((uint32_t *)u32RegAddr, u32DstAddr);
 
-    reg_addr = (void *)((uint32_t)&crypto->AES_CNT + (u32Channel * 0x3CUL));
-    outpw(reg_addr, u32TransCnt);
+    u32RegAddr = ((uint32_t)&crypto->AES_CNT) + (u32Channel * 0x3CUL);
+    outpw((uint32_t *)u32RegAddr, u32TransCnt);
 }
 
 
@@ -294,8 +298,9 @@ void SHA_SetDMATransfer(CRYPTO_T *crypto, uint32_t u32SrcAddr, uint32_t u32Trans
   */
 void SHA_Read(CRYPTO_T *crypto, uint32_t u32Digest[])
 {
-    uint32_t  i, wcnt;
-    uint32_t  reg_addr;
+    uint32_t i;
+    uint32_t wcnt;
+    uint32_t reg_addr;
 
     i = (crypto->HMAC_CTL & CRYPTO_HMAC_CTL_OPMODE_Msk) >> CRYPTO_HMAC_CTL_OPMODE_Pos;
 

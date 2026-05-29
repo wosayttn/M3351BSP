@@ -76,8 +76,6 @@ int main(void)
     printf("|          HardFault Secure code is running         |\n");
     printf("+---------------------------------------------------+\n");
 
-    /* [Workaround] Disable CACHE to ensure HardFault execution */
-    CACHE_Disable();
     SYS_UnlockReg();
     FMC_Open();
     /* Check Secure/Non-secure base address configuration */

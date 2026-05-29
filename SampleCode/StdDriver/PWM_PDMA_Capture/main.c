@@ -20,6 +20,9 @@
 __attribute__((aligned(4))) static uint16_t g_au16Count[4];
 static volatile uint32_t g_u32IsTestOver = 0;
 
+void PDMA0_IRQHandler(void);
+int32_t CalPeriodTime(PWM_T *PWM, uint32_t u32Ch);
+
 void PDMA0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -28,19 +31,25 @@ void PDMA0_IRQHandler(void)
     if (u32Status & PDMA_INTSTS_ABTIF_Msk)   /* abort */
     {
         if (PDMA_GET_ABORT_STS(PDMA0) & (PDMA_ABTSTS_ABTIF0_Msk << PDMA_CH))
+        {
             g_u32IsTestOver = 2;
+        }
 
         PDMA_CLR_ABORT_FLAG(PDMA0, (PDMA_ABTSTS_ABTIF0_Msk << PDMA_CH));
     }
     else if (u32Status & PDMA_INTSTS_TDIF_Msk)     /* done */
     {
         if (PDMA_GET_TD_STS(PDMA0) & (PDMA_TDSTS_TDIF0_Msk << PDMA_CH))
+        {
             g_u32IsTestOver = 1;
+        }
 
         PDMA_CLR_TD_FLAG(PDMA0, (PDMA_TDSTS_TDIF0_Msk << PDMA_CH));
     }
     else
+    {
         printf("unknown interrupt %x !!\n", u32Status);
+    }
 
     while (PDMA_GET_INT_STATUS(PDMA0))
     {
@@ -67,7 +76,11 @@ void PDMA0_IRQHandler(void)
 /*--------------------------------------------------------------------------------------*/
 int32_t CalPeriodTime(PWM_T *PWM, uint32_t u32Ch)
 {
-    uint16_t u16RisingTime, u16FallingTime, u16HighPeriod, u16LowPeriod, u16TotalPeriod;
+    uint16_t u16RisingTime;
+    uint16_t u16FallingTime;
+    uint16_t u16HighPeriod;
+    uint16_t u16LowPeriod;
+    uint16_t u16TotalPeriod;
     uint32_t u32TimeOutCnt;
 
     (void)PWM;
@@ -77,7 +90,7 @@ int32_t CalPeriodTime(PWM_T *PWM, uint32_t u32Ch)
     /* Wait PDMA interrupt (g_u32IsTestOver will be set at IRQ_Handler function) */
     u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    while (g_u32IsTestOver == 0)
+    while (g_u32IsTestOver == 0U)
     {
         if (--u32TimeOutCnt == 0)
         {
@@ -92,15 +105,15 @@ int32_t CalPeriodTime(PWM_T *PWM, uint32_t u32Ch)
 
     u16HighPeriod = g_au16Count[1] - g_au16Count[2];
 
-    u16LowPeriod = (uint16_t)(0x10000 - g_au16Count[3]);
+    u16LowPeriod = (uint16_t)(0x10000U - g_au16Count[3]);
 
-    u16TotalPeriod = (uint16_t)(0x10000 - g_au16Count[2]);
+    u16TotalPeriod = (uint16_t)(0x10000U - g_au16Count[2]);
 
     printf("\nPWM generate: \nHigh Period=17279 ~ 17281, Low Period=40319 ~ 40321, Total Period=57599 ~ 57601\n");
     printf("\nCapture Result: Rising Time = %d, Falling Time = %d \nHigh Period = %d, Low Period = %d, Total Period = %d.\n\n",
            u16RisingTime, u16FallingTime, u16HighPeriod, u16LowPeriod, u16TotalPeriod);
 
-    if ((u16HighPeriod < 17279) || (u16HighPeriod > 17281) || (u16LowPeriod < 40319) || (u16LowPeriod > 40321) || (u16TotalPeriod < 57599) || (u16TotalPeriod > 57601))
+    if ((u16HighPeriod < 17279U) || (u16HighPeriod > 17281U) || (u16LowPeriod < 40319U) || (u16LowPeriod > 40321U) || (u16TotalPeriod < 57599U) || (u16TotalPeriod > 57601U))
     {
         printf("Capture Test Fail!!\n");
         return (-1);
@@ -163,6 +176,7 @@ static void SYS_Init(void)
 
 int main(void)
 {
+    uint32_t u32ExitLoop = 0U;
     uint32_t u32TimeOutCnt;
 
     /* Init System, IP clock and multi-function I/O */
@@ -174,7 +188,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|                    PWM PDMA Capture Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -184,7 +198,7 @@ int main(void)
     printf("    PWM1 channel 2(PC.3) <--> PWM1 channel 0(PC.5)\n\n");
     printf("Use PWM1 Channel 2(PC.3) to capture the PWM1 Channel 0(PC.5) Waveform\n");
 
-    while (1)
+    while (u32ExitLoop == 0U)
     {
         printf("\n\nPress any key to start PWM Capture Test\n");
         getchar();
@@ -197,13 +211,13 @@ int main(void)
            duty ratio = (CMR)/(CNR+1)
            cycle time = CNR+1
            High level = CMR
-           PWM clock source frequency = PLL/2 = 72000000
+           PWM clock source frequency = CLK_GetPLLClockFreq()/2
            (CNR+1) = PWM clock source frequency/prescaler/PWM output frequency
-                   = 72000000/5/250 = 57600
+                   = (CLK_GetPLLClockFreq()/2)/5/250 = (CLK_GetPLLClockFreq()/2)/1250
            (Note: CNR is 16 bits, so if calculated value is larger than 65536, user should increase prescale value.)
-           CNR = 57600
+           CNR = (CLK_GetPLLClockFreq()/2)/1250
            duty ratio = 30% ==> (CMR)/(CNR+1) = 30%
-           CMR = 17280
+           CMR = ((CLK_GetPLLClockFreq()/2)/1250) * 30 / 100
            Prescale value is 4 : prescaler= 5
         */
 
@@ -223,7 +237,7 @@ int main(void)
         PDMA_Open(PDMA0, (BIT0 << PDMA_CH));
 
         /* Transfer width is half word(16 bit) and transfer count is 4 */
-        PDMA_SetTransferCnt(PDMA0, PDMA_CH, PDMA_WIDTH_16, 4);
+        PDMA_SetTransferCnt(PDMA0, PDMA_CH, PDMA_WIDTH_16, 4U);
 
         /* Set source address as PWM capture channel PDMA register(no increment) and destination address as g_au16Count array(increment) */
         PDMA_SetTransferAddr(PDMA0, PDMA_CH, (uint32_t)&PWM1->PDMACAP[(PWM_CAP_CH >> 1UL)], PDMA_SAR_FIX, (uint32_t)&g_au16Count[0], PDMA_DAR_INC);
@@ -246,19 +260,19 @@ int main(void)
         /*--------------------------------------------------------------------------------------*/
 
         /* If input minimum frequency is 250Hz, user can calculate capture settings by follows.
-           Capture clock source frequency = PLL/2 = 72000000 in the sample code.
+           Capture clock source frequency = CLK_GetPLLClockFreq()/2 in the sample code.
            (CNR+1) = Capture clock source frequency/prescaler/minimum input frequency
-                   = 72000000/5/250 = 57600
+                   = (CLK_GetPLLClockFreq()/2)/5/250 = (CLK_GetPLLClockFreq()/2)/1250
            (Note: CNR is 16 bits, so if calculated value is larger than 65536, user should increase prescale value.)
            CNR = 0xFFFF
            (Note: In capture mode, user should set CNR to 0xFFFF to increase capture frequency range.)
 
            Capture unit time = 1000000000/Capture clock source frequency*prescaler
-           69 ns = 1000000000/72000000*5
+           unit time = 1000000000/(CLK_GetPLLClockFreq()/2)*5
         */
 
         /* Set PWM1 channel 2 capture configuration */
-        PWM_ConfigCaptureChannel(PWM1, PWM_CAP_CH, 69, 0);
+        PWM_ConfigCaptureChannel(PWM1, PWM_CAP_CH, (uint32_t)(1000000000UL / (CLK_GetPLLClockFreq() / 2U) * 5U), 0);
         PWM_SET_PRESCALER(PWM1, PWM_CAP_CH, PWM_GET_PRESCALER(PWM1, PWM_OUT_CH));
 
         /* Enable Timer for PWM1 channel 2 */
@@ -273,85 +287,90 @@ int main(void)
         /* Wait until PWM1 channel 2 Timer start to count */
         u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-        while ((PWM1->CNT[PWM_CAP_CH]) == 0)
+        while (((PWM1->CNT[PWM_CAP_CH]) == 0U) && (u32ExitLoop == 0U))
         {
-            if (--u32TimeOutCnt == 0)
+            if (--u32TimeOutCnt == 0U)
             {
                 printf("Wait for PWM1 channel 2 Timer start time-out!\n");
-                goto lexit;
+                u32ExitLoop = 1U;
             }
         }
 
         /* Capture the Input Waveform Data */
-        if (CalPeriodTime(PWM1, PWM_CAP_CH) < 0)
-            goto lexit;
-
-        /*------------------------------------------------------------------------------------------------------------*/
-        /* Stop PWM1 channel 0 (Recommended procedure method 1)                                                      */
-        /* Set PWM Timer loaded value(Period) as 0. When PWM internal counter(CNT) reaches to 0, disable PWM Timer */
-        /*------------------------------------------------------------------------------------------------------------*/
-
-        /* Set PWM1 channel 0 loaded value as 0 */
-        PWM_Stop(PWM1, PWM_CH_0_MASK);
-
-        /* Wait until PWM1 channel 0 Timer Stop */
-        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
-
-        while ((PWM1->CNT[PWM_OUT_CH] & PWM_CNT_CNT_Msk) != 0)
+        if ((u32ExitLoop == 0U) && (CalPeriodTime(PWM1, PWM_CAP_CH) < 0))
         {
-            if (--u32TimeOutCnt == 0)
-            {
-                printf("Wait for PWM1 channel 0 Timer stop time-out!\n");
-                goto lexit;
-            }
+            u32ExitLoop = 1U;
         }
 
-        /* Disable Timer for PWM1 channel 0 */
-        PWM_ForceStop(PWM1, PWM_CH_0_MASK);
-
-        /* Disable PWM Output path for PWM1 channel 0 */
-        PWM_DisableOutput(PWM1, PWM_CH_0_MASK);
-
-        /*------------------------------------------------------------------------------------------------------------*/
-        /* Stop PWM1 channel 2 (Recommended procedure method 1)                                                      */
-        /* Set PWM Timer loaded value(Period) as 0. When PWM internal counter(CNT) reaches to 0, disable PWM Timer */
-        /*------------------------------------------------------------------------------------------------------------*/
-
-        /* Set loaded value as 0 for PWM1 channel 2 */
-        PWM_Stop(PWM1, PWM_CH_2_MASK);
-
-        /* Wait until PWM1 channel 2 current counter reach to 0 */
-        u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
-
-        while ((PWM1->CNT[PWM_CAP_CH] & PWM_CNT_CNT_Msk) != 0)
+        if (u32ExitLoop == 0U)
         {
-            if (--u32TimeOutCnt == 0)
+            /*------------------------------------------------------------------------------------------------------------*/
+            /* Stop PWM1 channel 0 (Recommended procedure method 1)                                                      */
+            /* Set PWM Timer loaded value(Period) as 0. When PWM internal counter(CNT) reaches to 0, disable PWM Timer */
+            /*------------------------------------------------------------------------------------------------------------*/
+
+            /* Set PWM1 channel 0 loaded value as 0 */
+            PWM_Stop(PWM1, PWM_CH_0_MASK);
+
+            /* Wait until PWM1 channel 0 Timer Stop */
+            u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+
+            while (((PWM1->CNT[PWM_OUT_CH] & PWM_CNT_CNT_Msk) != 0U) && (u32ExitLoop == 0U))
             {
-                printf("Wait for PWM1 channel 2 current counter reach to 0 time-out!\n");
-                goto lexit;
+                if (--u32TimeOutCnt == 0U)
+                {
+                    printf("Wait for PWM1 channel 0 Timer stop time-out!\n");
+                    u32ExitLoop = 1U;
+                }
             }
+
+            /* Disable Timer for PWM1 channel 0 */
+            PWM_ForceStop(PWM1, PWM_CH_0_MASK);
+
+            /* Disable PWM Output path for PWM1 channel 0 */
+            PWM_DisableOutput(PWM1, PWM_CH_0_MASK);
+
+            /*------------------------------------------------------------------------------------------------------------*/
+            /* Stop PWM1 channel 2 (Recommended procedure method 1)                                                      */
+            /* Set PWM Timer loaded value(Period) as 0. When PWM internal counter(CNT) reaches to 0, disable PWM Timer */
+            /*------------------------------------------------------------------------------------------------------------*/
+
+            /* Set loaded value as 0 for PWM1 channel 2 */
+            PWM_Stop(PWM1, PWM_CH_2_MASK);
+
+            /* Wait until PWM1 channel 2 current counter reach to 0 */
+            u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+
+            while (((PWM1->CNT[PWM_CAP_CH] & PWM_CNT_CNT_Msk) != 0U) && (u32ExitLoop == 0U))
+            {
+                if (--u32TimeOutCnt == 0U)
+                {
+                    printf("Wait for PWM1 channel 2 current counter reach to 0 time-out!\n");
+                    u32ExitLoop = 1U;
+                }
+            }
+
+            /* Disable Timer for PWM1 channel 2 */
+            PWM_ForceStop(PWM1, PWM_CH_2_MASK);
+
+            /* Disable Capture Function and Capture Input path for  PWM1 channel 2 */
+            PWM_DisableCapture(PWM1, PWM_CH_2_MASK);
+
+            /* Clear Capture Interrupt flag for PWM1 channel 2 */
+            PWM_ClearCaptureIntFlag(PWM1, PWM_CAP_CH, PWM_CAPTURE_INT_FALLING_LATCH | PWM_CAPTURE_INT_RISING_LATCH);
+
+            /* Disable PDMA NVIC */
+            NVIC_DisableIRQ(PDMA0_IRQn);
+
+            /* Close PDMA */
+            PDMA_Close(PDMA0);
         }
-
-        /* Disable Timer for PWM1 channel 2 */
-        PWM_ForceStop(PWM1, PWM_CH_2_MASK);
-
-        /* Disable Capture Function and Capture Input path for  PWM1 channel 2 */
-        PWM_DisableCapture(PWM1, PWM_CH_2_MASK);
-
-        /* Clear Capture Interrupt flag for PWM1 channel 2 */
-        PWM_ClearCaptureIntFlag(PWM1, PWM_CAP_CH, PWM_CAPTURE_INT_FALLING_LATCH | PWM_CAPTURE_INT_RISING_LATCH);
-
-        /* Disable PDMA NVIC */
-        NVIC_DisableIRQ(PDMA0_IRQn);
-
-        /* Close PDMA */
-        PDMA_Close(PDMA0);
     }
 
-lexit:
-
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

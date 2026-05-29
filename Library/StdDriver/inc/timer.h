@@ -51,10 +51,10 @@ extern "C"
 #define TIMER_CAPTURE_EVENT_GET_LOW_PERIOD      (6UL << TIMER_EXTCTL_CAPEDGE_Pos)  /*!< First capture event is at falling edge, follows are at at rising edge \hideinitializer */
 #define TIMER_CAPTURE_EVENT_GET_HIGH_PERIOD     (7UL << TIMER_EXTCTL_CAPEDGE_Pos)  /*!< First capture event is at rising edge, follows are at at falling edge \hideinitializer */
 
-/* Capture Sourdce Selection */
+/* Capture Source Selection */
 #define TIMER_CAPSRC_TMX_EXT                    (0UL << TIMER_CTL_CAPSRC_Pos)     /*!< Capture source from TMx_EXT pin      \hideinitializer */
 #define TIMER_CAPSRC_INTERNAL                   (1UL << TIMER_CTL_CAPSRC_Pos)      /*!< Capture source from Internal event such as LIRC or ACMP0/1 \hideinitializer */
-/* Capture Sourdce Divider */
+/* Capture Source Divider */
 #define TIMER_CAPTURE_SOURCE_DIV_1                  (0UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 1 \hideinitializer */
 #define TIMER_CAPTURE_SOURCE_DIV_2                  (1UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 2 \hideinitializer */
 #define TIMER_CAPTURE_SOURCE_DIV_4                  (2UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 4 \hideinitializer */
@@ -64,7 +64,7 @@ extern "C"
 #define TIMER_CAPTURE_SOURCE_DIV_64                 (6UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 64 \hideinitializer */
 #define TIMER_CAPTURE_SOURCE_DIV_128                (7UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 128 \hideinitializer */
 #define TIMER_CAPTURE_SOURCE_DIV_256                (8UL << TIMER_EXTCTL_CAPDIVSCL_Pos) /*!< Input capture source divide 256 \hideinitializer */
-/* Internal Capture Sourdce Selection */
+/* Internal Capture Source Selection */
 #define TIMER_INTERCAPSEL_ACMP0                 (0UL << TIMER_EXTCTL_INTERCAPSEL_Pos)   /*!< Capture source from Internal event ACMP0   \hideinitializer */
 #define TIMER_INTERCAPSEL_ACMP1                 (1UL << TIMER_EXTCTL_INTERCAPSEL_Pos)   /*!< Capture source from Internal event ACMP1   \hideinitializer */
 #define TIMER_INTERCAPSEL_HXT                   (2UL << TIMER_EXTCTL_INTERCAPSEL_Pos)   /*!< Capture source from Internal event HXT   \hideinitializer */
@@ -72,7 +72,7 @@ extern "C"
 #define TIMER_INTERCAPSEL_HIRC                  (4UL << TIMER_EXTCTL_INTERCAPSEL_Pos)   /*!< Capture source from Internal event HIRC   \hideinitializer */
 #define TIMER_INTERCAPSEL_LIRC                  (5UL << TIMER_EXTCTL_INTERCAPSEL_Pos)   /*!< Capture source from Internal event LIRC    \hideinitializer */
 #define TIMER_CAPTURE_FROM_EXTERNAL             (0xFFUL)                                  /*!< Capture source from TMx_EXT pin  \hideinitializer          */
-/* Event Counter Sourdce Selection */
+/* Event Counter Source Selection */
 #define TIMER_EVENT_COUNTER_SOURCE_TMX          (0UL << TIMER_EXTCTL_ECNTSSEL_Pos) /*!< Event Counter source from  external TMx (x= 0~3) pin \hideinitializer */
 #define TIMER_EVENT_COUNTER_SOURCE_USB          (1UL << TIMER_EXTCTL_ECNTSSEL_Pos) /*!< Event Counter source from USB internal output signal \hideinitializer */
 #define TIMER_EVENT_COUNTER_SOURCE_ACMP0        (2UL << TIMER_EXTCTL_ECNTSSEL_Pos) /*!< Event Counter source from internal ACMP0 output signal \hideinitializer */
@@ -120,7 +120,7 @@ extern "C"
   *                But if timer is operating at other modes, the timer up counter will restart counting and start from 0.
   * \hideinitializer
   */
-#define TIMER_SET_CMP_VALUE(timer, u32Value)        ((timer)->CMP = (u32Value))
+#define TIMER_SET_CMP_VALUE(timer, u32Value)        ((timer)->CMP = ((u32Value) & TIMER_CMP_CMPDAT_Msk))
 
 /**
   * @brief      Set Timer Prescale Value
@@ -131,7 +131,7 @@ extern "C"
   *             before it is fed into timer.
   * \hideinitializer
   */
-#define TIMER_SET_PRESCALE_VALUE(timer, u32Value)   ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_PSC_Msk) | (u32Value))
+#define TIMER_SET_PRESCALE_VALUE(timer, u32Value)   ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_PSC_Msk) | ((u32Value) & TIMER_CTL_PSC_Msk))
 
 /**
   * @brief      Check specify Timer Status
@@ -153,7 +153,7 @@ extern "C"
   * @details    This macro is used to select timer toggle-output pin is output on TMx or TMx_EXT pin.
   * \hideinitializer
   */
-#define TIMER_SELECT_TOUT_PIN(timer, u32ToutSel)    ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_TGLPINSEL_Msk) | (u32ToutSel))
+#define TIMER_SELECT_TOUT_PIN(timer, u32ToutSel)    ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_TGLPINSEL_Msk) | ((u32ToutSel) & TIMER_CTL_TGLPINSEL_Msk))
 
 /**
   * @brief      Select Timer operating mode
@@ -166,7 +166,7 @@ extern "C"
   * @return     None
   * \hideinitializer
   */
-#define TIMER_SET_OPMODE(timer, u32OpMode)   ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_OPMODE_Msk) | (u32OpMode))
+#define TIMER_SET_OPMODE(timer, u32OpMode)   ((timer)->CTL = ((timer)->CTL & ~TIMER_CTL_OPMODE_Msk) | ((u32OpMode) & TIMER_CTL_OPMODE_Msk))
 
 /* Declare these inline functions here to avoid MISRA C 2004 rule 8.1 error */
 __STATIC_INLINE void TIMER_Start(TIMER_T *timer);
@@ -183,15 +183,15 @@ __STATIC_INLINE void TIMER_EnableInt(TIMER_T *timer);
 __STATIC_INLINE void TIMER_DisableInt(TIMER_T *timer);
 __STATIC_INLINE void TIMER_EnableCaptureInt(TIMER_T *timer);
 __STATIC_INLINE void TIMER_DisableCaptureInt(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetIntFlag(TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetIntFlag(const TIMER_T *timer);
 __STATIC_INLINE void TIMER_ClearIntFlag(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlag(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlagOV(TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlag(const TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlagOV(const TIMER_T *timer);
 __STATIC_INLINE void TIMER_ClearCaptureIntFlag(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetWakeupFlag(TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetWakeupFlag(const TIMER_T *timer);
 __STATIC_INLINE void TIMER_ClearWakeupFlag(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetCaptureData(TIMER_T *timer);
-__STATIC_INLINE uint32_t TIMER_GetCounter(TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetCaptureData(const TIMER_T *timer);
+__STATIC_INLINE uint32_t TIMER_GetCounter(const TIMER_T *timer);
 __STATIC_INLINE void TIMER_EventCounterSelect(TIMER_T *timer, uint32_t u32Src);
 
 /**
@@ -357,7 +357,7 @@ __STATIC_INLINE void TIMER_DisableCaptureInt(TIMER_T *timer)
   * @retval     1   Timer time-out interrupt occurred
   * @details    This function indicates timer time-out interrupt occurred or not.
   */
-__STATIC_INLINE uint32_t TIMER_GetIntFlag(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetIntFlag(const TIMER_T *timer)
 {
     return ((timer->INTSTS & TIMER_INTSTS_TIF_Msk) ? 1UL : 0UL);
 }
@@ -380,7 +380,7 @@ __STATIC_INLINE void TIMER_ClearIntFlag(TIMER_T *timer)
   * @retval     1   Timer capture interrupt occurred
   * @details    This function indicates timer capture trigger interrupt occurred or not.
   */
-__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlag(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlag(const TIMER_T *timer)
 {
     return timer->EINTSTS;
 }
@@ -392,7 +392,7 @@ __STATIC_INLINE uint32_t TIMER_GetCaptureIntFlag(TIMER_T *timer)
   * @retval     1   Timer capture interrupt Overrun
   * @details    This function indicates Timer capture trigger interrupt Overrun or not.
   */
-__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlagOV(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetCaptureIntFlagOV(const TIMER_T *timer)
 {
     return ((timer->EINTSTS & TIMER_EINTSTS_CAPIFOV_Msk) ? 1UL : 0UL);
 }
@@ -415,9 +415,9 @@ __STATIC_INLINE void TIMER_ClearCaptureIntFlag(TIMER_T *timer)
   * @retval     1   Timer interrupt event cause CPU wake-up
   * @details    This function indicates timer interrupt event has waked up system or not.
   */
-__STATIC_INLINE uint32_t TIMER_GetWakeupFlag(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetWakeupFlag(const TIMER_T *timer)
 {
-    return (timer->INTSTS & TIMER_INTSTS_TWKF_Msk ? 1UL : 0UL);
+    return ((timer->INTSTS & TIMER_INTSTS_TWKF_Msk) ? 1UL : 0UL);
 }
 
 /**
@@ -437,7 +437,7 @@ __STATIC_INLINE void TIMER_ClearWakeupFlag(TIMER_T *timer)
   * @return     24-bit Capture Value
   * @details    This function reports the current 24-bit timer capture value.
   */
-__STATIC_INLINE uint32_t TIMER_GetCaptureData(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetCaptureData(const TIMER_T *timer)
 {
     return timer->CAP;
 }
@@ -448,7 +448,7 @@ __STATIC_INLINE uint32_t TIMER_GetCaptureData(TIMER_T *timer)
   * @return     24-bit Counter Value
   * @details    This function reports the current 24-bit timer counter value.
   */
-__STATIC_INLINE uint32_t TIMER_GetCounter(TIMER_T *timer)
+__STATIC_INLINE uint32_t TIMER_GetCounter(const TIMER_T *timer)
 {
     return timer->CNT;
 }
@@ -467,7 +467,7 @@ __STATIC_INLINE uint32_t TIMER_GetCounter(TIMER_T *timer)
   */
 __STATIC_INLINE void TIMER_EventCounterSelect(TIMER_T *timer, uint32_t u32Src)
 {
-    timer->EXTCTL = (timer->EXTCTL & ~TIMER_EXTCTL_ECNTSSEL_Msk) | u32Src;
+    timer->EXTCTL = (timer->EXTCTL & ~TIMER_EXTCTL_ECNTSSEL_Msk) | (u32Src & TIMER_EXTCTL_ECNTSSEL_Msk);
 }
 
 uint32_t TIMER_Open(TIMER_T *timer, uint32_t u32Mode, uint32_t u32Freq);
@@ -478,7 +478,7 @@ void TIMER_CaptureSelect(TIMER_T *timer, uint32_t u32Src);
 void TIMER_DisableCapture(TIMER_T *timer);
 void TIMER_EnableEventCounter(TIMER_T *timer, uint32_t u32Edge);
 void TIMER_DisableEventCounter(TIMER_T *timer);
-uint32_t TIMER_GetModuleClock(TIMER_T *timer);
+uint32_t TIMER_GetModuleClock(const TIMER_T *timer);
 void TIMER_EnableFreqCounter(TIMER_T *timer,
                              uint32_t u32DropCount,
                              uint32_t u32Timeout,

@@ -17,6 +17,47 @@
 /*---------------------------------------------------------------------------------------------------------*/
 static void ExecCTROperation(I3C_DEVICE_T *dev);
 
+/**
+  * @brief  SDR Dummy Read to wake up target.
+  */
+static int32_t SDRReadDummy(I3C_DEVICE_T *dev, uint8_t tgt)
+{
+    volatile uint32_t i;
+    int32_t iRet = I3C_STS_NO_ERR;
+    uint16_t len;
+    uint8_t g_DevRxData[I3C_DEVICE_TX_BUF_CNT * 4];
+
+    if (dev->port->TGTCFG[tgt] & I3C_TGTCFG_DEVTYPE_Msk)
+    {
+        printf("\nTarget index-%d NOT at I3C mode.\n", tgt);
+        return -1;
+    }
+
+    // SDR Read operation
+    len = 0;
+    dev->speed_mode = I3C_DEVI3C_SPEED_SDR0;
+    iRet = I3C_FuncSDRRead(dev, tgt, (uint8_t *)g_DevRxData, &len);
+
+    if (iRet != I3C_STS_NO_ERR)
+    {
+        return -1;
+    }
+
+    printf("\n[ SDR Read PASS ] (Tgt: 0x%02x)\n\t", dev->target_da[tgt]);
+
+    for (i = 0; i < len; i++)
+    {
+        printf("%02x ", g_DevRxData[i]);
+
+        if ((i % 8) == 7)
+        {
+            printf("\n\t");
+        }
+    }
+
+    printf("\n");
+    return 0;
+}
 
 /**
   * @brief  SDR Write and Read Sample Flow.
@@ -506,10 +547,14 @@ static void ExecCTROperation(I3C_DEVICE_T *dev)
     {
         mode = (char)DEBUG_PORT->DAT;
 #if (DEVICE_CONTROLLER_ROLE == 1)
-        uint32_t i = 0;
 
         switch (mode)
         {
+            case 'w':
+                // SDR Dummy Read to wake up Target-0;
+                SDRReadDummy(dev, 0);
+                break;
+
             case 'f':
                 // I2C FM+ Write and Read to Target-0;
                 I2CFMPWRSample(dev, 0);
@@ -556,40 +601,14 @@ static void ExecCTROperation(I3C_DEVICE_T *dev)
                 printf("[s] SDR :     Write 16-bytes to Target-0, then read back 16-bytes to compare \n");
                 printf("[d] HDR-DDR : Write 16-bytes to Target-1, then read back 16-bytes to compare \n");
                 printf("[b] HDR-BT :  Write 16-bytes to Target-2, then read back 16-bytes to compare \n");
+                printf("[w] SDR Dummy Read : Read 0-bytes to wake up Target-0 \n");
                 printf("[p] GETPID CCC : Get Target-0's PID \n");
                 printf("[e] ENTDAA CCC : Set all Targets in I3C mode \n");
                 printf("[r] RSTDAA CCC : Set all Targets in I2C mode \n");
                 printf("[C] Common Command Codes (CCC) flow \n");
                 /* Dump all Targets info. */
                 printf("\nAll Target's info on the bus:\n");
-
-                for (i = 0; i < 7; i++)
-                {
-                    if (dev->port->TGTCFG[i] & I3C_TGTCFG_DEVTYPE_Msk)
-                    {
-                        // Target at I2C mode
-                        dev->target_sa[i] = ((dev->port->TGTCFG[i] & I3C_TGTCFG_SADDR_Msk) >> I3C_TGTCFG_SADDR_Pos);
-
-                        if (dev->target_sa[i] == 0x0)
-                        {
-                            continue;
-                        }
-
-                        printf("\tTarget #%d:\n", i);
-                        printf("\t - SADDR          = 0x%02x \n", dev->target_sa[i]);
-                    }
-                    else
-                    {
-                        // Target at I3C mode
-                        dev->target_da[i] = ((dev->port->TGTCHAR[i].DADDR & I3C_TGTCHAR4_DADDR_Msk) >> I3C_TGTCHAR4_DADDR_Pos);
-                        printf("\tTarget #%d:\n", i);
-                        printf("\t - Provisional ID = 0x%08x%02x \n", dev->port->TGTCHAR[i].PIDMSB, dev->port->TGTCHAR[i].PIDLSB);
-                        printf("\t - BCR, DCR       = 0x%08x \n", dev->port->TGTCHAR[i].BCRDCR);
-                        printf("\t - DADDR          = 0x%02x \n", dev->target_da[i]);
-                    }
-                }
-
-                printf("\n");
+                I3C_DumpAllTargetInfo(dev);
                 break;
         }
 

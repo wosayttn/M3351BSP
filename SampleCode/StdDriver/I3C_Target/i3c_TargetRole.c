@@ -15,10 +15,25 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Functions and variables declaration                                                                     */
 /*---------------------------------------------------------------------------------------------------------*/
+static void     SystemEnterToPowerDown(void);
 static void     DumpCurrentTargetInfo(I3C_DEVICE_T *dev);
 static int32_t  ParseTGTReceiveData(I3C_DEVICE_T *dev);
 static void     ExecTGTOperation(I3C_DEVICE_T *dev);
 
+static void SystemEnterToPowerDown(void)
+{
+    /* Set Power-down mode */
+    CLK_SetPowerDownMode(CLK_PMUCTL_PDMSEL_NPD1);
+    /* Enter to Power-down mode */
+    printf("\n[ System enter to Power-down mode ]\n\n");
+    /* Check if all the debug messages are finished */
+    UART_WAIT_TX_EMPTY(DEBUG_PORT);
+    /* Enter to Power-down mode */
+    CLK_PowerDown();
+    /* Wake-up from  */
+    printf("\n[ Wake-up completed ]\n\n");
+    UART_WAIT_TX_EMPTY(DEBUG_PORT);
+}
 
 /**
   * @brief  Dump current Target's Info.
@@ -132,6 +147,16 @@ static void ExecTGTOperation(I3C_DEVICE_T *dev)
 
         switch (mode)
         {
+            case 'P':
+                if (dev->device_role == I3C_CONTROLLER)
+                {
+                    printf("Device at Controller Role, no action.\n\n");
+                    break;
+                }
+
+                SystemEnterToPowerDown();
+                break;
+
             case 'I':
                 if (dev->device_role == I3C_CONTROLLER)
                 {
@@ -158,6 +183,7 @@ static void ExecTGTOperation(I3C_DEVICE_T *dev)
 
             default:
                 printf("\n");
+                printf("[P] Enter to Power Down Mode \n");
                 printf("[I] Perform In-Band Interrupt Request \n");
                 printf("[#] Perform Controller Request (Target will switch to Controller Role) \n");
                 /* Dump Target Info. */

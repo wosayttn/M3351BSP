@@ -14,41 +14,45 @@
 /*---------------------------------------------------------------------------------------------------------*/
 static volatile uint32_t gu32Period;
 
+void TIMER0_IRQHandler(void);
 void TIMER0_IRQHandler(void)
 {
-    static uint32_t u32Toggle = 0;
-    uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
-
     if (TPWM_GET_PERIOD_INT_FLAG(TIMER0))
     {
+        static uint32_t u32Toggle = 0U;
+
         TPWM_CLEAR_PERIOD_INT_FLAG(TIMER0);
 
-        if (u32Toggle == 0)
+        if (u32Toggle == 0U)
         {
             /* Set PWM period to generate output frequency 36000 Hz */
-            TPWM_SET_PERIOD(TIMER0, ((gu32Period / 2) - 1));
+            TPWM_SET_PERIOD(TIMER0, ((gu32Period / 2U) - 1U));
 
             /* Set PWM duty, 40% */
-            TPWM_SET_CMPDAT(TIMER0, (((gu32Period / 2) * 4) / 10));
+            TPWM_SET_CMPDAT(TIMER0, (((gu32Period / 2U) * 4U) / 10U));
         }
         else
         {
             /* Set PWM period to generate output frequency 18000 Hz */
-            TPWM_SET_PERIOD(TIMER0, (gu32Period - 1));
+            TPWM_SET_PERIOD(TIMER0, (gu32Period - 1U));
 
             /* Set PWM duty, 50% */
-            TPWM_SET_CMPDAT(TIMER0, (gu32Period / 2));
+            TPWM_SET_CMPDAT(TIMER0, (gu32Period / 2U));
         }
 
-        u32Toggle ^= 1;
+        u32Toggle ^= 1U;
     }
 
-    while (TPWM_GET_PERIOD_INT_FLAG(TIMER0))
     {
-        if (--u32TimeOutCnt == 0)
+        uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
+
+        while (TPWM_GET_PERIOD_INT_FLAG(TIMER0))
         {
-            printf("Wait for TPWM0 IntFlag time-out!\n");
-            break;
+            if (--u32TimeOutCnt == 0U)
+            {
+                printf("Wait for TPWM0 IntFlag time-out!\n");
+                break;
+            }
         }
     }
 }
@@ -107,7 +111,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("+-----------------------------------------------+\n");
     printf("|    Timer PWM Change Duty Cycle Sample Code    |\n");
     printf("+-----------------------------------------------+\n\n");
@@ -124,7 +128,7 @@ int main(void)
     TPWM_ConfigOutputFreqAndDuty(TIMER0, 18000, 50);
 
     /* Get initial period and comparator value */
-    gu32Period = TPWM_GET_PERIOD(TIMER0) + 1;
+    gu32Period = TPWM_GET_PERIOD(TIMER0) + 1U;
 
     /* Enable output of PWM_CH0 */
     TPWM_ENABLE_OUTPUT(TIMER0, TPWM_CH0);
@@ -139,7 +143,7 @@ int main(void)
     printf("*** Check Timer0 PWM_CH0 output waveform by oscilloscope ***\n");
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

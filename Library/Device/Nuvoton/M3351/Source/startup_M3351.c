@@ -173,7 +173,7 @@ void ELLSI1_IRQHandler(void) __attribute__((weak, alias("Default_Handler")));
 #endif
 
 /* Static vector table */
-const VECTOR_TABLE_Type __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE =
+const VECTOR_TABLE_Type __VECTOR_TABLE[FMC_VECMAP_SIZE / 4] __VECTOR_TABLE_ATTRIBUTE =
 {
     (VECTOR_TABLE_Type)(&__INITIAL_SP),       /*!<      Initial Stack Pointer                            */
     Reset_Handler,                            /*!<      Reset Handler                                    */
@@ -360,9 +360,12 @@ const VECTOR_TABLE_Type __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE =
 __WEAK void Reset_Handler_PreInit(void)
 {
     /* Prevent using C runtime library functions (e.g. printf)
-     * or global variables in this function.
+     * or reading global variables in this function.
      */
 #ifndef NVT_CMSE_NON_SECURE
+    /* SystemCoreClock is not initialized at this stage,
+       so initialize it manually to ensure correct timeout checks. */
+    SystemCoreClock = __HSI;
     /* Clock Setting is only available in secure mode */
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -391,8 +394,11 @@ void Reset_Handler(void)
 {
     __set_PSP((uint32_t)(&__INITIAL_SP));
 
+#if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__) || \
+    defined(__ARM_ARCH_8_1M_MAIN__)
     __set_MSPLIM((uint32_t)(&__STACK_LIMIT));
     __set_PSPLIM((uint32_t)(&__STACK_LIMIT));
+#endif
 
 #if (defined (__FPU_USED) && (__FPU_USED == 1U))
     SCB->CPACR |= ((3UL << 10 * 2) |               /* set CP10 Full Access */

@@ -93,7 +93,7 @@ void WakeUpLVRFunction(uint32_t u32PDMode)
     /* Enable LVR function */
     SYS_ENABLE_LVR();
 
-    /* Wiat LVR function ready */
+    /* Wait LVR function ready */
     while ((SYS->BODCTL & SYS_BODCTL_LVRRDY_Msk) != SYS_BODCTL_LVRRDY_Msk)
     {
         if (--u32TimeOutCnt == 0)
@@ -124,8 +124,8 @@ void WakeUpBODFunction(uint32_t u32PDMode)
     /* Enable Brown-out detector function */
     SYS_ENABLE_BOD();
 
-    /* Set Brown-out detector voltage level as 2.7V */
-    SYS_SET_BOD_LEVEL(SYS_BODCTL_BODVL_2_7V);
+    /* Set Brown-out detector voltage level as 2.8V */
+    SYS_SET_BOD_LEVEL(SYS_BODCTL_BODVL_2_8V);
 
     /* Enable Brown-out detector reset function */
     SYS_ENABLE_BOD_RST();

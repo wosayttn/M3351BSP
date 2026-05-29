@@ -19,7 +19,7 @@ project:
         - ../../../../ThirdParty/mbedtls/library
         - ../../../../ThirdParty/mbedtls/tests/include/mbedtls
         - ../../../../ThirdParty/mbedtls/tests/include
- 
+
       define:
         - __PLDM_EMU__
         - x__TUBE_PRINTF__
@@ -31,6 +31,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -49,6 +51,8 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--gc-sections,-Map="$elf()$.map"
@@ -79,6 +83,6 @@ project:
     - group: libs
       files:
         - file: ../../../../Library/CryptoAccelerator/lib/mbedcrypto.lib
-          for-compiler: AC6  
+          for-compiler: AC6
         #- file: ../../../../Library/CryptoAccelerator/lib/libCryptoAccelerator.a
         #  for-compiler: GCC  

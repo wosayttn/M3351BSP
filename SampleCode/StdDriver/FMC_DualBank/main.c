@@ -282,10 +282,10 @@ int main(void)
     /* TIMER0->CNT is the elapsed us */
     printf("\nTime elapsed without program bank1: %d.%d seconds. Ticks: %d\n\n", u32TimerCnt / 1000000, u32TimerCnt / 1000, s_u32TickCnt);
 
-    s_u32DB_ProgAddr   = FMC_APROM_BANK1_BASE;  /* Dual bank background program address */
+    s_u32DB_ProgAddr    = FMC_APROM_BANK1_BASE; /* Dual bank background program address */
     s_u32DB_RemainBytes = DB_PROG_LEN;          /* Dual bank background length          */
-    s_u32DB_ProgState  = DB_STATE_START;        /* Start background dual bank program   */
-    s_u32CRC  = 0;
+    s_u32DB_ProgState   = DB_STATE_START;       /* Start background dual bank program   */
+    s_u32CRC = 0;
 
     StartTimer0();
 

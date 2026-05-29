@@ -8,6 +8,10 @@
 *****************************************************************************/
 #include "NuMicro.h"
 
+#define ELLSI_MODULE_NULL ((ELLSI_T *)0)
+#define ELLSI_CONFIG_NULL ((S_ELLSI_CONFIG_T *)0)
+#define ELLSI_TIME_INFO_NULL ((S_ELLSI_TIME_INFO_T *)0)
+
 /** @addtogroup Standard_Driver Standard Driver
   @{
 */
@@ -51,14 +55,36 @@ void ELLSI_Open(ELLSI_T *ellsi,
                 uint32_t u32PCNT,
                 uint32_t u32IDOS)
 {
-    uint32_t u32PCLKFreq = 0, u32Tmp1, u32Tmp2;
-    uint32_t u32Div, u32Period, u32T0H, u32T1H, u32ResetPeriod;
+    uint32_t u32PCLKFreq;
+    uint32_t u32Tmp1;
+    uint32_t u32Tmp2;
+    uint32_t u32Div;
+    uint32_t u32Period;
+    uint32_t u32T0H;
+    uint32_t u32T1H;
+    uint32_t u32ResetPeriod;
+
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return;
+    }
 
     /* Get PCLK clock frequency */
-    if (ellsi == ELLSI0)
-        u32PCLKFreq = CLK_GetPCLK0Freq();
+    if ((((uint32_t)ellsi - ELLSI0_BASE) % 0x1000UL) == 0UL)
+    {
+        if (((((uint32_t)ellsi - ELLSI0_BASE) / 0x1000UL) % 2UL) == 0UL)
+        {
+            u32PCLKFreq = CLK_GetPCLK0Freq();
+        }
+        else
+        {
+            u32PCLKFreq = CLK_GetPCLK1Freq();
+        }
+    }
     else
-        u32PCLKFreq = CLK_GetPCLK1Freq();
+    {
+        return;
+    }
 
     /* Default setting: software mode, RGB format, idle ouput low. */
     ellsi->CTL = (u32ELLSIMode) | (u32OutputFormat);
@@ -71,19 +97,18 @@ void ELLSI_Open(ELLSI_T *ellsi,
         u32Div = 0;
         ellsi->CLKDIV = 0;
     }
-    else if (u32BusClock == 0)
+    else if (u32BusClock == 0U)
     {
         /* Set DIVIDER to the maximum value 0xFF. f_ellsi = f_ellsi_clk_src / (DIVIDER + 1) */
-        u32Div = 0xFF;
+        u32Div = 0xFFU;
         ellsi->CLKDIV |= ELLSI_CLKDIV_DIVIDER_Msk;
     }
     else
     {
-        u32Div = (((u32PCLKFreq * 10) / u32BusClock + 5) / 10) - 1; /* Round to the nearest integer */
+        u32Div = ((((u32PCLKFreq * 10U) / u32BusClock) + 5U) / 10U) - 1U; /* Round to the nearest integer */
 
-        if (u32Div > 0xFF)
+        if (u32Div > 0xFFU)
         {
-            u32Div = 0xFF;
             ellsi->CLKDIV |= ELLSI_CLKDIV_DIVIDER_Msk;
         }
         else
@@ -92,14 +117,13 @@ void ELLSI_Open(ELLSI_T *ellsi,
         }
     }
 
-    u32Tmp1 = (u32PCLKFreq * 10) / 1000000;
-    u32Tmp2 = 1000 * (u32Div + 1);
+    u32Tmp1 = (u32PCLKFreq * 10U) / 1000000U;
+    u32Tmp2 = 1000U * (u32Div + 1U);
 
-    u32Period = (u32Tmp1 * u32TransferTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32Period = ((u32Tmp1 * u32TransferTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32Period > 0xFF)
+    if (u32Period > 0xFFU)
     {
-        u32Period = 0xFF;
         ellsi->PERIOD |= ELLSI_PERIOD_PERIOD_Msk;
     }
     else
@@ -107,11 +131,10 @@ void ELLSI_Open(ELLSI_T *ellsi,
         ellsi->PERIOD = (ellsi->PERIOD & (~ELLSI_PERIOD_PERIOD_Msk)) | (u32Period << ELLSI_PERIOD_PERIOD_Pos);
     }
 
-    u32T0H = (u32Tmp1 * u32T0HTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32T0H = ((u32Tmp1 * u32T0HTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32T0H > 0xFF)
+    if (u32T0H > 0xFFU)
     {
-        u32T0H = 0xFF;
         ellsi->DUTY |= ELLSI_DUTY_T0H_Msk;
     }
     else
@@ -119,11 +142,10 @@ void ELLSI_Open(ELLSI_T *ellsi,
         ellsi->DUTY = (ellsi->DUTY & (~ELLSI_DUTY_T0H_Msk)) | (u32T0H << ELLSI_DUTY_T0H_Pos);
     }
 
-    u32T1H = (u32Tmp1 * u32T1HTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32T1H = ((u32Tmp1 * u32T1HTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32T1H > 0xFF)
+    if (u32T1H > 0xFFU)
     {
-        u32T1H = 0xFF;
         ellsi->DUTY |= ELLSI_DUTY_T1H_Msk;
     }
     else
@@ -131,11 +153,10 @@ void ELLSI_Open(ELLSI_T *ellsi,
         ellsi->DUTY = (ellsi->DUTY & (~ELLSI_DUTY_T1H_Msk)) | (u32T1H << ELLSI_DUTY_T1H_Pos);
     }
 
-    u32ResetPeriod = (u32Tmp1 * u32ResetTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32ResetPeriod = ((u32Tmp1 * u32ResetTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32ResetPeriod > 0xFFFF)
+    if (u32ResetPeriod > 0xFFFFU)
     {
-        u32ResetPeriod = 0xFFFF;
         ellsi->RSTPERIOD |= ELLSI_RSTPERIOD_RSTPERIOD_Msk;
     }
     else
@@ -161,8 +182,13 @@ void ELLSI_Open(ELLSI_T *ellsi,
   *             u32IDOS Decides the idle output state. (ELLSI_IDLE_LOW, ELLSI_IDLE_HIGH)
   * @return None
   */
-void ELLSI_OpenbyConfig(ELLSI_T *ellsi, S_ELLSI_CONFIG_T *sELLSIConfig)
+void ELLSI_OpenbyConfig(ELLSI_T *ellsi, const S_ELLSI_CONFIG_T *sELLSIConfig)
 {
+    if ((ellsi == ELLSI_MODULE_NULL) || (sELLSIConfig == ELLSI_CONFIG_NULL))
+    {
+        return;
+    }
+
     ELLSI_Open(ellsi, sELLSIConfig->u32ELLSIMode, sELLSIConfig->u32OutputFormat, sELLSIConfig->sTimeInfo.u32BusClock,
                sELLSIConfig->sTimeInfo.u32TransferTimeNsec, sELLSIConfig->sTimeInfo.u32T0HTimeNsec,
                sELLSIConfig->sTimeInfo.u32T1HTimeNsec, sELLSIConfig->sTimeInfo.u32ResetTimeNsec,
@@ -196,32 +222,61 @@ void ELLSI_OpenbyConfig(ELLSI_T *ellsi, S_ELLSI_CONFIG_T *sELLSIConfig)
   * @return None
   * @details By default, the ELLSI uses 1 MHz as ELLSI command clock rate.
   */
-void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
+void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, const S_ELLSI_TIME_INFO_T *sPt)
 {
-    uint32_t u32PCLKFreq = 0, u32Tmp1, u32Tmp2;
-    uint32_t u32ELLSICmdFreq = 1000000, u32Div, u32CmdDiv;
-    uint32_t u32EnterHI, u32EnterLO;
-    uint32_t u32GetHI, u32GetHITol, u32CmdTimeout;
-    uint32_t u32FBCmdH0, u32FBCmdL0, u32FBCmdH1, u32FBCmdL1;
-    uint32_t u32FBCnt0, u32FBC0Tol, u32FBCnt1, u32FBC1Tol;
-    uint32_t u32FBID0, u32FBID0Tol, u32FBID1, u32FBID1Tol;
+    uint32_t u32PCLKFreq = 0UL;
+    uint32_t u32Tmp1;
+    uint32_t u32Tmp2;
+    uint32_t u32ELLSICmdFreq = 1000000UL;
+    uint32_t u32Div;
+    uint32_t u32CmdDiv;
+    uint32_t u32EnterHI;
+    uint32_t u32EnterLO;
+    uint32_t u32GetHI;
+    uint32_t u32GetHITol;
+    uint32_t u32CmdTimeout;
+    uint32_t u32FBCmdH0;
+    uint32_t u32FBCmdL0;
+    uint32_t u32FBCmdH1;
+    uint32_t u32FBCmdL1;
+    uint32_t u32FBCnt0;
+    uint32_t u32FBC0Tol;
+    uint32_t u32FBCnt1;
+    uint32_t u32FBC1Tol;
+    uint32_t u32FBID0;
+    uint32_t u32FBID0Tol;
+    uint32_t u32FBID1;
+    uint32_t u32FBID1Tol;
     uint32_t u32TH20HI;
-    uint32_t u32WakeupPulse, u32WakeupWaitPeriod;
+    uint32_t u32WakeupPulse;
+    uint32_t u32WakeupWaitPeriod;
+
+    if ((ellsi == ELLSI_MODULE_NULL) || (sPt == ELLSI_TIME_INFO_NULL))
+    {
+        return;
+    }
 
     /* Get PCLK clock frequency */
     if (ellsi == ELLSI0)
+    {
         u32PCLKFreq = CLK_GetPCLK0Freq();
-    else
+    }
+    else if (ellsi == ELLSI1)
+    {
         u32PCLKFreq = CLK_GetPCLK1Freq();
+    }
+    else
+    {
+        return;
+    }
 
     u32Div = ellsi->CLKDIV & ELLSI_CLKDIV_DIVIDER_Msk;
 
     /* f_ellsi_cmd = f_ellsi_clk_src / (DIVIDER + 1) / (CMDDIV + 1) */
-    u32CmdDiv = (((u32PCLKFreq * 10) / u32ELLSICmdFreq / (u32Div + 1) + 5) / 10) - 1; /* Round to the nearest integer */
+    u32CmdDiv = (((u32PCLKFreq * 10U) / u32ELLSICmdFreq / (u32Div + 1U) + 5U) / 10U) - 1U; /* Round to the nearest integer */
 
-    if (u32CmdDiv > 0xFF)
+    if (u32CmdDiv > 0xFFU)
     {
-        u32CmdDiv = 0xFF;
         ellsi->CLKDIV |= ELLSI_CLKDIV_CMDDIV_Msk;
     }
     else
@@ -229,14 +284,13 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CLKDIV = (ellsi->CLKDIV & (~ELLSI_CLKDIV_CMDDIV_Msk)) | (u32CmdDiv << ELLSI_CLKDIV_CMDDIV_Pos);
     }
 
-    u32Tmp1 = (u32PCLKFreq * 10) / 1000000;
-    u32Tmp2 = 1000 * (u32Div + 1) * (u32CmdDiv + 1);
+    u32Tmp1 = (u32PCLKFreq * 10U) / 1000000U;
+    u32Tmp2 = 1000U * (u32Div + 1U) * (u32CmdDiv + 1U);
 
-    u32EnterHI = (u32Tmp1 * sPt->u32EnterHTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32EnterHI = ((u32Tmp1 * sPt->u32EnterHTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32EnterHI > 0xFF)
+    if (u32EnterHI > 0xFFU)
     {
-        u32EnterHI = 0xFF;
         ellsi->CMDCTL |= ELLSI_CMDCTL_ENTERHI_Msk;
     }
     else
@@ -244,11 +298,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CMDCTL = (ellsi->CMDCTL & (~ELLSI_CMDCTL_ENTERHI_Msk)) | (u32EnterHI << ELLSI_CMDCTL_ENTERHI_Pos);
     }
 
-    u32EnterLO = (u32Tmp1 * sPt->u32EnterLTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32EnterLO = ((u32Tmp1 * sPt->u32EnterLTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32EnterLO > 0xFF)
+    if (u32EnterLO > 0xFFU)
     {
-        u32EnterLO = 0xFF;
         ellsi->CMDCTL |= ELLSI_CMDCTL_ENTERLO_Msk;
     }
     else
@@ -256,11 +309,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CMDCTL = (ellsi->CMDCTL & (~ELLSI_CMDCTL_ENTERLO_Msk)) | (u32EnterLO << ELLSI_CMDCTL_ENTERLO_Pos);
     }
 
-    u32GetHI = (u32Tmp1 * sPt->u32GetHTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32GetHI = ((u32Tmp1 * sPt->u32GetHTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32GetHI > 0xFF)
+    if (u32GetHI > 0xFFU)
     {
-        u32GetHI = 0xFF;
         ellsi->CMDGPP |= ELLSI_CMDGPP_GETHIP_Msk;
     }
     else
@@ -268,11 +320,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CMDGPP = (ellsi->CMDGPP & (~ELLSI_CMDGPP_GETHIP_Msk)) | (u32GetHI << ELLSI_CMDGPP_GETHIP_Pos);
     }
 
-    u32GetHITol = (u32Tmp1 * sPt->u32GetHTolTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32GetHITol = ((u32Tmp1 * sPt->u32GetHTolTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32GetHITol > 0xF)
+    if (u32GetHITol > 0xFU)
     {
-        u32GetHITol = 0xF;
         ellsi->CMDGPP |= ELLSI_CMDGPP_GETHITOL_Msk;
     }
     else
@@ -280,11 +331,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CMDGPP = (ellsi->CMDGPP & (~ELLSI_CMDGPP_GETHITOL_Msk)) | (u32GetHITol << ELLSI_CMDGPP_GETHITOL_Pos);
     }
 
-    u32CmdTimeout = (u32Tmp1 * sPt->u32CmdTimeoutTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32CmdTimeout = ((u32Tmp1 * sPt->u32CmdTimeoutTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32CmdTimeout > 0xFFFF)
+    if (u32CmdTimeout > 0xFFFFU)
     {
-        u32CmdTimeout = 0xFFFF;
         ellsi->CMDGPP |= ELLSI_CMDGPP_CMDTOP_Msk;
     }
     else
@@ -292,11 +342,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->CMDGPP = (ellsi->CMDGPP & (~ELLSI_CMDGPP_CMDTOP_Msk)) | (u32CmdTimeout << ELLSI_CMDGPP_CMDTOP_Pos);
     }
 
-    u32FBCmdH0 = (u32Tmp1 * sPt->u32FBH0TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCmdH0 = ((u32Tmp1 * sPt->u32FBH0TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCmdH0 > 0xFF)
+    if (u32FBCmdH0 > 0xFFU)
     {
-        u32FBCmdH0 = 0xFF;
         ellsi->FBCCTL |= ELLSI_FBCCTL_FBHIP0_Msk;
     }
     else
@@ -304,11 +353,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCCTL = (ellsi->FBCCTL & (~ELLSI_FBCCTL_FBHIP0_Msk)) | (u32FBCmdH0 << ELLSI_FBCCTL_FBHIP0_Pos);
     }
 
-    u32FBCmdL0 = (u32Tmp1 * sPt->u32FBL0TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCmdL0 = ((u32Tmp1 * sPt->u32FBL0TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCmdL0 > 0xFF)
+    if (u32FBCmdL0 > 0xFFU)
     {
-        u32FBCmdL0 = 0xFF;
         ellsi->FBCCTL |= ELLSI_FBCCTL_FBLOP0_Msk;
     }
     else
@@ -316,11 +364,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCCTL = (ellsi->FBCCTL & (~ELLSI_FBCCTL_FBLOP0_Msk)) | (u32FBCmdL0 << ELLSI_FBCCTL_FBLOP0_Pos);
     }
 
-    u32FBCmdH1 = (u32Tmp1 * sPt->u32FBH1TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCmdH1 = ((u32Tmp1 * sPt->u32FBH1TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCmdH1 > 0xFF)
+    if (u32FBCmdH1 > 0xFFU)
     {
-        u32FBCmdH1 = 0xFF;
         ellsi->FBCCTL |= ELLSI_FBCCTL_FBHIP1_Msk;
     }
     else
@@ -328,11 +375,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCCTL = (ellsi->FBCCTL & (~ELLSI_FBCCTL_FBHIP1_Msk)) | (u32FBCmdH1 << ELLSI_FBCCTL_FBHIP1_Pos);
     }
 
-    u32FBCmdL1 = (u32Tmp1 * sPt->u32FBL1TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCmdL1 = ((u32Tmp1 * sPt->u32FBL1TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCmdL1 > 0xFF)
+    if (u32FBCmdL1 > 0xFFU)
     {
-        u32FBCmdL1 = 0xFF;
         ellsi->FBCCTL |= ELLSI_FBCCTL_FBLOP1_Msk;
     }
     else
@@ -340,11 +386,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCCTL = (ellsi->FBCCTL & (~ELLSI_FBCCTL_FBLOP1_Msk)) | (u32FBCmdL1 << ELLSI_FBCCTL_FBLOP1_Pos);
     }
 
-    u32FBCnt0 = (u32Tmp1 * sPt->u32FBCNT0TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCnt0 = ((u32Tmp1 * sPt->u32FBCNT0TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCnt0 > 0xFF)
+    if (u32FBCnt0 > 0xFFU)
     {
-        u32FBCnt0 = 0xFF;
         ellsi->FBCTCTL |= ELLSI_FBCTCTL_FBCNT0_Msk;
     }
     else
@@ -352,11 +397,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCTCTL = (ellsi->FBCTCTL & (~ELLSI_FBCTCTL_FBCNT0_Msk)) | (u32FBCnt0 << ELLSI_FBCTCTL_FBCNT0_Pos);
     }
 
-    u32FBC0Tol = (u32Tmp1 * sPt->u32FBCNT0TolTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBC0Tol = ((u32Tmp1 * sPt->u32FBCNT0TolTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBC0Tol > 0xF)
+    if (u32FBC0Tol > 0xFU)
     {
-        u32FBC0Tol = 0xF;
         ellsi->FBCTCTL |= ELLSI_FBCTCTL_FBC0TOL_Msk;
     }
     else
@@ -364,11 +408,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCTCTL = (ellsi->FBCTCTL & (~ELLSI_FBCTCTL_FBC0TOL_Msk)) | (u32FBC0Tol << ELLSI_FBCTCTL_FBC0TOL_Pos);
     }
 
-    u32FBCnt1 = (u32Tmp1 * sPt->u32FBCNT1TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBCnt1 = ((u32Tmp1 * sPt->u32FBCNT1TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBCnt1 > 0xFF)
+    if (u32FBCnt1 > 0xFFU)
     {
-        u32FBCnt1 = 0xFF;
         ellsi->FBCTCTL |= ELLSI_FBCTCTL_FBCNT1_Msk;
     }
     else
@@ -376,11 +419,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCTCTL = (ellsi->FBCTCTL & (~ELLSI_FBCTCTL_FBCNT1_Msk)) | (u32FBCnt1 << ELLSI_FBCTCTL_FBCNT1_Pos);
     }
 
-    u32FBC1Tol = (u32Tmp1 * sPt->u32FBCNT1TolTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBC1Tol = ((u32Tmp1 * sPt->u32FBCNT1TolTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBC1Tol > 0xF)
+    if (u32FBC1Tol > 0xFU)
     {
-        u32FBC1Tol = 0xF;
         ellsi->FBCTCTL |= ELLSI_FBCTCTL_FBC1TOL_Msk;
     }
     else
@@ -388,11 +430,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBCTCTL = (ellsi->FBCTCTL & (~ELLSI_FBCTCTL_FBC1TOL_Msk)) | (u32FBC1Tol << ELLSI_FBCTCTL_FBC1TOL_Pos);
     }
 
-    u32FBID0 = (u32Tmp1 * sPt->u32FBID0TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBID0 = ((u32Tmp1 * sPt->u32FBID0TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBID0 > 0xFF)
+    if (u32FBID0 > 0xFFU)
     {
-        u32FBID0 = 0xFF;
         ellsi->FBIDTCTL |= ELLSI_FBIDTCTL_FBID0_Msk;
     }
     else
@@ -400,11 +441,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBIDTCTL = (ellsi->FBIDTCTL & (~ELLSI_FBIDTCTL_FBID0_Msk)) | (u32FBID0 << ELLSI_FBIDTCTL_FBID0_Pos);
     }
 
-    u32FBID0Tol = (u32Tmp1 * sPt->u32FBID0TolTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBID0Tol = ((u32Tmp1 * sPt->u32FBID0TolTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBID0Tol > 0xF)
+    if (u32FBID0Tol > 0xFU)
     {
-        u32FBID0Tol = 0xF;
         ellsi->FBIDTCTL |= ELLSI_FBIDTCTL_FBID0TOL_Msk;
     }
     else
@@ -412,11 +452,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBIDTCTL = (ellsi->FBIDTCTL & (~ELLSI_FBIDTCTL_FBID0TOL_Msk)) | (u32FBID0Tol << ELLSI_FBIDTCTL_FBID0TOL_Pos);
     }
 
-    u32FBID1 = (u32Tmp1 * sPt->u32FBID1TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBID1 = ((u32Tmp1 * sPt->u32FBID1TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBID1 > 0xFF)
+    if (u32FBID1 > 0xFFU)
     {
-        u32FBID1 = 0xFF;
         ellsi->FBIDTCTL |= ELLSI_FBIDTCTL_FBID1_Msk;
     }
     else
@@ -424,11 +463,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBIDTCTL = (ellsi->FBIDTCTL & (~ELLSI_FBIDTCTL_FBID1_Msk)) | (u32FBID1 << ELLSI_FBIDTCTL_FBID1_Pos);
     }
 
-    u32FBID1Tol = (u32Tmp1 * sPt->u32FBID1TolTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32FBID1Tol = ((u32Tmp1 * sPt->u32FBID1TolTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32FBID1Tol > 0xF)
+    if (u32FBID1Tol > 0xFU)
     {
-        u32FBID1Tol = 0xF;
         ellsi->FBIDTCTL |= ELLSI_FBIDTCTL_FBID1TOL_Msk;
     }
     else
@@ -436,11 +474,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->FBIDTCTL = (ellsi->FBIDTCTL & (~ELLSI_FBIDTCTL_FBID1TOL_Msk)) | (u32FBID1Tol << ELLSI_FBIDTCTL_FBID1TOL_Pos);
     }
 
-    u32TH20HI = (u32Tmp1 * sPt->u32TH20TimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32TH20HI = ((u32Tmp1 * sPt->u32TH20TimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32TH20HI > 0xFF)
+    if (u32TH20HI > 0xFFU)
     {
-        u32TH20HI = 0xFF;
         ellsi->TCTCTL |= ELLSI_TCTCTL_TH20HI_Msk;
     }
     else
@@ -448,11 +485,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->TCTCTL = (ellsi->TCTCTL & (~ELLSI_TCTCTL_TH20HI_Msk)) | (u32TH20HI << ELLSI_TCTCTL_TH20HI_Pos);
     }
 
-    u32WakeupPulse = (u32Tmp1 * sPt->u32WKPULSETimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32WakeupPulse = ((u32Tmp1 * sPt->u32WKPULSETimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32WakeupPulse > 0xFFFF)
+    if (u32WakeupPulse > 0xFFFFU)
     {
-        u32WakeupPulse = 0xFFFF;
         ellsi->WKTCTL |= ELLSI_WKTCTL_WKPULSE_Msk;
     }
     else
@@ -460,11 +496,10 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
         ellsi->WKTCTL = (ellsi->WKTCTL & (~ELLSI_WKTCTL_WKPULSE_Msk)) | (u32WakeupPulse << ELLSI_WKTCTL_WKPULSE_Pos);
     }
 
-    u32WakeupWaitPeriod = (u32Tmp1 * sPt->u32WKWPERTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32WakeupWaitPeriod = ((u32Tmp1 * sPt->u32WKWPERTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32WakeupWaitPeriod > 0xFFFF)
+    if (u32WakeupWaitPeriod > 0xFFFFU)
     {
-        u32WakeupWaitPeriod = 0xFFFF;
         ellsi->WKTCTL |= ELLSI_WKTCTL_WKWPER_Msk;
     }
     else
@@ -490,7 +525,7 @@ void ELLSI_Config_Y_Cable(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
   * @return None
   * @details
   */
-void ELLSI_SetTH20Data(ELLSI_T *ellsi, S_ELLSI_TH20SET_DATA_T *sPt)
+void ELLSI_SetTH20Data(ELLSI_T *ellsi, const S_ELLSI_TH20SET_DATA_T *sPt)
 {
     ellsi->TCCTL = 0;
     ellsi->TCCTL |= (sPt->BledDimming << 0);
@@ -526,6 +561,11 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 {
     uint32_t u32TimeOutCnt;
 
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return ELLSI_ERR_FAIL;
+    }
+
     /* Wait and clear normal command done flag */
     if ((u32Mask & ELLSI_CMDDONE_MASK) == ELLSI_CMDDONE_MASK)
     {
@@ -533,7 +573,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (!(ellsi->CMDSTS & ELLSI_CMDSTS_CMDDONE_Msk))
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
 
         ellsi->CMDSTS = ELLSI_CMDSTS_CMDDONE_Msk;
@@ -542,7 +585,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (ellsi->CMDSTS & ELLSI_CMDSTS_CMDDONE_Msk)
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
     }
 
@@ -553,7 +599,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (!(ellsi->CMDSTS & ELLSI_CMDSTS_FBDONE_Msk))
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
 
         ellsi->CMDSTS = ELLSI_CMDSTS_FBDONE_Msk;
@@ -562,7 +611,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (ellsi->CMDSTS & ELLSI_CMDSTS_FBDONE_Msk)
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
     }
 
@@ -573,7 +625,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (!(ellsi->CMDSTS & ELLSI_CMDSTS_TH20DONE_Msk))
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
 
         ellsi->CMDSTS = ELLSI_CMDSTS_TH20DONE_Msk;
@@ -582,7 +637,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (ellsi->CMDSTS & ELLSI_CMDSTS_TH20DONE_Msk)
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
     }
 
@@ -593,7 +651,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (!(ellsi->CMDSTS & ELLSI_CMDSTS_ASETDONE_Msk))
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
 
         ellsi->CMDSTS = ELLSI_CMDSTS_ASETDONE_Msk;
@@ -602,7 +663,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (ellsi->CMDSTS & ELLSI_CMDSTS_ASETDONE_Msk)
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
     }
 
@@ -613,7 +677,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (!(ellsi->CMDSTS & ELLSI_CMDSTS_ATHDONE_Msk))
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
 
         ellsi->CMDSTS = ELLSI_CMDSTS_ATHDONE_Msk;
@@ -622,7 +689,10 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
 
         while (ellsi->CMDSTS & ELLSI_CMDSTS_ATHDONE_Msk)
         {
-            if (--u32TimeOutCnt == 0) return ELLSI_ERR_TIMEOUT;
+            if (--u32TimeOutCnt == 0)
+            {
+                return ELLSI_ERR_TIMEOUT;
+            }
         }
     }
 
@@ -637,6 +707,11 @@ int32_t ELLSI_WaitCmdStsDone(ELLSI_T *ellsi, uint32_t u32Mask)
   */
 void ELLSI_Close(ELLSI_T *ellsi)
 {
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     ellsi->CTL &= ~ELLSI_CTL_ELLSIEN_Msk;
 }
 
@@ -672,23 +747,55 @@ void ELLSI_Close(ELLSI_T *ellsi)
   * @return None
   * @details This API is used to get the current ELLSI time information.
   */
-void ELLSI_GetTimeInfo(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
+void ELLSI_GetTimeInfo(const ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
 {
-    uint32_t u32PCLKFreq = 0, u32Tmp;
-    uint32_t u32Div, u32CmdDiv, u32Period, u32T0H, u32T1H, u32ResetPeriod;
-    uint32_t u32EnterHI, u32EnterLO;
-    uint32_t u32GetHI, u32GetHITol, u32CmdTimeout;
-    uint32_t u32FBCmdH0, u32FBCmdL0, u32FBCmdH1, u32FBCmdL1;
-    uint32_t u32FBCnt0, u32FBC0Tol, u32FBCnt1, u32FBC1Tol;
-    uint32_t u32FBID0, u32FBID0Tol, u32FBID1, u32FBID1Tol;
+    uint32_t u32PCLKFreq = 0UL;
+    uint32_t u32Tmp;
+    uint32_t u32Div;
+    uint32_t u32CmdDiv;
+    uint32_t u32Period;
+    uint32_t u32T0H;
+    uint32_t u32T1H;
+    uint32_t u32ResetPeriod;
+    uint32_t u32EnterHI;
+    uint32_t u32EnterLO;
+    uint32_t u32GetHI;
+    uint32_t u32GetHITol;
+    uint32_t u32CmdTimeout;
+    uint32_t u32FBCmdH0;
+    uint32_t u32FBCmdL0;
+    uint32_t u32FBCmdH1;
+    uint32_t u32FBCmdL1;
+    uint32_t u32FBCnt0;
+    uint32_t u32FBC0Tol;
+    uint32_t u32FBCnt1;
+    uint32_t u32FBC1Tol;
+    uint32_t u32FBID0;
+    uint32_t u32FBID0Tol;
+    uint32_t u32FBID1;
+    uint32_t u32FBID1Tol;
     uint32_t u32TH20HI;
-    uint32_t u32WakeupPulse, u32WakeupWaitPeriod;
+    uint32_t u32WakeupPulse;
+    uint32_t u32WakeupWaitPeriod;
+
+    if ((ellsi == ELLSI_MODULE_NULL) || (sPt == ELLSI_TIME_INFO_NULL))
+    {
+        return;
+    }
 
     /* Get PCLK clock frequency */
     if (ellsi == ELLSI0)
+    {
         u32PCLKFreq = CLK_GetPCLK0Freq();
-    else
+    }
+    else if (ellsi == ELLSI1)
+    {
         u32PCLKFreq = CLK_GetPCLK1Freq();
+    }
+    else
+    {
+        return;
+    }
 
     /* Get time data */
     u32Div = (ellsi->CLKDIV & ELLSI_CLKDIV_DIVIDER_Msk) >> ELLSI_CLKDIV_DIVIDER_Pos;
@@ -719,33 +826,33 @@ void ELLSI_GetTimeInfo(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
     u32WakeupWaitPeriod = (ellsi->WKTCTL & ELLSI_WKTCTL_WKWPER_Msk) >> ELLSI_WKTCTL_WKWPER_Pos;
 
     /* Compute ELLSI time information */
-    sPt->u32BusClock = u32PCLKFreq / (u32Div + 1);
+    sPt->u32BusClock = u32PCLKFreq / (u32Div + 1U);
 
-    u32Tmp = u32PCLKFreq / 1000;
-    sPt->u32TransferTimeNsec = u32Period * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32T0HTimeNsec = u32T0H * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32T1HTimeNsec = u32T1H * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32ResetTimeNsec = u32ResetPeriod * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32EnterHTimeNsec = u32EnterHI * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32EnterLTimeNsec = u32EnterLO * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32GetHTimeNsec = u32GetHI * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32GetHTolTimeNsec = u32GetHITol * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32CmdTimeoutTimeNsec = u32CmdTimeout * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBH0TimeNsec = u32FBCmdH0 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBL0TimeNsec = u32FBCmdL0 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBH1TimeNsec = u32FBCmdH1 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBL1TimeNsec = u32FBCmdL1 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBCNT0TimeNsec = u32FBCnt0 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBCNT0TolTimeNsec = u32FBC0Tol * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBCNT1TimeNsec = u32FBCnt1 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBCNT1TolTimeNsec = u32FBC1Tol * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBID0TimeNsec = u32FBID0 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBID0TolTimeNsec = u32FBID0Tol * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBID1TimeNsec = u32FBID1 * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32FBID1TolTimeNsec = u32FBID1Tol * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32TH20TimeNsec = u32TH20HI * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32WKPULSETimeNsec = u32WakeupPulse * 1000000 / u32Tmp * (u32Div + 1) * (u32CmdDiv + 1);
-    sPt->u32WKWPERTimeNsec = u32WakeupWaitPeriod * 100000 / u32Tmp * 10 * (u32Div + 1) * (u32CmdDiv + 1);
+    u32Tmp = u32PCLKFreq / 1000U;
+    sPt->u32TransferTimeNsec = u32Period * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32T0HTimeNsec = u32T0H * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32T1HTimeNsec = u32T1H * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32ResetTimeNsec = u32ResetPeriod * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32EnterHTimeNsec = u32EnterHI * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32EnterLTimeNsec = u32EnterLO * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32GetHTimeNsec = u32GetHI * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32GetHTolTimeNsec = u32GetHITol * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32CmdTimeoutTimeNsec = u32CmdTimeout * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBH0TimeNsec = u32FBCmdH0 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBL0TimeNsec = u32FBCmdL0 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBH1TimeNsec = u32FBCmdH1 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBL1TimeNsec = u32FBCmdL1 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBCNT0TimeNsec = u32FBCnt0 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBCNT0TolTimeNsec = u32FBC0Tol * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBCNT1TimeNsec = u32FBCnt1 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBCNT1TolTimeNsec = u32FBC1Tol * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBID0TimeNsec = u32FBID0 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBID0TolTimeNsec = u32FBID0Tol * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBID1TimeNsec = u32FBID1 * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32FBID1TolTimeNsec = u32FBID1Tol * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32TH20TimeNsec = u32TH20HI * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32WKPULSETimeNsec = u32WakeupPulse * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
+    sPt->u32WKWPERTimeNsec = u32WakeupWaitPeriod * 1000000U / u32Tmp * (u32Div + 1U) * (u32CmdDiv + 1U);
 }
 
 /**
@@ -757,7 +864,17 @@ void ELLSI_GetTimeInfo(ELLSI_T *ellsi, S_ELLSI_TIME_INFO_T *sPt)
   */
 void ELLSI_SetFIFO(ELLSI_T *ellsi, uint32_t u32TxThreshold)
 {
-    ellsi->CTL = (ellsi->CTL & ~ELLSI_CTL_TXTH_Msk) | (u32TxThreshold << ELLSI_CTL_TXTH_Pos);
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return;
+    }
+
+    if (u32TxThreshold > 3U)
+    {
+        return;
+    }
+
+    ellsi->CTL = (ellsi->CTL & ~ELLSI_CTL_TXTH_Msk) | ((u32TxThreshold << ELLSI_CTL_TXTH_Pos) & ELLSI_CTL_TXTH_Msk);
 }
 
 /**
@@ -778,29 +895,46 @@ void ELLSI_SetFIFO(ELLSI_T *ellsi, uint32_t u32TxThreshold)
   */
 void ELLSI_EnableInt(ELLSI_T *ellsi, uint32_t u32Mask)
 {
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Enable underflow interrupt flag */
     if ((u32Mask & ELLSI_UNDFL_INT_MASK) == ELLSI_UNDFL_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_UNDFLINTEN_Msk;
+    }
 
     /* Enable frame end interrupt flag */
     if ((u32Mask & ELLSI_FEND_INT_MASK) == ELLSI_FEND_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_FENDINTEN_Msk;
+    }
 
     /* Enable reset command interrupt flag */
     if ((u32Mask & ELLSI_RSTC_INT_MASK) == ELLSI_RSTC_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSTCINTEN_Msk;
+    }
 
     /* Enable FIFO empty interrupt flag */
     if ((u32Mask & ELLSI_EMP_INT_MASK) == ELLSI_EMP_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_EMPINTEN_Msk;
+    }
 
     /* Enable FIFO full interrupt flag */
     if ((u32Mask & ELLSI_FUL_INT_MASK) == ELLSI_FUL_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_FULINTEN_Msk;
+    }
 
     /* Enable TX threshold interrupt flag */
     if ((u32Mask & ELLSI_TXTH_INT_MASK) == ELLSI_TXTH_INT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_TXTHIEN_Msk;
+    }
 }
 
 /**
@@ -821,29 +955,46 @@ void ELLSI_EnableInt(ELLSI_T *ellsi, uint32_t u32Mask)
   */
 void ELLSI_DisableInt(ELLSI_T *ellsi, uint32_t u32Mask)
 {
+    if (ellsi == ELLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Disable underflow interrupt flag */
     if ((u32Mask & ELLSI_UNDFL_INT_MASK) == ELLSI_UNDFL_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_UNDFLINTEN_Msk;
+    }
 
     /* Disable frame end interrupt flag */
     if ((u32Mask & ELLSI_FEND_INT_MASK) == ELLSI_FEND_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_FENDINTEN_Msk;
+    }
 
     /* Disable reset command interrupt flag */
     if ((u32Mask & ELLSI_RSTC_INT_MASK) == ELLSI_RSTC_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSTCINTEN_Msk;
+    }
 
     /* Disable FIFO empty interrupt flag */
     if ((u32Mask & ELLSI_EMP_INT_MASK) == ELLSI_EMP_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_EMPINTEN_Msk;
+    }
 
     /* Disable FIFO full interrupt flag */
     if ((u32Mask & ELLSI_FUL_INT_MASK) == ELLSI_FUL_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_FULINTEN_Msk;
+    }
 
     /* Disable TX FIFO threshold interrupt flag */
     if ((u32Mask & ELLSI_TXTH_INT_MASK) == ELLSI_TXTH_INT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_TXTHIEN_Msk;
+    }
 }
 
 /**
@@ -862,33 +1013,45 @@ void ELLSI_DisableInt(ELLSI_T *ellsi, uint32_t u32Mask)
   * @return Interrupt flags of selected sources.
   * @details Get ELLSI related interrupt flags specified by u32Mask parameter.
   */
-uint32_t ELLSI_GetIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
+uint32_t ELLSI_GetIntFlag(const ELLSI_T *ellsi, uint32_t u32Mask)
 {
     uint32_t u32IntFlag = 0;
 
     /* Check underflow interrupt flag */
     if ((u32Mask & ELLSI_UNDFL_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_UNDFLIF_Msk))
+    {
         u32IntFlag |= ELLSI_UNDFL_INT_MASK;
+    }
 
     /* Check frame end interrupt flag */
     if ((u32Mask & ELLSI_FEND_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_FENDIF_Msk))
+    {
         u32IntFlag |= ELLSI_FEND_INT_MASK;
+    }
 
     /* Check reset command interrupt flag */
     if ((u32Mask & ELLSI_RSTC_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_RSTCIF_Msk))
+    {
         u32IntFlag |= ELLSI_RSTC_INT_MASK;
+    }
 
     /* Check FIFO empty interrupt flag */
     if ((u32Mask & ELLSI_EMP_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_EMPIF_Msk))
+    {
         u32IntFlag |= ELLSI_EMP_INT_MASK;
+    }
 
     /* Check FIFO full interrupt flag */
     if ((u32Mask & ELLSI_FUL_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_FULIF_Msk))
+    {
         u32IntFlag |= ELLSI_FUL_INT_MASK;
+    }
 
     /* Check TX FIFO threshold interrupt flag */
     if ((u32Mask & ELLSI_TXTH_INT_MASK) && (ellsi->STATUS & ELLSI_STATUS_TXTHIF_Msk))
+    {
         u32IntFlag |= ELLSI_TXTH_INT_MASK;
+    }
 
     return u32IntFlag;
 }
@@ -909,13 +1072,19 @@ uint32_t ELLSI_GetIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
 void ELLSI_ClearIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
 {
     if (u32Mask & ELLSI_UNDFL_INT_MASK)
+    {
         ellsi->STATUS = ELLSI_STATUS_UNDFLIF_Msk; /* Clear underflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FEND_INT_MASK)
+    {
         ellsi->STATUS = ELLSI_STATUS_FENDIF_Msk; /* Clear frame end interrupt flag */
+    }
 
     if (u32Mask & ELLSI_RSTC_INT_MASK)
+    {
         ellsi->STATUS = ELLSI_STATUS_RSTCIF_Msk; /* Clear reset command interrupt flag */
+    }
 }
 
 /**
@@ -955,95 +1124,141 @@ void ELLSI_EnableCmdInt(ELLSI_T *ellsi, uint32_t u32Mask)
 {
     /* Enable normal command done interrupt flag */
     if ((u32Mask & ELLSI_CMDDONE_MASK) == ELLSI_CMDDONE_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_NCMDDIEN_Msk;
+    }
 
     /* Enable feedback command done interrupt flag */
     if ((u32Mask & ELLSI_FBDONE_MASK) == ELLSI_FBDONE_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_FBSTSIEN_Msk;
+    }
 
     /* Enable TH20 command done interrupt flag */
     if ((u32Mask & ELLSI_TH20DONE_MASK) == ELLSI_TH20DONE_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_NCMDDIEN_Msk;
+    }
 
     /* Enable set ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_SETIDLONG_MASK) == ELLSI_SETIDLONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable check ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_CHKIDLONG_MASK) == ELLSI_CHKIDLONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable set ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_SETIDSHORT_MASK) == ELLSI_SETIDSHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable check ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_CHKIDSHORT_MASK) == ELLSI_CHKIDSHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable set ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETOV_MASK) == ELLSI_SETGETOV_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable check ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETOV_MASK) == ELLSI_CHKGETOV_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable set ID Get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETUN_MASK) == ELLSI_SETGETUN_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable check ID get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETUN_MASK) == ELLSI_CHKGETUN_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback count 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC0LONG_MASK) == ELLSI_FBC0LONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback count 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC0SHORT_MASK) == ELLSI_FBC0SHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback count 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC1LONG_MASK) == ELLSI_FBC1LONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback count 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC1SHORT_MASK) == ELLSI_FBC1SHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback ID 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID0LONG_MASK) == ELLSI_FBID0LONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback ID 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID0SHORT_MASK) == ELLSI_FBID0SHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback ID 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID1LONG_MASK) == ELLSI_FBID1LONG_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable feedback ID 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID1SHORT_MASK) == ELLSI_FBID1SHORT_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Enable AUTO SET mode feedback ID overflow interrupt flag */
     if ((u32Mask & ELLSI_ASETIDOV_MASK) == ELLSI_ASETIDOV_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_ASETIEN_Msk;
+    }
 
     /* Enable AUTO SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ASETDONE_MASK) == ELLSI_ASETDONE_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_ASETIEN_Msk;
+    }
 
     /* Enable AUTO TH20 SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ATHDONE_MASK) == ELLSI_ATHDONE_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_ATHIEN_Msk;
+    }
 
     /* Enable feedback pixel count overflow interrupt flag */
     if ((u32Mask & ELLSI_FBPOV_MASK) == ELLSI_FBPOV_MASK)
+    {
         ellsi->CTL |= ELLSI_CTL_FBSTSIEN_Msk;
+    }
 }
 
 /**
@@ -1083,95 +1298,141 @@ void ELLSI_DisableCmdInt(ELLSI_T *ellsi, uint32_t u32Mask)
 {
     /* Disable normal command done interrupt flag */
     if ((u32Mask & ELLSI_CMDDONE_MASK) == ELLSI_CMDDONE_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_NCMDDIEN_Msk;
+    }
 
     /* Disable feedback command done interrupt flag */
     if ((u32Mask & ELLSI_FBDONE_MASK) == ELLSI_FBDONE_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_FBSTSIEN_Msk;
+    }
 
     /* Disable TH20 command done interrupt flag */
     if ((u32Mask & ELLSI_TH20DONE_MASK) == ELLSI_TH20DONE_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_NCMDDIEN_Msk;
+    }
 
     /* Disable set ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_SETIDLONG_MASK) == ELLSI_SETIDLONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable check ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_CHKIDLONG_MASK) == ELLSI_CHKIDLONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable set ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_SETIDSHORT_MASK) == ELLSI_SETIDSHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable check ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_CHKIDSHORT_MASK) == ELLSI_CHKIDSHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable set ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETOV_MASK) == ELLSI_SETGETOV_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable check ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETOV_MASK) == ELLSI_CHKGETOV_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable set ID Get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETUN_MASK) == ELLSI_SETGETUN_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable check ID get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETUN_MASK) == ELLSI_CHKGETUN_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback count 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC0LONG_MASK) == ELLSI_FBC0LONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback count 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC0SHORT_MASK) == ELLSI_FBC0SHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback count 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC1LONG_MASK) == ELLSI_FBC1LONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback count 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC1SHORT_MASK) == ELLSI_FBC1SHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback ID 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID0LONG_MASK) == ELLSI_FBID0LONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback ID 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID0SHORT_MASK) == ELLSI_FBID0SHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback ID 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID1LONG_MASK) == ELLSI_FBID1LONG_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable feedback ID 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID1SHORT_MASK) == ELLSI_FBID1SHORT_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_RSPIEN_Msk;
+    }
 
     /* Disable AUTO SET mode feedback ID overflow interrupt flag */
     if ((u32Mask & ELLSI_ASETIDOV_MASK) == ELLSI_ASETIDOV_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_ASETIEN_Msk;
+    }
 
     /* Disable AUTO SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ASETDONE_MASK) == ELLSI_ASETDONE_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_ASETIEN_Msk;
+    }
 
     /* Disable AUTO TH20 SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ATHDONE_MASK) == ELLSI_ATHDONE_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_ATHIEN_Msk;
+    }
 
     /* Disable feedback pixel count overflow interrupt flag */
     if ((u32Mask & ELLSI_FBPOV_MASK) == ELLSI_FBPOV_MASK)
+    {
         ellsi->CTL &= ~ELLSI_CTL_FBSTSIEN_Msk;
+    }
 }
 
 /**
@@ -1206,97 +1467,141 @@ void ELLSI_DisableCmdInt(ELLSI_T *ellsi, uint32_t u32Mask)
   * @return Command interrupt flags of selected sources.
   * @details Get ELLSI related command interrupt flags specified by u32Mask parameter.
   */
-uint32_t ELLSI_GetCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
+uint32_t ELLSI_GetCmdIntFlag(const ELLSI_T *ellsi, uint32_t u32Mask)
 {
     uint32_t u32IntFlag = 0;
 
     /* Check normal command done interrupt flag */
     if ((u32Mask & ELLSI_CMDDONE_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_CMDDONE_Msk))
+    {
         u32IntFlag |= ELLSI_CMDDONE_MASK;
+    }
 
     /* Check feedback command done interrupt flag */
     if ((u32Mask & ELLSI_FBDONE_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBDONE_Msk))
+    {
         u32IntFlag |= ELLSI_FBDONE_MASK;
+    }
 
     /* Check TH20 command done interrupt flag */
     if ((u32Mask & ELLSI_TH20DONE_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_TH20DONE_Msk))
+    {
         u32IntFlag |= ELLSI_TH20DONE_MASK;
+    }
 
     /* Check set ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_SETIDLONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_SETIDLONG_Msk))
+    {
         u32IntFlag |= ELLSI_SETIDLONG_MASK;
+    }
 
     /* Check check ID get pulse long interrupt flag */
     if ((u32Mask & ELLSI_CHKIDLONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_CHKIDLONG_Msk))
+    {
         u32IntFlag |= ELLSI_CHKIDLONG_MASK;
+    }
 
     /* Check set ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_SETIDSHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_SETIDSHORT_Msk))
+    {
         u32IntFlag |= ELLSI_SETIDSHORT_MASK;
+    }
 
     /* Check check ID get pulse short interrupt flag */
     if ((u32Mask & ELLSI_CHKIDSHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_CHKIDSHORT_Msk))
+    {
         u32IntFlag |= ELLSI_CHKIDSHORT_MASK;
+    }
 
     /* Check set ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETOV_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_SETGETOV_Msk))
+    {
         u32IntFlag |= ELLSI_SETGETOV_MASK;
+    }
 
     /* Check check ID get pulse overflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETOV_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_CHKGETOV_Msk))
+    {
         u32IntFlag |= ELLSI_CHKGETOV_MASK;
+    }
 
     /* Check set ID Get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_SETGETUN_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_SETGETUN_Msk))
+    {
         u32IntFlag |= ELLSI_SETGETUN_MASK;
+    }
 
     /* Check check ID get pulse underflow interrupt flag */
     if ((u32Mask & ELLSI_CHKGETUN_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_CHKGETUN_Msk))
+    {
         u32IntFlag |= ELLSI_CHKGETUN_MASK;
+    }
 
     /* Check feedback count 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC0LONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBC0LONG_Msk))
+    {
         u32IntFlag |= ELLSI_FBC0LONG_MASK;
+    }
 
     /* Check feedback count 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC0SHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBC0SHORT_Msk))
+    {
         u32IntFlag |= ELLSI_FBC0SHORT_MASK;
+    }
 
     /* Check feedback count 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBC1LONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBC1LONG_Msk))
+    {
         u32IntFlag |= ELLSI_FBC1LONG_MASK;
+    }
 
     /* Check feedback count 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBC1SHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBC1SHORT_Msk))
+    {
         u32IntFlag |= ELLSI_FBC1SHORT_MASK;
+    }
 
     /* Check feedback ID 0 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID0LONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBID0LONG_Msk))
+    {
         u32IntFlag |= ELLSI_FBID0LONG_MASK;
+    }
 
     /* Check feedback ID 0 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID0SHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBID0SHORT_Msk))
+    {
         u32IntFlag |= ELLSI_FBID0SHORT_MASK;
+    }
 
     /* Check feedback ID 1 pulse long interrupt flag */
     if ((u32Mask & ELLSI_FBID1LONG_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBID1LONG_Msk))
+    {
         u32IntFlag |= ELLSI_FBID1LONG_MASK;
+    }
 
     /* Check feedback ID 1 pulse short interrupt flag */
     if ((u32Mask & ELLSI_FBID1SHORT_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_FBID1SHORT_Msk))
+    {
         u32IntFlag |= ELLSI_FBID1SHORT_MASK;
+    }
 
     /* Check AUTO SET mode feedback ID overflow interrupt flag */
     if ((u32Mask & ELLSI_ASETIDOV_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_ASETIDOV_Msk))
+    {
         u32IntFlag |= ELLSI_ASETIDOV_MASK;
+    }
 
     /* Check AUTO SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ASETDONE_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_ASETDONE_Msk))
+    {
         u32IntFlag |= ELLSI_ASETDONE_MASK;
+    }
 
     /* Check AUTO TH20 SET mode done interrupt flag */
     if ((u32Mask & ELLSI_ATHDONE_MASK) && (ellsi->CMDSTS & ELLSI_CMDSTS_ATHDONE_Msk))
+    {
         u32IntFlag |= ELLSI_ATHDONE_MASK;
+    }
 
     return u32IntFlag;
 }
@@ -1336,70 +1641,114 @@ uint32_t ELLSI_GetCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
 void ELLSI_ClearCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
 {
     if (u32Mask & ELLSI_CMDDONE_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_CMDDONE_Msk; /* Clear normal command done interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBDONE_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBDONE_Msk; /* Clear feedback command done interrupt flag */
+    }
 
     if (u32Mask & ELLSI_TH20DONE_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_TH20DONE_Msk; /* Clear TH20 command done interrupt flag */
+    }
 
     if (u32Mask & ELLSI_SETIDLONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_SETIDLONG_Msk; /* Clear set ID get pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_CHKIDLONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_CHKIDLONG_Msk; /* Clear check ID get pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_SETIDSHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_SETIDSHORT_Msk; /* Clear set ID get pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_CHKIDSHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_CHKIDSHORT_Msk; /* Clear check ID get pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_SETGETOV_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_SETGETOV_Msk; /* Clear set ID get pulse overflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_CHKGETOV_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_CHKGETOV_Msk; /* Clear check ID get pulse overflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_SETGETUN_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_SETGETUN_Msk; /* Clear set ID Get pulse underflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_CHKGETUN_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_CHKGETUN_Msk; /* Clear check ID get pulse underflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBC0LONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBC0LONG_Msk; /* Clear feedback count 0 pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBC0SHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBC0SHORT_Msk; /* Clear feedback count 0 pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBC1LONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBC1LONG_Msk; /* Clear feedback count 1 pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBC1SHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBC1SHORT_Msk; /* Clear feedback count 1 pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBID0LONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBID0LONG_Msk; /* Clear feedback ID 0 pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBID0SHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBID0SHORT_Msk; /* Clear feedback ID 0 pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBID1LONG_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBID1LONG_Msk; /* Clear feedback ID 1 pulse long interrupt flag */
+    }
 
     if (u32Mask & ELLSI_FBID1SHORT_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_FBID1SHORT_Msk; /* Clear feedback ID 1 pulse short interrupt flag */
+    }
 
     if (u32Mask & ELLSI_ASETIDOV_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_ASETIDOV_Msk; /* Clear AUTO SET mode feedback ID overflow interrupt flag */
+    }
 
     if (u32Mask & ELLSI_ASETDONE_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_ASETDONE_Msk; /* Clear AUTO SET mode done interrupt flag */
+    }
 
     if (u32Mask & ELLSI_ATHDONE_MASK)
+    {
         ellsi->CMDSTS = ELLSI_CMDSTS_ATHDONE_Msk; /* Clear AUTO TH20 SET mode done interrupt flag */
+    }
 }
 
 /**
@@ -1413,21 +1762,16 @@ void ELLSI_ClearCmdIntFlag(ELLSI_T *ellsi, uint32_t u32Mask)
   */
 int32_t ELLSI_GetOverflowFlag(ELLSI_T *ellsi, uint32_t u32ID)
 {
-    uint32_t i;
-    uint32_t FBPOV;
+    uint32_t u32Idx;
 
-    if ((u32ID == 0) || (u32ID >= 16))
-        return -1;
-
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U))
     {
-        FBPOV = ellsi->FB[i].FBPCNT;
-
-        if (i == (u32ID - 1))
-            break;
+        return -1;
     }
 
-    return (FBPOV & ELLSI_FBPCNT_FBPOV_Msk) >> ELLSI_FBPCNT_FBPOV_Pos;
+    u32Idx = u32ID - 1U;
+
+    return (int32_t)((ellsi->FB[u32Idx].FBPCNT & ELLSI_FBPCNT_FBPOV_Msk) >> ELLSI_FBPCNT_FBPOV_Pos);
 }
 
 /**
@@ -1439,16 +1783,16 @@ int32_t ELLSI_GetOverflowFlag(ELLSI_T *ellsi, uint32_t u32ID)
   */
 void ELLSI_ClearOverflowFlag(ELLSI_T *ellsi, uint32_t u32ID)
 {
-    uint32_t i;
-    uint32_t *FBPOV;
+    uint32_t u32Idx;
 
-    for (i = 0; i < ELLSI_MAX_STRIP_CNT; i++)
+    if ((u32ID == 0U) || (u32ID > 15U))
     {
-        FBPOV = (uint32_t *)((uint32_t)&ellsi->FB[i].FBPCNT);
-
-        if (i == (u32ID - 1))
-            *FBPOV = *FBPOV & ELLSI_FBPCNT_FBPOV_Msk;
+        return;
     }
+
+    u32Idx = u32ID - 1U;
+
+    ellsi->FB[u32Idx].FBPCNT |= ELLSI_FBPCNT_FBPOV_Msk;
 }
 
 /** @} end of group ELLSI_EXPORTED_FUNCTIONS */

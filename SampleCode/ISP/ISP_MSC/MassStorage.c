@@ -76,7 +76,6 @@ static uint8_t g_au8ModePage_3F[64] =
     0x1C, 0x06, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00
 };
 
-
 void USBD_IRQHandler(void)
 {
     uint32_t u32IntSts = USBD_GET_INT_FLAG();
@@ -137,6 +136,7 @@ void USBD_IRQHandler(void)
             USBD_CLR_INT_FLAG(USBD_INTSTS_EP1);
 
             /* control OUT */
+            USBD_CtrlOut();
         }
 
         if (u32IntSts & USBD_INTSTS_EP2)
@@ -187,7 +187,10 @@ void MSC_Init(void)
     /* Buffer range for setup packet -> [0 ~ 0x7] */
     USBD->STBUFSEG = SETUP_BUF_BASE;
 
-    /*****************************************************/
+    USBD_Open(&gsInfo, MSC_ClassRequest, NULL);
+
+    USBD_SetConfigCallback(MSC_SetConfig);
+
     /* EP0 ==> control IN endpoint, address 0 */
     USBD_CONFIG_EP(EP0, USBD_CFG_CSTALL | USBD_CFG_EPMODE_IN | 0);
     /* Buffer range for EP0 */
@@ -198,23 +201,7 @@ void MSC_Init(void)
     /* Buffer range for EP1 */
     USBD_SET_EP_BUF_ADDR(EP1, EP1_BUF_BASE);
 
-    /*****************************************************/
-    /* EP2 ==> Bulk IN endpoint, address 2 */
-    USBD_CONFIG_EP(EP2, USBD_CFG_EPMODE_IN | BULK_IN_EP_NUM);
-    /* Buffer range for EP2 */
-    USBD_SET_EP_BUF_ADDR(EP2, EP2_BUF_BASE);
-
-    /* EP3 ==> Bulk Out endpoint, address 3 */
-    USBD_CONFIG_EP(EP3, USBD_CFG_EPMODE_OUT | BULK_OUT_EP_NUM);
-    /* Buffer range for EP3 */
-    USBD_SET_EP_BUF_ADDR(EP3, EP3_BUF_BASE);
-
-    /* trigger to receive OUT data */
-    USBD_SET_PAYLOAD_LEN(EP3, EP3_MAX_PKT_SIZE);
-
-    /*****************************************************/
-    g_u32BulkBuf0 = EP3_BUF_BASE;
-    g_u32BulkBuf1 = EP2_BUF_BASE;
+    MSC_SetConfig();
 
     g_sCSW.dCSWSignature = CSW_SIGNATURE;
     g_u32StorageSize = FMC_Init();
@@ -697,9 +684,9 @@ void MSC_ProcessCmd(void)
 
             case UFI_MODE_SENSE_6:
             {
-                /* Byte0 Mode Data Length = 03（Byte1~Byte3）
+                /* Byte0 Mode Data Length = 03(Byte1~Byte3)
                  * Byte1 Medium Type = 00
-                 * Byte2 Device-Specific = 00（WP=0）
+                 * Byte2 Device-Specific = 00(WP=0)
                  * Byte3 Block Descriptor Length = 00
                  */
                 outp32((USBD_BUF_BASE + g_u32BulkBuf1), 0x3);
@@ -852,6 +839,9 @@ void MSC_SetConfig(void)
     USBD_SET_PAYLOAD_LEN(EP3, EP3_MAX_PKT_SIZE);
 
     g_u8BulkState = BULK_CBW;
+    g_u8EP3Ready = 0;
+    g_u32BulkBuf0 = EP3_BUF_BASE;
+    g_u32BulkBuf1 = EP2_BUF_BASE;
 
     DBG_PRINTF("Set config\n");
 }

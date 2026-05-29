@@ -161,7 +161,7 @@ static uint8_t gu8StringSerial[26] =
 {
     26,             // bLength
     DESC_STRING,    // bDescriptorType
-    'M', 0, '2', 0, '3', 0, '5', 0, '5', 0, '-', 0, '0', 0, '0', 0, '2', 0, '0', 0, '1', 0, '8', 0
+    'M', 0, '3', 0, '3', 0, '5', 0, '1', 0, '-', 0, '0', 0, '0', 0, '2', 0, '0', 0, '2', 0, '6', 0
 };
 
 static uint8_t *gpu8UsbString[4] =

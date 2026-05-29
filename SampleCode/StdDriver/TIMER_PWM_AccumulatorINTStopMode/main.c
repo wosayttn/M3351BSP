@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "NuMicro.h"
 
+void TIMER0_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -83,7 +85,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("+------------------------------------------------------------+\n");
     printf("|    Timer PWM Accumulator Inerrupt Stop Mode Sample Code    |\n");
     printf("+------------------------------------------------------------+\n\n");
@@ -121,7 +123,9 @@ int main(void)
     TPWM_START_COUNTER(TIMER0);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

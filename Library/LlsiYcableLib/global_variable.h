@@ -47,11 +47,11 @@ enum eColorTable
 
 extern uint32_t TimeCounterFrameUpdate;
 extern uint8_t LED_Frame_Update_flag;
-#define TIMER_FRAME_UPDATE 25
+#define TIMER_FRAME_UPDATE 25U
 
 struct LED_Setting_Tag;
 typedef void (*LED_FUNC)(volatile struct LED_Setting_Tag *LED_Setting);
-#define LED_MODE_COUNT 11
+#define LED_MODE_COUNT 11U
 extern void *const Mode_Function[LED_MODE_COUNT];
 
 typedef struct LED_Setting_Tag
@@ -82,109 +82,111 @@ typedef struct LED_Setting_Tag
     uint16_t  LED_Offset;
 } LED_Setting_T;
 
-#define TOTAL_LED_AREA 10
+#define TOTAL_LED_AREA 10U
 /* LED Gen2 amount setting */
 #define LED_GEN2_MAX_SUPPORT_PORT   TOTAL_LED_AREA
-#define LED_GEN2_MAX_STRIP_COUNT    5
-#define LED_GEN2_DEFAULT_LED_NUMBER 30
-#define LED_GEN2_MAX_LED_NUMBER     LED_GEN2_MAX_STRIP_COUNT*LED_GEN2_DEFAULT_LED_NUMBER
+#define LED_GEN2_MAX_STRIP_COUNT    5U
+#define LED_GEN2_DEFAULT_LED_NUMBER 150U
+#define LED_BYTES_PER_PIXEL         3U
+#define LED_GEN2_MAX_LED_NUMBER     ((LED_GEN2_MAX_STRIP_COUNT) * (LED_GEN2_DEFAULT_LED_NUMBER))
+#define LED_GEN2_CONTROL_BUFFER_LEN (((LED_GEN2_MAX_LED_NUMBER) * (LED_BYTES_PER_PIXEL)) + ((LED_GEN2_MAX_STRIP_COUNT) * (LED_BYTES_PER_PIXEL)))
 /* Static Y cable mode data */
-#define PIX_Y_CABLE_RESET    25    // 250 us
-#define PIX_Y_CABLE_H        4     // 40  us
-#define PIX_Y_CABLE_L        1     // 10  us
-#define PIX_Y_CABLE          (PIX_Y_CABLE_RESET + PIX_Y_CABLE_H + PIX_Y_CABLE_L)
-#define PIX_COMMAND_ID       1     //
-#define PIX_CONTROL_CMD      (PIX_Y_CABLE + PIX_COMMAND_ID)
-#define BYTE_Y_CABLE         (PIX_Y_CABLE * 3)
-#define BYTE_COMMAND_ID      (PIX_COMMAND_ID * 3)
-#define BYTE_CONTROL_CMD     (PIX_CONTROL_CMD * 3)
+#define PIX_Y_CABLE_RESET    25U   // 250 us
+#define PIX_Y_CABLE_H        4U    // 40  us
+#define PIX_Y_CABLE_L        1U    // 10  us
+#define PIX_Y_CABLE          ((PIX_Y_CABLE_RESET) + (PIX_Y_CABLE_H) + (PIX_Y_CABLE_L))
+#define PIX_COMMAND_ID       1U    //
+#define PIX_CONTROL_CMD      ((PIX_Y_CABLE) + (PIX_COMMAND_ID))
+#define BYTE_Y_CABLE         ((PIX_Y_CABLE) * (LED_BYTES_PER_PIXEL))
+#define BYTE_COMMAND_ID      ((PIX_COMMAND_ID) * (LED_BYTES_PER_PIXEL))
+#define BYTE_CONTROL_CMD     ((PIX_CONTROL_CMD) * (LED_BYTES_PER_PIXEL))
 
-#define cStripA_LED 144
-#if((cStripA_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_STRIPA_LEN (cStripA_LED*3)
+#define cStripA_LED 144U
+#if (((cStripA_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_STRIPA_LEN ((cStripA_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_STRIPA_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_STRIPA_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t StripALEDData[LED_STRIPA_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T StripA_LEDSetting;
 
-#define cStripB_LED 144
-#if((cStripB_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_STRIPB_LEN (cStripB_LED*3)
+#define cStripB_LED 144U
+#if (((cStripB_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_STRIPB_LEN ((cStripB_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_STRIPB_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_STRIPB_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t StripBLEDData[LED_STRIPB_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T StripB_LEDSetting;
 
-#define cFAN1_LED   54
-#if((cFAN1_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN1LED_LEN (cFAN1_LED*3)
+#define cFAN1_LED   54U
+#if (((cFAN1_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN1LED_LEN ((cFAN1_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN1LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN1LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN1LEDData[LED_FAN1LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN1_LEDSetting;
 
-#define cFAN2_LED   54
-#if((cFAN2_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN2LED_LEN (cFAN2_LED*3)
+#define cFAN2_LED   54U
+#if (((cFAN2_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN2LED_LEN ((cFAN2_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN2LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN2LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN2LEDData[LED_FAN2LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN2_LEDSetting;
 
-#define cFAN3_LED   54
-#if((cFAN3_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN3LED_LEN (cFAN3_LED*3)
+#define cFAN3_LED   54U
+#if (((cFAN3_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN3LED_LEN ((cFAN3_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN3LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN3LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN3LEDData[LED_FAN3LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN3_LEDSetting;
 
-#define cFAN4_LED   54
-#if((cFAN4_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN4LED_LEN (cFAN4_LED*3)
+#define cFAN4_LED   54U
+#if (((cFAN4_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN4LED_LEN ((cFAN4_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN4LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN4LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN4LEDData[LED_FAN4LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN4_LEDSetting;
 
-#define cFAN5_LED   54
-#if((cFAN5_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN5LED_LEN (cFAN5_LED*3)
+#define cFAN5_LED   54U
+#if (((cFAN5_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN5LED_LEN ((cFAN5_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN5LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN5LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN5LEDData[LED_FAN5LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN5_LEDSetting;
 
-#define cFAN6_LED   54
-#if((cFAN6_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN6LED_LEN (cFAN6_LED*3)
+#define cFAN6_LED   54U
+#if (((cFAN6_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN6LED_LEN ((cFAN6_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN6LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN6LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN6LEDData[LED_FAN6LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN6_LEDSetting;
 
-#define cFAN7_LED   54
-#if((cFAN7_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN7LED_LEN (cFAN7_LED*3)
+#define cFAN7_LED   54U
+#if (((cFAN7_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN7LED_LEN ((cFAN7_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN7LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN7LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN7LEDData[LED_FAN7LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN7_LEDSetting;
 
-#define cFAN8_LED   54
-#if((cFAN8_LED*3) > (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3))
-    #define LED_FAN8LED_LEN (cFAN8_LED*3)
+#define cFAN8_LED   54U
+#if (((cFAN8_LED) * (LED_BYTES_PER_PIXEL)) > (LED_GEN2_CONTROL_BUFFER_LEN))
+    #define LED_FAN8LED_LEN ((cFAN8_LED) * (LED_BYTES_PER_PIXEL))
 #else
-    #define LED_FAN8LED_LEN (LED_GEN2_MAX_LED_NUMBER*3 + LED_GEN2_MAX_STRIP_COUNT*3)
+    #define LED_FAN8LED_LEN (LED_GEN2_CONTROL_BUFFER_LEN)
 #endif
 extern __attribute__((aligned(4))) uint8_t FAN8LEDData[LED_FAN8LED_LEN];
 extern __attribute__((aligned(4))) volatile LED_Setting_T FAN8_LEDSetting;
@@ -230,7 +232,7 @@ typedef struct
     uint8_t Use_Gen2;
     uint8_t ClearData_Flag;
     uint8_t LLSI_INT_Count;
-    LED_Gen2_Strip_T LED_Gen2_Setting[LED_GEN2_MAX_STRIP_COUNT + 1];
+    LED_Gen2_Strip_T LED_Gen2_Setting[LED_GEN2_MAX_STRIP_COUNT + 1U];
 } LED_Gen2_Setting_T;
 
 extern __attribute__((aligned(4))) volatile LED_Gen2_Setting_T LED_Gen2_Port_Setting[LED_GEN2_MAX_SUPPORT_PORT];

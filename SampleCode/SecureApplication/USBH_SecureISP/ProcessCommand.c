@@ -17,13 +17,11 @@
     #include "crypto_mbedtls.h"
 #endif
 
-//#define DBG           printf
+//#define DBG             printf
+//#define DUMP_PACKET     1
 
 #ifndef DBG
     #define DBG(...)
-    #define DUMP_PACKET     0
-#else
-    #define DUMP_PACKET     1
 #endif
 
 #define CMD_CONNECT                 0x80
@@ -258,8 +256,8 @@ static uint32_t sysGetNum(void)
 */
 static uint16_t _Perform_CCITT(uint32_t *pu32buf, uint16_t len, uint8_t mode)
 {
-    volatile uint16_t   i;
-    uint16_t            *pu16buf, u32OrgSum, u32CalSum;
+    uint32_t i;
+    uint16_t *pu16buf, u16OrgSum, u16CalSum;
 
     if (len > 56) // valid data byte count
         return -1;
@@ -270,24 +268,23 @@ static uint16_t _Perform_CCITT(uint32_t *pu32buf, uint16_t len, uint8_t mode)
     CRC_Open(CRC_CCITT, 0, 0xFFFFul, CRC_CPU_WDATA_16);
 
     for (i = 1; i < (len / 2); i++)
-        CRC->DAT = *(pu16buf + i);
+        CRC_WRITE_DATA(pu16buf[i]);
 
-    u32OrgSum = *(pu16buf + 0);
-    u32CalSum = (CRC->CHECKSUM & 0xFFFFul);
+    u16OrgSum = pu16buf[0];
+    u16CalSum = CRC_GetChecksum();
 
-    /* Clear CRC checksum */
-    CRC->SEED = 0xFFFFul;
-    CRC->CTL |= CRC_CTL_CHKSINIT_Msk;
+    /* Clear CRC checksum and reset seed */
+    CRC_SET_SEED(0xFFFF);
 
     if (mode == 0)
     {
-        *(pu16buf + 0) = u32CalSum;
-        return u32CalSum;
+        pu16buf[0] = u16CalSum;
+        return u16CalSum;
     }
     else if (mode == 1)
     {
         /* Verify CCITT checksum */
-        if (u32OrgSum == u32CalSum)
+        if (u16OrgSum == u16CalSum)
             return 0;   /* Verify CCITT Pass */
         else
         {
@@ -320,23 +317,22 @@ static uint32_t _Perform_CRC32(uint32_t *pu32buf, uint16_t len, uint8_t mode)
     for (i = 0; i < (len / 4) - 1; i++)
     {
 #if (0)
-        DBG("idx-%d: 0x%08x. (CRC32)\n", i, *(pu32buf + i));
+        DBG("idx-%d: 0x%08x. (CRC32)\n", i, pu32buf[i]);
 #endif
-        CRC->DAT = *(pu32buf + i);
+        CRC_WRITE_DATA(pu32buf[i]);
     }
 
-    u32OrgSum = *(pu32buf + i);
-    u32CalSum = (CRC->CHECKSUM & 0xFFFFFFFFul);
+    u32OrgSum = pu32buf[i];
+    u32CalSum = CRC_GetChecksum();
 
-    /* Clear CRC checksum */
-    CRC->SEED = 0xFFFFFFFFul;
-    CRC->CTL |= CRC_CTL_CHKSINIT_Msk;
+    /* Clear CRC checksum and reset seed */
+    CRC_SET_SEED(0xFFFFFFFF);
 
     DBG("mode: %d\n", mode);
 
     if (mode == 0)
     {
-        *(pu32buf + i) = u32CalSum;
+        pu32buf[i] = u32CalSum;
         return u32CalSum;
     }
     else if (mode == 1)
@@ -378,6 +374,7 @@ static int32_t _AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_
 {
     int32_t i32TimeOutCnt;
 
+    AES_CLR_INT_FLAG(CRYPTO);
     AES_Open(CRYPTO, 0, 1, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
     AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
     AES_SetInitVect(CRYPTO, 0, IV);
@@ -386,12 +383,19 @@ static int32_t _AES256Encrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_
 
     i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
-    while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
+    while (AES_GET_INT_FLAG(CRYPTO) == 0)
     {
         if (i32TimeOutCnt-- < 0)
             return -1;
     }
 
+    if (AES_GET_INT_FLAG(CRYPTO) & CRYPTO_INTSTS_AESEIF_Msk)
+    {
+        AES_CLR_INT_FLAG(CRYPTO);
+        return -2;
+    }
+
+    AES_CLR_INT_FLAG(CRYPTO);
     return 0;
 }
 
@@ -402,6 +406,7 @@ static int32_t _AES256Decrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_
 {
     int32_t i32TimeOutCnt;
 
+    AES_CLR_INT_FLAG(CRYPTO);
     AES_Open(CRYPTO, 0, 0, AES_MODE_CFB, AES_KEY_SIZE_256, AES_IN_OUT_SWAP);
     AES_SetKey(CRYPTO, 0, KEY, 4 * 8);
     AES_SetInitVect(CRYPTO, 0, IV);
@@ -410,12 +415,19 @@ static int32_t _AES256Decrypt(uint32_t *in, uint32_t *out, uint32_t len, uint32_
 
     i32TimeOutCnt = SystemCoreClock; /* > 1 second time-out */
 
-    while (CRYPTO->AES_STS & CRYPTO_AES_STS_BUSY_Msk)
+    while (AES_GET_INT_FLAG(CRYPTO) == 0)
     {
         if (i32TimeOutCnt-- < 0)
             return -1;
     }
 
+    if (AES_GET_INT_FLAG(CRYPTO) & CRYPTO_INTSTS_AESEIF_Msk)
+    {
+        AES_CLR_INT_FLAG(CRYPTO);
+        return -2;
+    }
+
+    AES_CLR_INT_FLAG(CRYPTO);
     return 0;
 }
 

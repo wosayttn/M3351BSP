@@ -1490,7 +1490,6 @@ void MSC_SetConfig(void)
     /* trigger to receive OUT data */
     USBD_SET_PAYLOAD_LEN(EP6, EP6_MAX_PKT_SIZE);
 
-
     USBD_LockEpStall(0);
 
     s_u8BulkState = BULK_CBW;

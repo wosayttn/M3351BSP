@@ -13,6 +13,7 @@
 #define PWM_OUT_CH    0UL
 #define PWM_BRAKE_PIN 0UL
 
+void BRAKE0_IRQHandler(void);
 void BRAKE0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -100,12 +101,12 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nConnet PB.1 (PWM0 brake pin 0) to PD.5.\n");
     printf("It will generate brake interrupt and PWM0 channel 0 output PA.5 stop toggling.\n");
 
     GPIO_SetMode(PD, BIT5, GPIO_MODE_OUTPUT);
-    PD5 = 0;
+    PD5 = 0UL;
 
     /* PWM0 frequency is 100Hz, duty 30%, */
     PWM_ConfigOutputChannel(PWM0, PWM_OUT_CH, 100, 30);
@@ -131,10 +132,10 @@ int main(void)
 
     printf("\nPress any key to generate a brake event\n");
     getchar();
-    PD5 = 1;
+    PD5 = 1UL;
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

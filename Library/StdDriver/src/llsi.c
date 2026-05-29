@@ -8,6 +8,10 @@
 *****************************************************************************/
 #include "NuMicro.h"
 
+#define LLSI_MODULE_NULL ((LLSI_T *)0)
+#define LLSI_CONFIG_NULL ((S_LLSI_CONFIG_T *)0)
+#define LLSI_TIME_INFO_NULL ((S_LLSI_TIME_INFO_T *)0)
+
 /** @addtogroup Standard_Driver Standard Driver
   @{
 */
@@ -51,96 +55,111 @@ void LLSI_Open(LLSI_T *llsi,
                uint32_t u32PCNT,
                uint32_t u32IDOS)
 {
-    uint32_t u32PCLKFreq = 0, u32Tmp1, u32Tmp2;
-    uint32_t u32Div, u32Period, u32T0H, u32T1H, u32ResetPeriod;
+    uint32_t u32PCLKFreq;
+    uint32_t u32Tmp1;
+    uint32_t u32Tmp2;
+    uint32_t u32Div;
+    uint32_t u32Period;
+    uint32_t u32T0H;
+    uint32_t u32T1H;
+    uint32_t u32ResetPeriod;
+
+    if (llsi == LLSI_MODULE_NULL)
+    {
+        return;
+    }
 
     /* Get PCLK clock frequency */
     if ((llsi == LLSI0) || (llsi == LLSI2) || (llsi == LLSI4) || (llsi == LLSI6) || (llsi == LLSI8))
+    {
         u32PCLKFreq = CLK_GetPCLK0Freq();
+    }
     else if ((llsi == LLSI1) || (llsi == LLSI3) || (llsi == LLSI5) || (llsi == LLSI7) || (llsi == LLSI9))
+    {
         u32PCLKFreq = CLK_GetPCLK1Freq();
+    }
+    else
+    {
+        return;
+    }
 
     /* Default setting: software mode, RGB format, idle ouput low. */
-    llsi->CTL = (u32LLSIMode) | (u32OutputFormat);
-    llsi->PCNT = u32PCNT;
-    llsi->OCTL = u32IDOS;
+    llsi->CTL = (u32LLSIMode & LLSI_CTL_LLSIMODE_Msk) | (u32OutputFormat & LLSI_CTL_OFDEF_Msk);
+    llsi->PCNT = (u32PCNT & LLSI_PCNT_PCNT_Msk);
+    llsi->OCTL = (u32IDOS & LLSI_OCTL_IDOS_Msk);
 
     if (u32BusClock >= u32PCLKFreq)
     {
         /* Set DIVIDER = 0 */
-        u32Div = 0;
-        llsi->CLKDIV = 0;
+        u32Div = 0UL;
+        llsi->CLKDIV = 0UL;
     }
-    else if (u32BusClock == 0)
+    else if (u32BusClock == 0UL)
     {
         /* Set DIVIDER to the maximum value 0xFF. f_llsi = f_llsi_clk_src / (DIVIDER + 1) */
-        u32Div = 0xFF;
+        u32Div = 0xFFU;
         llsi->CLKDIV |= LLSI_CLKDIV_DIVIDER_Msk;
     }
     else
     {
-        u32Div = (((u32PCLKFreq * 10) / u32BusClock + 5) / 10) - 1; /* Round to the nearest integer */
+        u32Div = ((((u32PCLKFreq * 10U) / u32BusClock) + 5U) / 10U) - 1U; /* Round to the nearest integer */
 
-        if (u32Div > 0xFF)
+        if (u32Div > 0xFFU)
         {
-            u32Div = 0xFF;
+            u32Div = 0xFFU;
             llsi->CLKDIV |= LLSI_CLKDIV_DIVIDER_Msk;
         }
         else
         {
-            llsi->CLKDIV = (llsi->CLKDIV & (~LLSI_CLKDIV_DIVIDER_Msk)) | (u32Div << LLSI_CLKDIV_DIVIDER_Pos);
+            llsi->CLKDIV = (llsi->CLKDIV & (~LLSI_CLKDIV_DIVIDER_Msk)) | (u32Div << (uint32_t)LLSI_CLKDIV_DIVIDER_Pos);
         }
     }
 
-    u32Tmp1 = (u32PCLKFreq * 10) / 1000000;
-    u32Tmp2 = 1000 * (u32Div + 1);
+    u32Tmp1 = (u32PCLKFreq * 10U) / 1000000U;
+    u32Tmp2 = 1000U * (u32Div + 1U);
 
-    u32Period = (u32Tmp1 * u32TransferTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32Period = ((u32Tmp1 * u32TransferTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32Period > 0xFF)
+    if (u32Period > 0xFFU)
     {
-        u32Period = 0xFF;
         llsi->PERIOD |= LLSI_PERIOD_PERIOD_Msk;
     }
     else
     {
-        llsi->PERIOD = (llsi->PERIOD & (~LLSI_PERIOD_PERIOD_Msk)) | (u32Period << LLSI_PERIOD_PERIOD_Pos);
+        llsi->PERIOD = (llsi->PERIOD & (~LLSI_PERIOD_PERIOD_Msk)) | (u32Period << (uint32_t)LLSI_PERIOD_PERIOD_Pos);
     }
 
-    u32T0H = (u32Tmp1 * u32T0HTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32T0H = ((u32Tmp1 * u32T0HTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32T0H > 0xFF)
+    if (u32T0H > 0xFFU)
     {
-        u32T0H = 0xFF;
         llsi->DUTY |= LLSI_DUTY_T0H_Msk;
     }
     else
     {
-        llsi->DUTY = (llsi->DUTY & (~LLSI_DUTY_T0H_Msk)) | (u32T0H << LLSI_DUTY_T0H_Pos);
+        llsi->DUTY = (llsi->DUTY & (~LLSI_DUTY_T0H_Msk)) | (u32T0H << (uint32_t)LLSI_DUTY_T0H_Pos);
     }
 
-    u32T1H = (u32Tmp1 * u32T1HTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32T1H = ((u32Tmp1 * u32T1HTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32T1H > 0xFF)
+    if (u32T1H > 0xFFU)
     {
-        u32T1H = 0xFF;
         llsi->DUTY |= LLSI_DUTY_T1H_Msk;
     }
     else
     {
-        llsi->DUTY = (llsi->DUTY & (~LLSI_DUTY_T1H_Msk)) | (u32T1H << LLSI_DUTY_T1H_Pos);
+        llsi->DUTY = (llsi->DUTY & (~LLSI_DUTY_T1H_Msk)) | (u32T1H << (uint32_t)LLSI_DUTY_T1H_Pos);
     }
 
-    u32ResetPeriod = (u32Tmp1 * u32ResetTimeNsec / u32Tmp2 + 5) / 10; /* Round to the nearest integer */
+    u32ResetPeriod = ((u32Tmp1 * u32ResetTimeNsec / u32Tmp2) + 5U) / 10U; /* Round to the nearest integer */
 
-    if (u32ResetPeriod > 0xFFFF)
+    if (u32ResetPeriod > 0xFFFFU)
     {
-        u32ResetPeriod = 0xFFFF;
         llsi->RSTPERIOD |= LLSI_RSTPERIOD_RSTPERIOD_Msk;
     }
     else
     {
-        llsi->RSTPERIOD = (llsi->RSTPERIOD & (~LLSI_RSTPERIOD_RSTPERIOD_Msk)) | (u32ResetPeriod << LLSI_RSTPERIOD_RSTPERIOD_Pos);
+        llsi->RSTPERIOD = (llsi->RSTPERIOD & (~LLSI_RSTPERIOD_RSTPERIOD_Msk)) | (u32ResetPeriod << (uint32_t)LLSI_RSTPERIOD_RSTPERIOD_Pos);
     }
 
     /* LLSI_Open not Enable LLSI Tx */
@@ -161,8 +180,13 @@ void LLSI_Open(LLSI_T *llsi,
   *             u32IDOS Decides the idle output state. (LLSI_IDLE_LOW, LLSI_IDLE_HIGH)
   * @return None
   */
-void LLSI_OpenbyConfig(LLSI_T *llsi, S_LLSI_CONFIG_T *sLLSIConfig)
+void LLSI_OpenbyConfig(LLSI_T *llsi, const S_LLSI_CONFIG_T *sLLSIConfig)
 {
+    if ((llsi == LLSI_MODULE_NULL) || (sLLSIConfig == LLSI_CONFIG_NULL))
+    {
+        return;
+    }
+
     LLSI_Open(llsi, sLLSIConfig->u32LLSIMode, sLLSIConfig->u32OutputFormat, sLLSIConfig->sTimeInfo.u32BusClock,
               sLLSIConfig->sTimeInfo.u32TransferTimeNsec, sLLSIConfig->sTimeInfo.u32T0HTimeNsec,
               sLLSIConfig->sTimeInfo.u32T1HTimeNsec, sLLSIConfig->sTimeInfo.u32ResetTimeNsec,
@@ -177,6 +201,11 @@ void LLSI_OpenbyConfig(LLSI_T *llsi, S_LLSI_CONFIG_T *sLLSIConfig)
   */
 void LLSI_Close(LLSI_T *llsi)
 {
+    if (llsi == LLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     llsi->CTL &= ~LLSI_CTL_LLSIEN_Msk;
 }
 
@@ -192,32 +221,50 @@ void LLSI_Close(LLSI_T *llsi)
   * @return None
   * @details This API is used to get the current LLSI time information.
   */
-void LLSI_GetTimeInfo(LLSI_T *llsi, S_LLSI_TIME_INFO_T *sPt)
+void LLSI_GetTimeInfo(const LLSI_T *llsi, S_LLSI_TIME_INFO_T *sPt)
 {
-    uint32_t u32PCLKFreq = 0, u32Tmp;
-    uint32_t u32Div, u32Period, u32T0H, u32T1H, u32ResetPeriod;
+    uint32_t u32PCLKFreq = 0UL;
+    uint32_t u32Tmp;
+    uint32_t u32Div;
+    uint32_t u32Period;
+    uint32_t u32T0H;
+    uint32_t u32T1H;
+    uint32_t u32ResetPeriod;
+
+    if ((llsi == LLSI_MODULE_NULL) || (sPt == LLSI_TIME_INFO_NULL))
+    {
+        return;
+    }
 
     /* Get PCLK clock frequency */
     if ((llsi == LLSI0) || (llsi == LLSI2) || (llsi == LLSI4) || (llsi == LLSI6) || (llsi == LLSI8))
+    {
         u32PCLKFreq = CLK_GetPCLK0Freq();
+    }
     else if ((llsi == LLSI1) || (llsi == LLSI3) || (llsi == LLSI5) || (llsi == LLSI7) || (llsi == LLSI9))
+    {
         u32PCLKFreq = CLK_GetPCLK1Freq();
+    }
+    else
+    {
+        return;
+    }
 
     /* Get time data */
-    u32Div = (llsi->CLKDIV & LLSI_CLKDIV_DIVIDER_Msk) >> LLSI_CLKDIV_DIVIDER_Pos;
-    u32Period = (llsi->PERIOD & LLSI_PERIOD_PERIOD_Msk) >> LLSI_PERIOD_PERIOD_Pos;
-    u32T0H = (llsi->DUTY & LLSI_DUTY_T0H_Msk) >> LLSI_DUTY_T0H_Pos;
-    u32T1H = (llsi->DUTY & LLSI_DUTY_T1H_Msk) >> LLSI_DUTY_T1H_Pos;
-    u32ResetPeriod = (llsi->RSTPERIOD & LLSI_RSTPERIOD_RSTPERIOD_Msk) >> LLSI_RSTPERIOD_RSTPERIOD_Pos;
+    u32Div = (llsi->CLKDIV & LLSI_CLKDIV_DIVIDER_Msk) >> (uint32_t)LLSI_CLKDIV_DIVIDER_Pos;
+    u32Period = (llsi->PERIOD & LLSI_PERIOD_PERIOD_Msk) >> (uint32_t)LLSI_PERIOD_PERIOD_Pos;
+    u32T0H = (llsi->DUTY & LLSI_DUTY_T0H_Msk) >> (uint32_t)LLSI_DUTY_T0H_Pos;
+    u32T1H = (llsi->DUTY & LLSI_DUTY_T1H_Msk) >> (uint32_t)LLSI_DUTY_T1H_Pos;
+    u32ResetPeriod = (llsi->RSTPERIOD & LLSI_RSTPERIOD_RSTPERIOD_Msk) >> (uint32_t)LLSI_RSTPERIOD_RSTPERIOD_Pos;
 
     /* Compute LLSI time information */
-    sPt->u32BusClock = u32PCLKFreq / (u32Div + 1);
+    sPt->u32BusClock = u32PCLKFreq / (u32Div + 1U);
 
-    u32Tmp = u32PCLKFreq / 1000;
-    sPt->u32TransferTimeNsec = u32Period * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32T0HTimeNsec =  u32T0H * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32T1HTimeNsec =  u32T1H * 1000000 / u32Tmp * (u32Div + 1);
-    sPt->u32ResetTimeNsec =  u32ResetPeriod * 1000000 / u32Tmp * (u32Div + 1);
+    u32Tmp = u32PCLKFreq / 1000U;
+    sPt->u32TransferTimeNsec = u32Period * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32T0HTimeNsec =  u32T0H * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32T1HTimeNsec =  u32T1H * 1000000U / u32Tmp * (u32Div + 1U);
+    sPt->u32ResetTimeNsec =  u32ResetPeriod * 1000000U / u32Tmp * (u32Div + 1U);
 }
 
 /**
@@ -229,7 +276,12 @@ void LLSI_GetTimeInfo(LLSI_T *llsi, S_LLSI_TIME_INFO_T *sPt)
   */
 void LLSI_SetFIFO(LLSI_T *llsi, uint32_t u32TxThreshold)
 {
-    llsi->CTL = (llsi->CTL & ~LLSI_CTL_TXTH_Msk) | (u32TxThreshold << LLSI_CTL_TXTH_Pos);
+    if (llsi == LLSI_MODULE_NULL)
+    {
+        return;
+    }
+
+    llsi->CTL = (llsi->CTL & ~LLSI_CTL_TXTH_Msk) | ((u32TxThreshold << ((uint32_t)LLSI_CTL_TXTH_Pos)) & LLSI_CTL_TXTH_Msk);
 }
 
 /**
@@ -250,29 +302,46 @@ void LLSI_SetFIFO(LLSI_T *llsi, uint32_t u32TxThreshold)
   */
 void LLSI_EnableInt(LLSI_T *llsi, uint32_t u32Mask)
 {
+    if (llsi == LLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Enable underflow interrupt flag */
-    if ((u32Mask & LLSI_UNDFL_INT_MASK) == LLSI_UNDFL_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_UNDFL_INT_MASK) == (uint32_t)LLSI_UNDFL_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_UNDFLINTEN_Msk;
+    }
 
     /* Enable frame end interrupt flag */
-    if ((u32Mask & LLSI_FEND_INT_MASK) == LLSI_FEND_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_FEND_INT_MASK) == (uint32_t)LLSI_FEND_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_FENDINTEN_Msk;
+    }
 
     /* Enable reset command interrupt flag */
-    if ((u32Mask & LLSI_RSTC_INT_MASK) == LLSI_RSTC_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_RSTC_INT_MASK) == (uint32_t)LLSI_RSTC_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_RSTCINTEN_Msk;
+    }
 
     /* Enable FIFO empty interrupt flag */
-    if ((u32Mask & LLSI_EMP_INT_MASK) == LLSI_EMP_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_EMP_INT_MASK) == (uint32_t)LLSI_EMP_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_EMPINTEN_Msk;
+    }
 
     /* Enable FIFO full interrupt flag */
-    if ((u32Mask & LLSI_FUL_INT_MASK) == LLSI_FUL_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_FUL_INT_MASK) == (uint32_t)LLSI_FUL_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_FULINTEN_Msk;
+    }
 
     /* Enable TX threshold interrupt flag */
-    if ((u32Mask & LLSI_TXTH_INT_MASK) == LLSI_TXTH_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_TXTH_INT_MASK) == (uint32_t)LLSI_TXTH_INT_MASK)
+    {
         llsi->CTL |= LLSI_CTL_TXTHIEN_Msk;
+    }
 }
 
 /**
@@ -293,29 +362,46 @@ void LLSI_EnableInt(LLSI_T *llsi, uint32_t u32Mask)
   */
 void LLSI_DisableInt(LLSI_T *llsi, uint32_t u32Mask)
 {
+    if (llsi == LLSI_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Disable underflow interrupt flag */
-    if ((u32Mask & LLSI_UNDFL_INT_MASK) == LLSI_UNDFL_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_UNDFL_INT_MASK) == (uint32_t)LLSI_UNDFL_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_UNDFLINTEN_Msk;
+    }
 
     /* Disable frame end interrupt flag */
-    if ((u32Mask & LLSI_FEND_INT_MASK) == LLSI_FEND_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_FEND_INT_MASK) == (uint32_t)LLSI_FEND_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_FENDINTEN_Msk;
+    }
 
     /* Disable reset command interrupt flag */
-    if ((u32Mask & LLSI_RSTC_INT_MASK) == LLSI_RSTC_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_RSTC_INT_MASK) == (uint32_t)LLSI_RSTC_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_RSTCINTEN_Msk;
+    }
 
     /* Disable FIFO empty interrupt flag */
-    if ((u32Mask & LLSI_EMP_INT_MASK) == LLSI_EMP_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_EMP_INT_MASK) == (uint32_t)LLSI_EMP_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_EMPINTEN_Msk;
+    }
 
     /* Disable FIFO full interrupt flag */
-    if ((u32Mask & LLSI_FUL_INT_MASK) == LLSI_FUL_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_FUL_INT_MASK) == (uint32_t)LLSI_FUL_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_FULINTEN_Msk;
+    }
 
     /* Disable TX FIFO threshold interrupt flag */
-    if ((u32Mask & LLSI_TXTH_INT_MASK) == LLSI_TXTH_INT_MASK)
+    if ((u32Mask & (uint32_t)LLSI_TXTH_INT_MASK) == (uint32_t)LLSI_TXTH_INT_MASK)
+    {
         llsi->CTL &= ~LLSI_CTL_TXTHIEN_Msk;
+    }
 }
 
 /**
@@ -334,33 +420,45 @@ void LLSI_DisableInt(LLSI_T *llsi, uint32_t u32Mask)
   * @return Interrupt flags of selected sources.
   * @details Get LLSI related interrupt flags specified by u32Mask parameter.
   */
-uint32_t LLSI_GetIntFlag(LLSI_T *llsi, uint32_t u32Mask)
+uint32_t LLSI_GetIntFlag(const LLSI_T *llsi, uint32_t u32Mask)
 {
-    uint32_t u32IntFlag = 0;
+    uint32_t u32IntFlag = 0UL;
 
     /* Check underflow interrupt flag */
-    if ((u32Mask & LLSI_UNDFL_INT_MASK) && (llsi->STATUS & LLSI_STATUS_UNDFLIF_Msk))
-        u32IntFlag |= LLSI_UNDFL_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_UNDFL_INT_MASK) && (llsi->STATUS & LLSI_STATUS_UNDFLIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_UNDFL_INT_MASK;
+    }
 
     /* Check frame end interrupt flag */
-    if ((u32Mask & LLSI_FEND_INT_MASK) && (llsi->STATUS & LLSI_STATUS_FENDIF_Msk))
-        u32IntFlag |= LLSI_FEND_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_FEND_INT_MASK) && (llsi->STATUS & LLSI_STATUS_FENDIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_FEND_INT_MASK;
+    }
 
     /* Check reset command interrupt flag */
-    if ((u32Mask & LLSI_RSTC_INT_MASK) && (llsi->STATUS & LLSI_STATUS_RSTCIF_Msk))
-        u32IntFlag |= LLSI_RSTC_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_RSTC_INT_MASK) && (llsi->STATUS & LLSI_STATUS_RSTCIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_RSTC_INT_MASK;
+    }
 
     /* Check FIFO empty interrupt flag */
-    if ((u32Mask & LLSI_EMP_INT_MASK) && (llsi->STATUS & LLSI_STATUS_EMPIF_Msk))
-        u32IntFlag |= LLSI_EMP_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_EMP_INT_MASK) && (llsi->STATUS & LLSI_STATUS_EMPIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_EMP_INT_MASK;
+    }
 
     /* Check FIFO full interrupt flag */
-    if ((u32Mask & LLSI_FUL_INT_MASK) && (llsi->STATUS & LLSI_STATUS_FULIF_Msk))
-        u32IntFlag |= LLSI_FUL_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_FUL_INT_MASK) && (llsi->STATUS & LLSI_STATUS_FULIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_FUL_INT_MASK;
+    }
 
     /* Check TX FIFO threshold interrupt flag */
-    if ((u32Mask & LLSI_TXTH_INT_MASK) && (llsi->STATUS & LLSI_STATUS_TXTHIF_Msk))
-        u32IntFlag |= LLSI_TXTH_INT_MASK;
+    if ((u32Mask & (uint32_t)LLSI_TXTH_INT_MASK) && (llsi->STATUS & LLSI_STATUS_TXTHIF_Msk))
+    {
+        u32IntFlag |= (uint32_t)LLSI_TXTH_INT_MASK;
+    }
 
     return u32IntFlag;
 }
@@ -380,14 +478,20 @@ uint32_t LLSI_GetIntFlag(LLSI_T *llsi, uint32_t u32Mask)
   */
 void LLSI_ClearIntFlag(LLSI_T *llsi, uint32_t u32Mask)
 {
-    if (u32Mask & LLSI_UNDFL_INT_MASK)
+    if (u32Mask & (uint32_t)LLSI_UNDFL_INT_MASK)
+    {
         llsi->STATUS = LLSI_STATUS_UNDFLIF_Msk; /* Clear underflow interrupt flag */
+    }
 
-    if (u32Mask & LLSI_FEND_INT_MASK)
+    if (u32Mask & (uint32_t)LLSI_FEND_INT_MASK)
+    {
         llsi->STATUS = LLSI_STATUS_FENDIF_Msk; /* Clear frame end interrupt flag */
+    }
 
-    if (u32Mask & LLSI_RSTC_INT_MASK)
+    if (u32Mask & (uint32_t)LLSI_RSTC_INT_MASK)
+    {
         llsi->STATUS = LLSI_STATUS_RSTCIF_Msk; /* Clear reset command interrupt flag */
+    }
 }
 
 /** @} end of group LLSI_EXPORTED_FUNCTIONS */

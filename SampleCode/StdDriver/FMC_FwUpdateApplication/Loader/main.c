@@ -263,6 +263,8 @@ int32_t main(void)
 
             /* Remap to Bank1 to execute backup firmware */
             FMC_RemapBank(1);
+            /* Flush CACHE to ensure the CPU fetches updated instructions/data from the remapped bank */
+            CACHE_Flush();
             s_u32ExecBank = (uint32_t)((FMC->ISPSTS & FMC_ISPSTS_FBS_Msk) >> FMC_ISPSTS_FBS_Pos);
             printf("\n Bank%d Loader after remap  \n\n", s_u32ExecBank);
 

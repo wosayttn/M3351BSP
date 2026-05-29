@@ -72,7 +72,7 @@ extern "C"
 #define FMC_USER_CONFIG_17      (FMC_CONFIG_BASE + 0x84UL)              /*!< User Config 17 address             \hideinitializer */
 #define FMC_USER_CONFIG_18      (FMC_CONFIG_BASE + 0x88UL)              /*!< User Config 18 address             \hideinitializer */
 #define FMC_USER_CONFIG_CNT     19UL                                    /*!< Total User Config count            \hideinitializer */
-#define FMC_CONT_CONFIG_CNT     16
+#define FMC_CONT_CONFIG_CNT     16UL                                    /*!< Contiguous User Config count       \hideinitializer */
 #define FMC_SCRLOCK_BASE        (FMC_USER_CONFIG_11)                    /*!< Secure Region Lock base address    \hideinitializer */
 #define FMC_NSCBA_BASE          (FMC_USER_CONFIG_12)                    /*!< Non-Secure base address            \hideinitializer */
 #define FMC_ARLOCK_BASE         (FMC_USER_CONFIG_13)                    /*!< All Region Lock base address       \hideinitializer */
@@ -86,7 +86,7 @@ extern "C"
 
 #define FMC_FLASH_PAGE_SIZE     0x2000UL                                /*!< Flash Page Size (8K bytes)         \hideinitializer */
 #define FMC_VECMAP_SIZE         0x400UL                                 /*!< VECMAP Size (1024 bytes)           \hideinitializer */
-#define FMC_PAGE_ADDR_MASK      0xFFFFE000UL                            /*!< Flash page address mask            \hideinitializer */
+#define FMC_PAGE_ADDR_MASK      ((uint32_t)(~((uint32_t)FMC_FLASH_PAGE_SIZE - 1UL)))              /*!< Flash page address mask            \hideinitializer */
 #define FMC_APWPROT_BLOCK_SIZE  0x8000UL                                /*!< APWPROT block size (32K bytes)     \hideinitializer */
 #define FMC_LDWPROT_BLK_SIZE    0x2000UL                                /*!< LDWPROT block size (8K bytes)      \hideinitializer */
 #define FMC_DFWPROT_BLK_SIZE    0x2000UL                                /*!< DFWPROT block size (8K bytes)      \hideinitializer */
@@ -111,7 +111,6 @@ extern "C"
 #define FMC_ISPCMD_READ_CKS     0x0DUL          /*!< ISP Command: Read checksum             \hideinitializer */
 #define FMC_ISPCMD_PROGRAM      0x21UL          /*!< ISP Command: Write flash word          \hideinitializer */
 #define FMC_ISPCMD_PAGE_ERASE   0x22UL          /*!< ISP Command: Page Erase Flash          \hideinitializer */
-#define FMC_ISPCMD_BANK_ERASE   0x23UL          /*!< ISP Command: Erase Flash bank          \hideinitializer */
 #define FMC_ISPCMD_CFG_ERASE    0x24UL          /*!< ISP Command: Erase config word         \hideinitializer */
 #define FMC_ISPCMD_RUN_ALL1     0x28UL          /*!< ISP Command: Run all-one verification  \hideinitializer */
 #define FMC_ISPCMD_BANK_REMAP   0x2CUL          /*!< ISP Command: Bank Remap                \hideinitializer */
@@ -121,25 +120,36 @@ extern "C"
 #define FMC_ISPCMD_PROGRAM_64   0x61UL          /*!< ISP Command: Write double flash word   \hideinitializer */
 #define FMC_ISPCMD_READ_NO_ECC  0x60UL          /*!< ISP Command: Read double flash word    \hideinitializer */
 #define FMC_ISPCMD_PROGRAM_ECC  0x41UL          /*!< ISP Command: Write double flash word   \hideinitializer */
+/* FMC_ISPCMD_BANK_ERASE is is NOT supported on M3351. Use FMC_EraseBank() instead.                          */
 
 #define READ_ALLONE_YES         0xA11FFFFFUL    /*!< Check-all-one result is all one.       \hideinitializer */
 #define READ_ALLONE_NOT         0xA1100000UL    /*!< Check-all-one result is not all one.   \hideinitializer */
 #define READ_ALLONE_CMD_FAIL    0xFFFFFFFFUL    /*!< Check-all-one command failed.          \hideinitializer */
 
 /*---------------------------------------------------------------------------------------------------------*/
-/* FMC Time-out Handler Constant Definitions                                                               */
+/* FMC Timeout Handler Constant Definitions                                                                */
 /*---------------------------------------------------------------------------------------------------------*/
-#define FMC_TIMEOUT_READ        (SystemCoreClock >> 3)      /*!< Read command time-out 125 ms               \hideinitializer */
-#define FMC_TIMEOUT_WRITE       (SystemCoreClock >> 3)      /*!< Write command time-out 125 ms              \hideinitializer */
-#define FMC_TIMEOUT_ERASE       (SystemCoreClock >> 2)      /*!< Erase command time-out 250 ms              \hideinitializer */
-#define FMC_TIMEOUT_CHKSUM      (SystemCoreClock << 1)      /*!< Get checksum command time-out 2 s          \hideinitializer */
-#define FMC_TIMEOUT_CHKALLONE   (SystemCoreClock << 1)      /*!< Check-all-one command time-out 2 s         \hideinitializer */
+#define FMC_TIMEOUT_READ        (SystemCoreClock >> 3)      /*!< Read command timeout: 125 ms               \hideinitializer */
+#define FMC_TIMEOUT_WRITE       (SystemCoreClock >> 3)      /*!< Write command timeout: 125 ms              \hideinitializer */
+#define FMC_TIMEOUT_ERASE       (SystemCoreClock >> 2)      /*!< Erase command timeout: 250 ms              \hideinitializer */
+#define FMC_TIMEOUT_CHKSUM      (SystemCoreClock << 1)      /*!< Get checksum command timeout: 2 s          \hideinitializer */
+#define FMC_TIMEOUT_CHKALLONE   (SystemCoreClock << 1)      /*!< Check-all-one command timeout: 2 s         \hideinitializer */
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* FMC Error Code Definitions                                                                              */
+/*---------------------------------------------------------------------------------------------------------*/
 #define FMC_OK                  ( 0L)                       /*!< FMC operation OK                           \hideinitializer */
 #define FMC_ERR_FAIL            (-1L)                       /*!< FMC operation failed                       \hideinitializer */
 #define FMC_ERR_TIMEOUT         (-2L)                       /*!< FMC operation abort due to timeout error   \hideinitializer */
 #define FMC_ERR_ECC             (-3L)                       /*!< FMC read has ecc error                     \hideinitializer */
-#define FMC_ERR_INVALID_PARAM   (-4L)                       /*!< FMC read has ecc error                     \hideinitializer */
-#define FMC_ERR_XOM_INACTIVE    (-5L)                       /*!< FMC read has ecc error                     \hideinitializer */
+#define FMC_ERR_INVALID_PARAM   (-4L)                       /*!< FMC invalid parameter error                \hideinitializer */
+#define FMC_ERR_XOM_INACTIVE    (-5L)                       /*!< FMC XOM inactive error                     \hideinitializer */
+#define FMC_ERR_ERASE_FAILED    (-6L)                       /*!< FMC erase failed                           \hideinitializer */
+
+/*---------------------------------------------------------------------------------------------------------*/
+/* FMC backward compatible definitions                                                                     */
+/*---------------------------------------------------------------------------------------------------------*/
+#define FMC_Erase_Bank          FMC_EraseBank               /*!< FMC erase bank function                    \hideinitializer */
 
 /** @} end of group FMC_EXPORTED_CONSTANTS */
 
@@ -197,7 +207,7 @@ extern "C"
  * @brief      Disable LDROM Update Function
  * @param      None
  * @return     None
- * @details    This function will set ISPEN bit of FMC_ISPCTL control register to disable LDROM update function.
+ * @details    This function will clear LDUEN bit of FMC_ISPCTL control register to disable LDROM update function.
  *
  */
 #define FMC_DISABLE_LD_UPDATE()     (FMC->ISPCTL &= ~FMC_ISPCTL_LDUEN_Msk)                      /*!< Disable LDROM update       \hideinitializer */
@@ -215,7 +225,7 @@ extern "C"
  * @brief      Disable Data Flash Update Function
  * @param      None
  * @return     None
- * @details    This function will set DFUEN bit of FMC_ISPCTL control register to disable Data Flash update function.
+ * @details    This function will clear DFUEN bit of FMC_ISPCTL control register to disable Data Flash update function.
  */
 #define FMC_DISABLE_DF_UPDATE()     (FMC->ISPCTL &= ~FMC_ISPCTL_DFUEN_Msk)                      /*!< Disable Data Flash update  \hideinitializer */
 
@@ -524,36 +534,25 @@ __STATIC_INLINE void FMC_DisableINT(void)
 }
 
 /**
-  * @brief       Get current vector mapping address.
-  * @param       None
-  * @return      The current vector mapping address.
-  * @details     To get VECMAP value which is the page address for remapping to vector page (0x0).
-  */
-__STATIC_INLINE uint32_t FMC_GetVECMAP(void)
-{
-    return (FMC->ISPSTS & FMC_ISPSTS_VECMAP_Msk);
-}
-
-/**
   * @brief    Read company ID
   * @param    None
   * @return   The company ID (32-bit). 0xFFFFFFFF means read failed.
   * @details  The company ID of Nuvoton is fixed to be 0x530000DA
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           FMC_ERR_TIMEOUT  Read time-out
+  *           FMC_ERR_TIMEOUT: Read timed out
   */
 __STATIC_INLINE uint32_t FMC_ReadCID(void)
 {
     int32_t i32TimeOutCnt = FMC_TIMEOUT_READ;
 
-    g_FMC_i32ErrCode = 0;
+    g_FMC_i32ErrCode = FMC_OK;
 
-    FMC->ISPCMD = FMC_ISPCMD_READ_CID;           /* Set ISP Command Code */
-    FMC->ISPADDR = 0x0U;                         /* Must keep 0x0 when read CID */
-    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;          /* Trigger to start ISP procedure */
+    FMC->ISPCMD  = FMC_ISPCMD_READ_CID;         /* Set ISP Command Code */
+    FMC->ISPADDR = 0x0U;                        /* Must keep 0x0 when read CID */
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;        /* Trigger to start ISP procedure */
 
-    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)   /* Waiting for ISP Done */
+    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
     {
         if (i32TimeOutCnt-- <= 0)
         {
@@ -572,23 +571,23 @@ __STATIC_INLINE uint32_t FMC_ReadCID(void)
   * @details  This function is used to read product ID.
   *
   * @note     Global error code g_FMC_i32ErrCode
-  *           -1  Read time-out
+  *           FMC_ERR_TIMEOUT: Read timed out
   */
 __STATIC_INLINE uint32_t FMC_ReadPID(void)
 {
     int32_t i32TimeOutCnt = FMC_TIMEOUT_READ;
 
-    g_FMC_i32ErrCode = 0;
+    g_FMC_i32ErrCode = FMC_OK;
 
-    FMC->ISPCMD = FMC_ISPCMD_READ_DID;          /* Set ISP Command Code */
+    FMC->ISPCMD  = FMC_ISPCMD_READ_DID;         /* Set ISP Command Code */
     FMC->ISPADDR = 0x04U;                       /* Must keep 0x4 when read PID */
-    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;         /* Trigger to start ISP procedure */
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;        /* Trigger to start ISP procedure */
 
     while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
     {
         if (i32TimeOutCnt-- <= 0)
         {
-            g_FMC_i32ErrCode = -1;
+            g_FMC_i32ErrCode = FMC_ERR_TIMEOUT;
             return 0xFFFFFFFFU;
         }
     }
@@ -603,18 +602,18 @@ __STATIC_INLINE uint32_t FMC_ReadPID(void)
  * @details     To read out 96-bit Unique ID.
  *
  * @note        Global error code g_FMC_i32ErrCode
- *              FMC_ERR_TIMEOUT  Read time-out
+ *              FMC_ERR_TIMEOUT: Read timed out
  */
 __STATIC_INLINE uint32_t FMC_ReadUID(uint8_t u8Index)
 {
     int32_t i32TimeOutCnt = FMC_TIMEOUT_READ;
 
-    g_FMC_i32ErrCode = 0;
+    g_FMC_i32ErrCode = FMC_OK;
 
-    FMC->ISPCMD = FMC_ISPCMD_READ_UID;
+    FMC->ISPCMD  = FMC_ISPCMD_READ_UID;
     FMC->ISPADDR = ((uint32_t)u8Index << 2U);
-    FMC->ISPDAT = 0U;
-    FMC->ISPTRG = 0x1U;
+    FMC->ISPDAT  = 0U;
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;
 
     while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
     {
@@ -635,19 +634,50 @@ __STATIC_INLINE uint32_t FMC_ReadUID(uint8_t u8Index)
   * @details    This function is used to read unique chip ID (UCID). 0xFFFFFFFF means read failed.
   *
   * @note       Global error code g_FMC_i32ErrCode
-  *             FMC_ERR_TIMEOUT  Read time-out
+  *             FMC_ERR_TIMEOUT: Read timed out
   */
 __STATIC_INLINE uint32_t FMC_ReadUCID(uint32_t u32Index)
 {
     int32_t i32TimeOutCnt = FMC_TIMEOUT_READ;
 
-    g_FMC_i32ErrCode = 0;
+    g_FMC_i32ErrCode = FMC_OK;
 
-    FMC->ISPCMD = FMC_ISPCMD_READ_UID;            /* Set ISP Command Code */
-    FMC->ISPADDR = (0x04U * u32Index) + 0x10U;    /* The UCID is at offset 0x10 with word alignment. */
-    FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;           /* Trigger to start ISP procedure */
+    FMC->ISPCMD  = FMC_ISPCMD_READ_UID;         /* Set ISP Command Code */
+    FMC->ISPADDR = (0x04U * u32Index) + 0x10U;  /* The UCID is at offset 0x10 with word alignment. */
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;        /* Trigger to start ISP procedure */
 
-    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)    /* Waiting for ISP Done */
+    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
+    {
+        if (i32TimeOutCnt-- <= 0)
+        {
+            g_FMC_i32ErrCode = FMC_ERR_TIMEOUT;
+            return 0xFFFFFFFFU;
+        }
+    }
+
+    return FMC->ISPDAT;
+}
+
+/**
+  * @brief    Read device ID
+  * @param    None
+  * @return   The device ID (32-bit). 0xFFFFFFFF means read failed.
+  * @details  This function is used to read device ID.
+  *
+  * @note     Global error code g_FMC_i32ErrCode
+  *           FMC_ERR_TIMEOUT: Read timed out
+  */
+__STATIC_INLINE uint32_t FMC_ReadDID(void)
+{
+    int32_t i32TimeOutCnt = FMC_TIMEOUT_READ;
+
+    g_FMC_i32ErrCode = FMC_OK;
+
+    FMC->ISPCMD  = FMC_ISPCMD_READ_DID;         /* Set ISP Command Code */
+    FMC->ISPADDR = 0x00U;                       /* Must keep 0x0 when read DID */
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;        /* Trigger to start ISP procedure */
+
+    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
     {
         if (i32TimeOutCnt-- <= 0)
         {
@@ -661,35 +691,66 @@ __STATIC_INLINE uint32_t FMC_ReadUCID(uint32_t u32Index)
 
 /**
  * @brief       Set vector mapping address
- * @param[in]   u32PageAddr  The page address to remap to address 0x0. The address must be page alignment.
- * @return      To set VECMAP to remap specified page address to 0x0.
- * @details     This function is used to set VECMAP to map specified page to vector page (0x0).
- * @retval      0   Success
- * @retval      -1  Failed
+ * @param[in]   u32PageAddr  The page address to remap to FMC_APROM_BASE. The address must be page alignment.
+ * @details     This function is used to set VECMAP to remap specified page address to FMC_APROM_BASE.
+ * @retval      FMC_OK: Success
+ * @retval      FMC_ERR_TIMEOUT: Command timeout
  *
  * @note        Global error code g_FMC_i32ErrCode
- *              FMC_ERR_TIMEOUT  Command time-out
+ *              FMC_ERR_TIMEOUT: Command timeout
  */
 __STATIC_INLINE int32_t FMC_SetVectorPageAddr(uint32_t u32PageAddr)
 {
     int32_t i32TimeOutCnt = FMC_TIMEOUT_WRITE;
 
-    g_FMC_i32ErrCode = 0;
+    g_FMC_i32ErrCode = FMC_OK;
 
-    FMC->ISPCMD = FMC_ISPCMD_VECMAP;  /* Set ISP Command Code */
-    FMC->ISPADDR = u32PageAddr;       /* The address of specified page which will be map to address 0x0. It must be page alignment. */
-    FMC->ISPTRG = 0x1U;               /* Trigger to start ISP procedure */
+    FMC->ISPCMD  = FMC_ISPCMD_VECMAP;           /* Set ISP Command Code */
+    FMC->ISPADDR = u32PageAddr;                 /* The address of specified page which will be map to address 0x0. It must be page alignment. */
+    FMC->ISPTRG  = FMC_ISPTRG_ISPGO_Msk;        /* Trigger to start ISP procedure */
 
-    while (FMC->ISPTRG)               /* Waiting for ISP Done */
+    while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk)  /* Waiting for ISP Done */
     {
         if (i32TimeOutCnt-- <= 0)
         {
             g_FMC_i32ErrCode = FMC_ERR_TIMEOUT;
-            return -1;
+            return FMC_ERR_TIMEOUT;
         }
     }
 
-    return 0;
+    return FMC_OK;
+}
+
+/**
+  * @brief       Get current vector mapping address.
+  * @param       None
+  * @return      The current vector mapping address.
+  * @details     To get VECMAP value which is the page address for remapping to vector page (FMC_APROM_BASE).
+  */
+__STATIC_INLINE uint32_t FMC_GetVECMAP(void)
+{
+    return (FMC->ISPSTS & FMC_ISPSTS_VECMAP_Msk);
+}
+
+/**
+ * @brief       Get selected flash bank index.
+ * @param       None
+ * @return      The selected flash bank index. 0: Bank0, 1: Bank1.
+ */
+__STATIC_INLINE uint32_t FMC_GetBankIdx(void)
+{
+    return ((FMC->ISPSTS & FMC_ISPSTS_FBS_Msk) >> FMC_ISPSTS_FBS_Pos);
+}
+
+/**
+ * @brief       Check if bank remap function is enabled or not.
+ * @param       None
+ * @return      0: Bank remap function is disabled.
+ *              1: Bank remap function is enabled.
+ */
+__STATIC_INLINE uint32_t FMC_IsBankRemapEnabled(void)
+{
+    return ((FMC->ISPSTS & FMC_ISPSTS_MIRBOUND_Msk) >> FMC_ISPSTS_MIRBOUND_Pos);
 }
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -697,6 +758,7 @@ __STATIC_INLINE int32_t FMC_SetVectorPageAddr(uint32_t u32PageAddr)
 /*---------------------------------------------------------------------------------------------------------*/
 extern void     FMC_Open(void);
 extern void     FMC_Close(void);
+extern int32_t  FMC_GetBootSource(void);
 extern int32_t  FMC_ConfigXOM(uint32_t u32XomNum, uint32_t u32XomBase, uint8_t u8XomPage);
 extern int32_t  FMC_Erase(uint32_t u32PageAddr);
 extern int32_t  FMC_EraseXOM(uint32_t u32XomNum);
@@ -714,6 +776,7 @@ extern int32_t  FMC_EraseConfig(uint32_t u32ConfigAddr);
 extern uint32_t FMC_GetChkSum(uint32_t u32Addr, uint32_t u32Count);
 extern uint32_t FMC_CheckAllOne(uint32_t u32Addr, uint32_t u32Count);
 extern int32_t  FMC_RemapBank(uint32_t u32Bank);
+extern int32_t  FMC_EraseBank(uint32_t u32BankAddr);
 
 /** @} end of group FMC_EXPORTED_FUNCTIONS */
 /** @} end of group FMC_Driver */

@@ -13,6 +13,17 @@
 #include "led_control.h"
 #include "led_gen2_control.h"
 
+void LLSI0_IRQHandler(void);
+void LLSI1_IRQHandler(void);
+void LLSI2_IRQHandler(void);
+void LLSI3_IRQHandler(void);
+void LLSI4_IRQHandler(void);
+void LLSI5_IRQHandler(void);
+void LLSI6_IRQHandler(void);
+void LLSI7_IRQHandler(void);
+void LLSI8_IRQHandler(void);
+void LLSI9_IRQHandler(void);
+
 uint32_t TimeCounterFrameUpdate = 0;
 uint8_t LED_Frame_Update_flag = 0;
 
@@ -45,43 +56,43 @@ const uint32_t LED_Data_Array_Size[TOTAL_LED_AREA] =
 
 /* Initial Strip1 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T StripA_LEDSetting = {0, 0, cStripA_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                        1, 1, 0, FUNC_Static, StripALEDData, 0, 0, 0, Music_POP, cStripA_LED * 3, 0, eColorRed, 0
+                                                                        1, 1, 0, FUNC_Static, StripALEDData, 0, 0, 0, Music_POP, cStripA_LED * 3U, 0U, eColorRed, 0U
                                                                        };
 /* Initial Strip2 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T StripB_LEDSetting = {0, 0, cStripB_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                        1, 1, 0, FUNC_Static, StripBLEDData, 0, 0, 0, Music_POP, cStripB_LED * 3, 1, eColorRed, 0
+                                                                        1, 1, 0, FUNC_Static, StripBLEDData, 0, 0, 0, Music_POP, cStripB_LED * 3U, 1U, eColorRed, 0U
                                                                        };
 /* Initial Strip3 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN1_LEDSetting = {0, 0, cFAN1_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN1LEDData, 0, 0, 0, Music_POP, cFAN1_LED * 3, 2, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN1LEDData, 0, 0, 0, Music_POP, cFAN1_LED * 3U, 2U, eColorRed, 0U
                                                                      };
 /* Initial Strip4 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN2_LEDSetting = {0, 0, cFAN2_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN2LEDData, 0, 0, 0, Music_POP, cFAN2_LED * 3, 3, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN2LEDData, 0, 0, 0, Music_POP, cFAN2_LED * 3U, 3U, eColorRed, 0U
                                                                      };
 /* Initial Strip5 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN3_LEDSetting = {0, 0, cFAN3_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN3LEDData, 0, 0, 0, Music_POP, cFAN3_LED * 3, 4, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN3LEDData, 0, 0, 0, Music_POP, cFAN3_LED * 3U, 4U, eColorRed, 0U
                                                                      };
 /* Initial Strip6 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN4_LEDSetting = {0, 0, cFAN4_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN4LEDData, 0, 0, 0, Music_POP, cFAN4_LED * 3, 5, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN4LEDData, 0, 0, 0, Music_POP, cFAN4_LED * 3U, 5U, eColorRed, 0U
                                                                      };
 /* Initial Strip7 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN5_LEDSetting = {0, 0, cFAN5_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN5LEDData, 0, 0, 0, Music_POP, cFAN5_LED * 3, 6, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN5LEDData, 0, 0, 0, Music_POP, cFAN5_LED * 3U, 6U, eColorRed, 0U
                                                                      };
 /* Initial Strip8 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN6_LEDSetting = {0, 0, cFAN6_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN6LEDData, 0, 0, 0, Music_POP, cFAN6_LED * 3, 7, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN6LEDData, 0, 0, 0, Music_POP, cFAN6_LED * 3U, 7U, eColorRed, 0U
                                                                      };
 /* Initial Strip9 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN7_LEDSetting = {0, 0, cFAN7_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN7LEDData, 0, 0, 0, Music_POP, cFAN7_LED * 3, 8, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN7LEDData, 0, 0, 0, Music_POP, cFAN7_LED * 3U, 8U, eColorRed, 0U
                                                                      };
 /* Initial Strip10 Setting */
 __attribute__((aligned(4))) volatile LED_Setting_T FAN8_LEDSetting = {0, 0, cFAN8_LED, 1, 255, 0, 0, 0xFF, 0, Dir_Forward, Type_GRB,
-                                                                      1, 1, 0, FUNC_Static, FAN8LEDData, 0, 0, 0, Music_POP, cFAN8_LED * 3, 9, eColorRed, 0
+                                                                      1, 1, 0, FUNC_Static, FAN8LEDData, 0, 0, 0, Music_POP, cFAN8_LED * 3U, 9U, eColorRed, 0U
                                                                      };
 
 volatile LLSI_T *LLSI_Port_Mapping[TOTAL_LED_AREA] = {LLSI0, LLSI1, LLSI2, LLSI3, LLSI4, LLSI5, LLSI6, LLSI7, LLSI8, LLSI9};                         // The sequence should match to number of LLSI_Num
@@ -109,29 +120,13 @@ volatile LED_Setting_T *PDMA_Mapping[TOTAL_LED_AREA] = {&StripA_LEDSetting, &Str
                                                         &FAN4_LEDSetting, &FAN5_LEDSetting, &FAN6_LEDSetting, &FAN7_LEDSetting, &FAN8_LEDSetting
                                                        };    // The sequence should match to number of LLSI_Num
 
-#define BreathingArraySize 150
-const uint8_t BreathingBright[BreathingArraySize]   = {  0,   0,   0,   0,   1,   1,   2,   3,   4,   5,
-                                                         7,   8,  10,  11,  13,  15,  17,  19,  21,  23,
-                                                         25,  28,  30,  32,  35,  37,  40,  42,  45,  47,
-                                                         50,  52,  55,  57,  60,  62,  65,  67,  70,  72,
-                                                         75,  77,  79,  81,  83,  85,  87,  89,  90,  92,
-                                                         93,  95,  96,  97,  98,  99,  99, 100, 100, 100,
-                                                         100, 100, 100, 100, 100,  99,  99,  98,  97,  96,
-                                                         95,  93,  92,  90,  89,  87,  85,  83,  81,  79,
-                                                         77,  75,  72,  70,  67,  65,  62,  60,  57,  55,
-                                                         52,  50,  47,  45,  42,  40,  37,  34,  32,  30,
-                                                         28,  25,  23,  21,  19,  17,  15,  13,  11,  10,
-                                                         8,   7,   5,   4,   3,   2,   1,   1,   0,   0,
-                                                         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-                                                         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-                                                         0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-                                                      };
+#define BreathingArraySize 150U
 
 /* Number of LED for each mode */
-#define cMeteor_LED 4
+#define cMeteor_LED 4U
 
-#define RainbowSize 8
-const uint8_t RainbowColor[RainbowSize][3]    // (R, G, B)
+#define RainbowSize 8U
+static const uint8_t RainbowColor[RainbowSize][3]    // (R, G, B)
 = {{255,   0,   0},   // Red
     {255,  85,   0},   // Orange
     {255, 255,   0},   // Yellow
@@ -145,15 +140,27 @@ const uint8_t RainbowColor[RainbowSize][3]    // (R, G, B)
 void LLSI_Initial(uint8_t port)
 {
     uint32_t module;
+    const int32_t llsi_irqn = (int32_t)LLSI0_IRQn + (int32_t)port;
     S_LLSI_CONFIG_T sConfig;
+    static const uint32_t llsi_modules[TOTAL_LED_AREA] =
+    {
+        LLSI0_MODULE,
+        LLSI1_MODULE,
+        LLSI2_MODULE,
+        LLSI3_MODULE,
+        LLSI4_MODULE,
+        LLSI5_MODULE,
+        LLSI6_MODULE,
+        LLSI7_MODULE,
+        LLSI8_MODULE,
+        LLSI9_MODULE
+    };
 
     /* Unlock protected registers */
     SYS_UnlockReg();
 
     /* Enable module clock */
-    module = (MODULE_APBCLK_ENC(3UL) | MODULE_IP_EN_Pos_ENC(CLK_APBCLK2_LLSI0CKEN_Pos + port) | \
-              MODULE_CLKSEL_ENC(NA) | MODULE_CLKSEL_Msk_ENC(NA) | MODULE_CLKSEL_Pos_ENC(NA) | \
-              MODULE_CLKDIV_ENC(NA) | MODULE_CLKDIV_Msk_ENC(NA) | MODULE_CLKDIV_Pos_ENC(NA));
+    module = llsi_modules[port];
     CLK_EnableModuleClock(module);
 
     /*---------------------------------------------------------------------------------------------------------*/
@@ -161,7 +168,7 @@ void LLSI_Initial(uint8_t port)
     /*---------------------------------------------------------------------------------------------------------*/
     /* Set LLSI multi-function pin */
     *(uint32_t *)(SYS_BASE + LED_LLSI_IO_Setting[port].IO_MFP_OFFSET) =
-        (*(uint32_t *)(SYS_BASE + LED_LLSI_IO_Setting[port].IO_MFP_OFFSET) & (~(0xF << (LED_LLSI_IO_Setting[port].IO_Number * 4)))) | \
+        (*(uint32_t *)(SYS_BASE + LED_LLSI_IO_Setting[port].IO_MFP_OFFSET) & (~(0xFUL << ((uint32_t)LED_LLSI_IO_Setting[port].IO_Number * 4U)))) | \
         LED_LLSI_IO_Setting[port].IO_LLSI_MSK;
 
     /* Set LLSI configuration */
@@ -177,8 +184,13 @@ void LLSI_Initial(uint8_t port)
     LLSI_OpenbyConfig((LLSI_T *)LLSI_Port_Mapping[port], &sConfig);
 
     /* Set LLSI RGB format */
-    if (PDMA_Mapping[port]->LED_Type == Type_RGB)
-        LLSI_SET_RGB_FORMAT((LLSI_T *)(PERIPH_BASE + 0x1000 * (PDMA_Mapping[port]->LLSI_Num % 2) + 0x88000 + 0x200 * (PDMA_Mapping[port]->LLSI_Num / 2)));
+    if (PDMA_Mapping[port]->LED_Type == (uint8_t)Type_RGB)
+    {
+        LLSI_SET_RGB_FORMAT((LLSI_T *)(PERIPH_BASE +
+                                       (0x1000UL * (PDMA_Mapping[port]->LLSI_Num % 2U)) +
+                                       0x88000UL +
+                                       (0x200UL * (PDMA_Mapping[port]->LLSI_Num / 2U))));
+    }
 
     /* Enable reset command function */
     LLSI_ENABLE_RESET_COMMAND(LLSI_Port_Mapping[port]);
@@ -187,10 +199,10 @@ void LLSI_Initial(uint8_t port)
     LLSI_EnableInt((LLSI_T *)LLSI_Port_Mapping[port], LLSI_RSTC_INT_MASK);
 
     /* Enable NVIC for LLSI */
-    NVIC_EnableIRQ((IRQn_Type)(LLSI0_IRQn + port));
+    NVIC_EnableIRQ((IRQn_Type)llsi_irqn);
 
     /* Change interrupt priority to normal */
-    NVIC_SetPriority((IRQn_Type)(LLSI0_IRQn + port), INT_PRIORITY_HIGH);
+    NVIC_SetPriority((IRQn_Type)llsi_irqn, INT_PRIORITY_HIGH);
 
     /* Lock protected registers */
     SYS_LockReg();
@@ -205,7 +217,7 @@ void PDMA_Initial(uint8_t port)
     SYS_UnlockReg();
 
     /* Open Channel */
-    PDMA_Open(PDMA0, 1 << port);
+    PDMA_Open(PDMA0, 1UL << (uint32_t)port);
 
     /* PDMA Setting for LLSI */
     /* Transfer type is single transfer */
@@ -220,7 +232,8 @@ void PDMA_Initial(uint8_t port)
 
 void LLSI_Underflow_Handler(uint8_t target_port)
 {
-    LLSI_T *target_LLSI = (LLSI_T *)(LLSI0_BASE + 0x1000 * (target_port & 0x1) + 0x200 * (target_port >> 1));
+    LLSI_T *target_LLSI = (LLSI_T *)LLSI_Port_Mapping[target_port];
+    uint32_t pdma_mask;
 
     /* Check underflow flag */
     if (target_LLSI->STATUS & LLSI_STATUS_UNDFLIF_Msk)
@@ -231,18 +244,25 @@ void LLSI_Underflow_Handler(uint8_t target_port)
         /* Disable LLSI */
         LLSI_DISABLE(target_LLSI);
 
-        while (target_LLSI->CTL & LLSI_CTL_LLSIEN_Msk);
+        while (target_LLSI->CTL & LLSI_CTL_LLSIEN_Msk)
+        {
+        }
 
         /* Clear underflow flag */
         target_LLSI->STATUS = LLSI_STATUS_UNDFLIF_Msk;
 
         /* Reset PDMA */
         if (LED_GEN2_MAX_SUPPORT_PORT > target_port)
+        {
             LED_Gen2_Port_Setting[target_port].LLSI_INT_Count = 0;
+        }
 
-        PDMA0->CHRST = 1 << (target_port);
+        pdma_mask = 1UL << (uint32_t)target_port;
+        PDMA0->CHRST = pdma_mask;
 
-        while (PDMA0->CHCTL & (1 << target_port));
+        while ((PDMA0->CHCTL & pdma_mask) != 0U)
+        {
+        }
 
         //        PDMA_SetREQSEL(PDMA0, target_port);
         PDMA0->DSCT[target_port].CTL &= ~PDMA_DSCT_CTL_OPMODE_Msk;
@@ -252,7 +272,8 @@ void LLSI_Underflow_Handler(uint8_t target_port)
         {
             if (LED_Gen2_Port_Setting[target_port].Use_Gen2 == TRUE)
             {
-                uint8_t i;
+                uint32_t i;
+                const uint32_t gen2_desc_count = (uint32_t)LED_GEN2_MAX_STRIP_COUNT * (uint32_t)LED_GEN2_PDMA_DESC_NUM;
 
                 //                PDMA_SetREQSEL(PDMA0, target_port);
 
@@ -260,18 +281,22 @@ void LLSI_Underflow_Handler(uint8_t target_port)
                 PDMA0->DSCT[target_port].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][0];// - (PDMA0->SCATBA);
 
                 /* Even descriptor table configuration */
-                for (i = 0; i < (LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM); i += 2)
+                for (i = 0U; i < gen2_desc_count; i += 2U)
+                {
                     /* Configure next descriptor table address */
-                    LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1]; // - (PDMA0->SCATBA); /* next descriptor table is table i+1 */
+                    LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1U];
+                }
 
                 /* Odd descriptor table configuration */
-                for (i = 1; i < (LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM - 1); i += 2)
+                for (i = 1U; i < (gen2_desc_count - 1U); i += 2U)
+                {
                     /* Configure next descriptor table address */
-                    LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1]; // - (PDMA0->SCATBA); /* next descriptor table is table i+1 */
+                    LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1U];
+                }
 
                 /* Last descriptor table configuration */
                 /* Configure next descriptor table address */
-                LED_Gen2_PDMA_DESC[target_port][LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM - 1].NEXT = 0; /* No next operation table. No effect in basic mode */
+                LED_Gen2_PDMA_DESC[target_port][gen2_desc_count - 1U].NEXT = 0U; /* No next operation table. No effect in basic mode */
             }
             else
             {
@@ -284,7 +309,7 @@ void LLSI_Underflow_Handler(uint8_t target_port)
         }
 
         /* Eanble PDMA */
-        PDMA0->CHCTL |= (1 << target_port);
+        PDMA0->CHCTL |= (1UL << (uint32_t)target_port);
 
         /* Write dummy data */
         LLSI_ENABLE(target_LLSI);
@@ -296,50 +321,57 @@ void LLSI_Underflow_Handler(uint8_t target_port)
 
 void Polling_PDMA_Abort(void)
 {
-    uint8_t target_port, target_port_tmp;
-    LLSI_T *target_LLSI;
-
     /* Check abort flag */
     if (PDMA0->INTSTS & PDMA_INTSTS_ABTIF_Msk)
     {
         /* Check which PDMA channel aborts */
-        for (target_port_tmp = 0; target_port_tmp < TOTAL_LED_AREA; target_port_tmp++)
+        for (uint8_t target_port_tmp = 0U; target_port_tmp < TOTAL_LED_AREA; target_port_tmp++)
         {
-            if (PDMA0->ABTSTS & (1 << target_port_tmp))
-            {
-                for (target_port = target_port_tmp; target_port < LED_GEN2_MAX_STRIP_COUNT; target_port++)
-                {
-                    /* Set target LLSI port */
-                    target_LLSI = (LLSI_T *)(LLSI0_BASE + 0x1000 * (target_port & 0x1) + 0x200 * (target_port >> 1));
+            uint32_t pdma_mask = 1UL << (uint32_t)target_port_tmp;
 
+            if ((PDMA0->ABTSTS & pdma_mask) != 0U)
+            {
+                for (uint8_t target_port = target_port_tmp; target_port < LED_GEN2_MAX_STRIP_COUNT; target_port++)
+                {
+                    LLSI_T *target_LLSI = (LLSI_T *)LLSI_Port_Mapping[target_port];
+
+                    /* Set target LLSI port */
                     /* Set LLSI to SW mode */
                     LLSI_SET_SW_MODE(target_LLSI);
 
                     /* Disable LLSI */
                     LLSI_DISABLE(target_LLSI);
 
-                    while (target_LLSI->CTL & LLSI_CTL_LLSIEN_Msk);
+                    while (target_LLSI->CTL & LLSI_CTL_LLSIEN_Msk)
+                    {
+                    }
 
                     /* Reset PDMA */
                     if (LED_GEN2_MAX_SUPPORT_PORT > target_port)
+                    {
                         LED_Gen2_Port_Setting[target_port].LLSI_INT_Count = 0;
+                    }
 
-                    PDMA0->CHRST = 1 << (target_port);
+                    pdma_mask = 1UL << (uint32_t)target_port;
+                    PDMA0->CHRST = pdma_mask;
 
-                    while (PDMA0->CHCTL & (1 << target_port));
+                    while ((PDMA0->CHCTL & pdma_mask) != 0U)
+                    {
+                    }
 
                     //                    PDMA_SetREQSEL(PDMA0, target_port);
                     PDMA0->DSCT[target_port].CTL &= ~PDMA_DSCT_CTL_OPMODE_Msk;
 
                     /* Clear abort flag */
-                    PDMA0->ABTSTS = (1 << target_port);
+                    PDMA0->ABTSTS = pdma_mask;
 
                     /* Set PDMA setting */
                     if (LED_GEN2_MAX_SUPPORT_PORT > target_port)
                     {
                         if (LED_Gen2_Port_Setting[target_port].Use_Gen2 == TRUE)
                         {
-                            uint8_t i;
+                            uint32_t i;
+                            const uint32_t gen2_desc_count = (uint32_t)LED_GEN2_MAX_STRIP_COUNT * (uint32_t)LED_GEN2_PDMA_DESC_NUM;
 
                             //                            PDMA_SetREQSEL(PDMA0, target_port);
 
@@ -347,18 +379,22 @@ void Polling_PDMA_Abort(void)
                             PDMA0->DSCT[target_port].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][0];// - (PDMA0->SCATBA);
 
                             /* Even descriptor table configuration */
-                            for (i = 0; i < (LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM); i += 2)
+                            for (i = 0U; i < gen2_desc_count; i += 2U)
+                            {
                                 /* Configure next descriptor table address */
-                                LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1]; // - (PDMA0->SCATBA); /* next descriptor table is table i+1 */
+                                LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1U];
+                            }
 
                             /* Odd descriptor table configuration */
-                            for (i = 1; i < (LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM - 1); i += 2)
+                            for (i = 1U; i < (gen2_desc_count - 1U); i += 2U)
+                            {
                                 /* Configure next descriptor table address */
-                                LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1]; // - (PDMA0->SCATBA); /* next descriptor table is table i+1 */
+                                LED_Gen2_PDMA_DESC[target_port][i].NEXT = (uint32_t)&LED_Gen2_PDMA_DESC[target_port][i + 1U];
+                            }
 
                             /* Last descriptor table configuration */
                             /* Configure next descriptor table address */
-                            LED_Gen2_PDMA_DESC[target_port][LED_GEN2_MAX_STRIP_COUNT * LED_GEN2_PDMA_DESC_NUM - 1].NEXT = 0; /* No next operation table. No effect in basic mode */
+                            LED_Gen2_PDMA_DESC[target_port][gen2_desc_count - 1U].NEXT = 0U; /* No next operation table. No effect in basic mode */
                         }
                         else
                         {
@@ -371,7 +407,7 @@ void Polling_PDMA_Abort(void)
                     }
 
                     /* Eanble PDMA */
-                    PDMA0->CHCTL |= (1 << target_port);
+                    PDMA0->CHCTL |= (1UL << (uint32_t)target_port);
 
                     /* Write dummy data */
                     LLSI_ENABLE(target_LLSI);
@@ -388,11 +424,11 @@ void LLSI0_IRQHandler(void)
 {
     if (!PDMA_Mapping[0]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[0].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[0].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[0].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[0].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[0].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[0]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI0);
@@ -416,11 +452,11 @@ void LLSI1_IRQHandler(void)
 {
     if (!PDMA_Mapping[1]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[1].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[1].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[1].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[1].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[1].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[1]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI1);
@@ -444,11 +480,11 @@ void LLSI2_IRQHandler(void)
 {
     if (!PDMA_Mapping[2]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[2].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[2].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[2].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[2].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[2].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[2]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI2);
@@ -472,11 +508,11 @@ void LLSI3_IRQHandler(void)
 {
     if (!PDMA_Mapping[3]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[3].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[3].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[3].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[3].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[3].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[3]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI3);
@@ -500,11 +536,11 @@ void LLSI4_IRQHandler(void)
 {
     if (!PDMA_Mapping[4]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[4].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[4].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[4].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[4].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[4].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[4]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI4);
@@ -528,11 +564,11 @@ void LLSI5_IRQHandler(void)
 {
     if (!PDMA_Mapping[5]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[5].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[5].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[5].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[5].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[5].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[5]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI5);
@@ -556,11 +592,11 @@ void LLSI6_IRQHandler(void)
 {
     if (!PDMA_Mapping[6]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[6].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[6].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[6].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[6].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[6].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[6]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI6);
@@ -584,11 +620,11 @@ void LLSI7_IRQHandler(void)
 {
     if (!PDMA_Mapping[7]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[7].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[7].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[7].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[7].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[7].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[7]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI7);
@@ -612,11 +648,11 @@ void LLSI8_IRQHandler(void)
 {
     if (!PDMA_Mapping[8]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[8].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[8].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[8].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[8].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[8].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[8]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI8);
@@ -640,11 +676,11 @@ void LLSI9_IRQHandler(void)
 {
     if (!PDMA_Mapping[9]->fPDMA_Done)
     {
-        if (LED_Gen2_Port_Setting[9].LLSI_INT_Count > 0)
+        if (LED_Gen2_Port_Setting[9].LLSI_INT_Count > 0U)
         {
             LED_Gen2_Port_Setting[9].LLSI_INT_Count--;
 
-            if (LED_Gen2_Port_Setting[9].LLSI_INT_Count == 0)
+            if (LED_Gen2_Port_Setting[9].LLSI_INT_Count == 0U)
             {
                 PDMA_Mapping[9]->fPDMA_Done = 1;
                 LLSI_SET_SW_MODE(LLSI9);
@@ -664,47 +700,78 @@ void LLSI9_IRQHandler(void)
     LLSI_Underflow_Handler(9);
 }
 
+static uint8_t LED_GetColorComponent(const volatile struct LED_Setting_Tag *led_setting, uint32_t index)
+{
+    uint8_t color;
+
+    if (index == 0U)
+    {
+        color = led_setting->Color_R;
+    }
+    else if (index == 1U)
+    {
+        color = led_setting->Color_G;
+    }
+    else
+    {
+        color = led_setting->Color_B;
+    }
+
+    return color;
+}
+
 void Set_Single(uint8_t *LED_DATA, uint32_t TotalLED, uint32_t Offset, uint8_t Data_R, uint8_t Data_G, uint8_t Data_B)
 {
     uint32_t i;
 
     for (i = 0; i < TotalLED; i++)
     {
-        *(LED_DATA + Offset + i * 3 + 0) = Data_R;
-        *(LED_DATA + Offset + i * 3 + 1) = Data_G;
-        *(LED_DATA + Offset + i * 3 + 2) = Data_B;
+        LED_DATA[Offset + (i * 3U)] = Data_R;
+        LED_DATA[Offset + (i * 3U) + 1U] = Data_G;
+        LED_DATA[Offset + (i * 3U) + 2U] = Data_B;
     }
 }
 
-void Set_Array(uint8_t *LED_DATA, uint32_t TotalLED, uint32_t Offset, uint8_t *DisplayData, uint8_t MaxBright)
+void Set_Array(uint8_t *LED_DATA, uint32_t TotalLED, uint32_t Offset, const uint8_t *DisplayData, uint8_t MaxBright)
 {
     uint32_t i;
-    uint8_t TempR, TempG, TempB;
 
     for (i = 0; i < TotalLED; i++)
     {
-        TempR = HDIV_Div(*(DisplayData + i * 3 + 0) * MaxBright, 0xFF);
-        TempG = HDIV_Div(*(DisplayData + i * 3 + 1) * MaxBright, 0xFF);
-        TempB = HDIV_Div(*(DisplayData + i * 3 + 2) * MaxBright, 0xFF);
-        *(LED_DATA + Offset + i * 3 + 0) = TempR;
-        *(LED_DATA + Offset + i * 3 + 1) = TempG;
-        *(LED_DATA + Offset + i * 3 + 2) = TempB;
+        uint8_t TempR;
+        uint8_t TempG;
+        uint8_t TempB;
+
+        TempR = HDIV_Div(DisplayData[i * 3U] * MaxBright, 0xFF);
+        TempG = HDIV_Div(DisplayData[(i * 3U) + 1U] * MaxBright, 0xFF);
+        TempB = HDIV_Div(DisplayData[(i * 3U) + 2U] * MaxBright, 0xFF);
+        LED_DATA[Offset + (i * 3U)] = TempR;
+        LED_DATA[Offset + (i * 3U) + 1U] = TempG;
+        LED_DATA[Offset + (i * 3U) + 2U] = TempB;
     }
 }
 
-void Set_InverseArray(uint8_t *LED_DATA, uint32_t TotalLED, uint32_t Offset, uint8_t *DisplayData, uint8_t MaxBright)
+void Set_InverseArray(uint8_t *LED_DATA, uint32_t TotalLED, uint32_t Offset, const uint8_t *DisplayData, uint8_t MaxBright)
 {
-    uint32_t i, j;
-    uint8_t TempR, TempG, TempB;
+    uint32_t i;
+    uint32_t j;
 
-    for (i = 0, j = TotalLED - 1; i < TotalLED; i++, j--)
+    j = TotalLED - 1U;
+
+    for (i = 0; i < TotalLED; i++)
     {
-        TempR = HDIV_Div(*(DisplayData + j * 3 + 0) * MaxBright, 0xFF);
-        TempG = HDIV_Div(*(DisplayData + j * 3 + 1) * MaxBright, 0xFF);
-        TempB = HDIV_Div(*(DisplayData + j * 3 + 2) * MaxBright, 0xFF);
-        *(LED_DATA + Offset + i * 3 + 0) = TempR;
-        *(LED_DATA + Offset + i * 3 + 1) = TempG;
-        *(LED_DATA + Offset + i * 3 + 2) = TempB;
+        uint8_t TempR;
+        uint8_t TempG;
+        uint8_t TempB;
+
+        TempR = HDIV_Div(DisplayData[j * 3U] * MaxBright, 0xFF);
+        TempG = HDIV_Div(DisplayData[(j * 3U) + 1U] * MaxBright, 0xFF);
+        TempB = HDIV_Div(DisplayData[(j * 3U) + 2U] * MaxBright, 0xFF);
+        LED_DATA[Offset + (i * 3U)] = TempR;
+        LED_DATA[Offset + (i * 3U) + 1U] = TempG;
+        LED_DATA[Offset + (i * 3U) + 2U] = TempB;
+
+        j--;
     }
 }
 
@@ -713,10 +780,12 @@ void Set_LED_Data(volatile struct LED_Setting_Tag *LED_Setting)
     uint32_t u32Count;
 
     /* Calculate transfer count */
-    u32Count = LED_Setting->LEDNum * 3 / 4;
+    u32Count = (LED_Setting->LEDNum * 3U) / 4U;
 
-    if ((LED_Setting->LEDNum * 3) % 4)
+    if (((LED_Setting->LEDNum * 3U) % 4U) != 0U)
+    {
         u32Count++;
+    }
 
     /* Set transfer count */
     PDMA_SetTransferCnt(PDMA0, LED_Setting->LLSI_Num, PDMA_WIDTH_32, u32Count);
@@ -750,7 +819,9 @@ void FUNC_Off(volatile struct LED_Setting_Tag *LED_Setting)
 
 void FUNC_Static(volatile struct LED_Setting_Tag *LED_Setting)
 {
-    uint32_t TempR, TempG, TempB;
+    uint32_t TempR;
+    uint32_t TempG;
+    uint32_t TempB;
 
     /* Calculate Color */
     TempR = HDIV_Div((LED_Setting->Color_R * LED_Setting->Brightness), 0xFF);
@@ -763,43 +834,69 @@ void FUNC_Static(volatile struct LED_Setting_Tag *LED_Setting)
 
 void FUNC_Breathing(volatile struct LED_Setting_Tag *LED_Setting)
 {
-    uint32_t Temp, TempR, TempG, TempB;
+    static const uint8_t BreathingBright[BreathingArraySize] = {  0,   0,   0,   0,   1,   1,   2,   3,   4,   5,
+                                                                  7,   8,  10,  11,  13,  15,  17,  19,  21,  23,
+                                                                  25,  28,  30,  32,  35,  37,  40,  42,  45,  47,
+                                                                  50,  52,  55,  57,  60,  62,  65,  67,  70,  72,
+                                                                  75,  77,  79,  81,  83,  85,  87,  89,  90,  92,
+                                                                  93,  95,  96,  97,  98,  99,  99, 100, 100, 100,
+                                                                  100, 100, 100, 100, 100,  99,  99,  98,  97,  96,
+                                                                  95,  93,  92,  90,  89,  87,  85,  83,  81,  79,
+                                                                  77,  75,  72,  70,  67,  65,  62,  60,  57,  55,
+                                                                  52,  50,  47,  45,  42,  40,  37,  34,  32,  30,
+                                                                  28,  25,  23,  21,  19,  17,  15,  13,  11,  10,
+                                                                  8,   7,   5,   4,   3,   2,   1,   1,   0,   0,
+                                                                  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+                                                                  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+                                                                  0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+                                                               };
+    uint32_t Temp;
+    uint32_t TempR;
+    uint32_t TempG;
+    uint32_t TempB;
+    uint32_t breathing_period;
 
     /* Calculate Color */
     Temp = HDIV_Mod(HDIV_Div(LED_Setting->TimeCounter, 8 + HDIV_Div(LED_Setting->Speed, 10)), BreathingArraySize);
-    TempR = HDIV_Div((LED_Setting->Color_R * LED_Setting->Brightness * *(BreathingBright + Temp)), 0xFF * 100);
-    TempG = HDIV_Div((LED_Setting->Color_G * LED_Setting->Brightness * *(BreathingBright + Temp)), 0xFF * 100);
-    TempB = HDIV_Div((LED_Setting->Color_B * LED_Setting->Brightness * *(BreathingBright + Temp)), 0xFF * 100);
+    TempR = HDIV_Div((LED_Setting->Color_R * LED_Setting->Brightness * BreathingBright[Temp]), 0xFF * 100);
+    TempG = HDIV_Div((LED_Setting->Color_G * LED_Setting->Brightness * BreathingBright[Temp]), 0xFF * 100);
+    TempB = HDIV_Div((LED_Setting->Color_B * LED_Setting->Brightness * BreathingBright[Temp]), 0xFF * 100);
 
     /* Mapping Color to LED Format */
     Set_Single(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, TempR, TempG, TempB);
 
     /* Reset CountingTime */
-    if (LED_Setting->TimeCounter >= (uint32_t)((8 + HDIV_Div(LED_Setting->Speed, 10)) * BreathingArraySize))
+    breathing_period = (8U + (uint32_t)HDIV_Div(LED_Setting->Speed, 10)) * BreathingArraySize;
+
+    if (LED_Setting->TimeCounter >= breathing_period)
     {
-        LED_Setting->TimeCounter -= (8 + HDIV_Div(LED_Setting->Speed, 10)) * BreathingArraySize;
+        LED_Setting->TimeCounter -= breathing_period;
     }
 }
 
 void FUNC_Strobe(volatile struct LED_Setting_Tag *LED_Setting)
 {
-    uint32_t TempR, TempG, TempB;
+    const uint32_t strobe_phase = (5U * LED_Setting->Speed) + 275U;
 
     /* Reset CountingTime */
-    while (LED_Setting->TimeCounter >= (((5 * LED_Setting->Speed) + 275) * 2))
+    while (LED_Setting->TimeCounter >= (strobe_phase * 2U))
     {
-        LED_Setting->TimeCounter -= (((5 * LED_Setting->Speed) + 275) * 2);
+        LED_Setting->TimeCounter -= (strobe_phase * 2U);
     }
 
     /* Extinguish */
-    if (LED_Setting->TimeCounter < ((5 * LED_Setting->Speed) + 275))
+    if (LED_Setting->TimeCounter < strobe_phase)
     {
         /* Mapping Color to LED Format */
-        Set_Single(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, 0, 0, 0);
+        Set_Single(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, 0U, 0U, 0U);
     }
     /* Lighten */
     else
     {
+        uint32_t TempR;
+        uint32_t TempG;
+        uint32_t TempB;
+
         /* Calculate Color */
         TempR = HDIV_Div((LED_Setting->Color_R * LED_Setting->Brightness), 0xFF);
         TempG = HDIV_Div((LED_Setting->Color_G * LED_Setting->Brightness), 0xFF);
@@ -813,22 +910,25 @@ void FUNC_Strobe(volatile struct LED_Setting_Tag *LED_Setting)
 void FUNC_Cycling(volatile struct LED_Setting_Tag *LED_Setting)
 {
     /* Reset CountingTime */
-    if (LED_Setting->TimeCounter >= (500 + LED_Setting->Speed * 10))
+    if (LED_Setting->TimeCounter >= (500U + (LED_Setting->Speed * 10U)))
     {
-        LED_Setting->TimeCounter -= (500 + LED_Setting->Speed * 10);
+        LED_Setting->TimeCounter -= (500U + (LED_Setting->Speed * 10U));
 
         /* Switch to next color state. */
-        if (LED_Setting->ColorIndex == eColorRed)
+        if (LED_Setting->ColorIndex == (uint8_t)eColorRed)
         {
-            LED_Setting->ColorIndex = eColorGreen;
+            LED_Setting->ColorIndex = (uint8_t)eColorGreen;
         }
-        else if (LED_Setting->ColorIndex == eColorGreen)
+        else if (LED_Setting->ColorIndex == (uint8_t)eColorGreen)
         {
-            LED_Setting->ColorIndex = eColorBlue;
+            LED_Setting->ColorIndex = (uint8_t)eColorBlue;
         }
-        else if (LED_Setting->ColorIndex == eColorBlue)
+        else if (LED_Setting->ColorIndex == (uint8_t)eColorBlue)
         {
-            LED_Setting->ColorIndex = eColorRed;
+            LED_Setting->ColorIndex = (uint8_t)eColorRed;
+        }
+        else
+        {
         }
     }
 
@@ -842,18 +942,22 @@ void FUNC_Cycling(volatile struct LED_Setting_Tag *LED_Setting)
 void FUNC_Random(volatile struct LED_Setting_Tag *LED_Setting)
 {
     static uint8_t u8RandColorIndex = eColorRed;
-    uint8_t temp;
 
     /* Reset CountingTime */
-    if (LED_Setting->TimeCounter >= (500 + LED_Setting->Speed * 10))
+    if (LED_Setting->TimeCounter >= (500U + (LED_Setting->Speed * 10U)))
     {
-        LED_Setting->TimeCounter -= (500 + LED_Setting->Speed * 10);
+        uint8_t temp;
+
+        LED_Setting->TimeCounter -= (500U + (LED_Setting->Speed * 10U));
 
         /* Calculate next random color state. */
         /* If next state is same as current state, random again. */
         do
         {
-            temp = ((RainbowSize * (rand() % 1024)) / 1024);
+            int32_t random_mod = rand() % 1024;
+            uint32_t random_color_index = (RainbowSize * (uint32_t)random_mod) / 1024U;
+
+            temp = (uint8_t)random_color_index;
         } while (temp == u8RandColorIndex);
 
         /* Set next color state index. */
@@ -878,17 +982,19 @@ void FUNC_Music(volatile struct LED_Setting_Tag *LED_Setting)
     /* Init Array */
     for (j = 0; j < LED_Setting->LEDNum; j++)
     {
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
+        {
             JAZZ_Display[j][i] = 0;
+        }
     }
 
     /* POP */
-    if (LED_Setting->Music_Action == Music_POP)
+    if (LED_Setting->Music_Action == (uint8_t)Music_POP)
     {
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
         {
-            POP_Color[i] = HDIV_Div(RainbowColor[eColorBlue][i] * (100 - LED_Setting->Main_Volume), 100)\
-                           + HDIV_Div(RainbowColor[eColorRed][i] * LED_Setting->Main_Volume, 100);
+            POP_Color[i] = HDIV_Div(RainbowColor[(uint8_t)eColorBlue][i] * (100U - LED_Setting->Main_Volume), 100)\
+                           + HDIV_Div(RainbowColor[(uint8_t)eColorRed][i] * LED_Setting->Main_Volume, 100);
         }
 
         /* Mapping Color to LED Format */
@@ -898,35 +1004,42 @@ void FUNC_Music(volatile struct LED_Setting_Tag *LED_Setting)
                    HDIV_Div((POP_Color[2] * LED_Setting->Brightness), 0xFF));
     }
     /* JAZZ */
-    else if (LED_Setting->Music_Action == Music_JAZZ)
+    else if (LED_Setting->Music_Action == (uint8_t)Music_JAZZ)
     {
         for (j = 0; j < Unit_Volume; j++)
         {
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 3U; i++)
             {
-                JAZZ_Display[j][i] = *(&LED_Setting->Color_R + i);
+                JAZZ_Display[j][i] = LED_GetColorComponent(LED_Setting, i);
             }
         }
 
         /* Mapping Color to LED Format */
         /* Direction forward or backward */
-        if (LED_Setting->Direction == Dir_Forward)
+        if (LED_Setting->Direction == (uint8_t)Dir_Forward)
+        {
             Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)JAZZ_Display, LED_Setting->Brightness);
-        else if (LED_Setting->Direction == Dir_Backward)
+        }
+        else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
+        {
             Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)JAZZ_Display, LED_Setting->Brightness);
+        }
+        else
+        {
+        }
     }
     /* Mixed */
-    else if (LED_Setting->Music_Action == Music_Mixed)
+    else if (LED_Setting->Music_Action == (uint8_t)Music_Mixed)
     {
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
         {
-            POP_Color[i] = HDIV_Div(RainbowColor[eColorBlue][i] * (100 - LED_Setting->Main_Volume), 100)\
-                           + HDIV_Div(RainbowColor[eColorRed][i] * LED_Setting->Main_Volume, 100);
+            POP_Color[i] = HDIV_Div(RainbowColor[(uint8_t)eColorBlue][i] * (100U - LED_Setting->Main_Volume), 100)\
+                           + HDIV_Div(RainbowColor[(uint8_t)eColorRed][i] * LED_Setting->Main_Volume, 100);
         }
 
         for (j = 0; j < Unit_Volume; j++)
         {
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 3U; i++)
             {
                 JAZZ_Display[j][i] = POP_Color[i];
             }
@@ -934,48 +1047,61 @@ void FUNC_Music(volatile struct LED_Setting_Tag *LED_Setting)
 
         /* Mapping Color to LED Format */
         /* Direction forward or backward */
-        if (LED_Setting->Direction == Dir_Forward)
+        if (LED_Setting->Direction == (uint8_t)Dir_Forward)
+        {
             Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)JAZZ_Display, LED_Setting->Brightness);
-        else if (LED_Setting->Direction == Dir_Backward)
+        }
+        else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
+        {
             Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)JAZZ_Display, LED_Setting->Brightness);
+        }
+        else
+        {
+        }
+    }
+    else
+    {
     }
 }
 
 void FUNC_Wave(volatile struct LED_Setting_Tag *LED_Setting)
 {
     static uint32_t i;
-    uint32_t DeltaT = 800 + LED_Setting->Speed * 4;
+    uint32_t DeltaT = 800U + (LED_Setting->Speed * 4U);
     uint32_t CurrentTime;
     uint8_t Color1[3];
     uint8_t Color2[3];
     uint8_t DisplayColor[3];
     uint32_t Temp;
 
-    if (LED_Setting->Direction == Dir_Forward)
+    if (LED_Setting->Direction == (uint8_t)Dir_Forward)
     {
         /* Take Color1 and Color2 from Rainbow array by TimeCounter */
         Temp = HDIV_Mod(HDIV_Div(LED_Setting->TimeCounter, DeltaT), RainbowSize);
 
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
         {
             /* Set Color1 */
             Color1[i] = RainbowColor[Temp][i];
             /* Set Color2 */
-            Color2[i] = RainbowColor[HDIV_Mod((Temp + 1), RainbowSize)][i];
+            Color2[i] = RainbowColor[HDIV_Mod((Temp + 1U), RainbowSize)][i];
         }
     }
-    else if (LED_Setting->Direction == Dir_Backward)
+    else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
     {
         /* Take Color1 and Color2 from Rainbow array by TimeCounter */
         Temp = HDIV_Mod(HDIV_Div(LED_Setting->TimeCounter, DeltaT), RainbowSize);
 
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
         {
             /* Set Color1 */
-            Color1[i] = RainbowColor[RainbowSize - 1 - Temp][i];
+            Color1[i] = RainbowColor[RainbowSize - 1U - Temp][i];
             /* Set Color2 */
-            Color2[i] = RainbowColor[HDIV_Mod((RainbowSize + RainbowSize - 2 - Temp), RainbowSize)][i];
+            Color2[i] = RainbowColor[HDIV_Mod((RainbowSize + RainbowSize - 2U - Temp), RainbowSize)][i];
         }
+    }
+    else
+    {
     }
 
     /* Reset CountingTime */
@@ -987,43 +1113,49 @@ void FUNC_Wave(volatile struct LED_Setting_Tag *LED_Setting)
     /* Judge current time and set mixed Displaycolor by color1 and color2 */
     CurrentTime = HDIV_Mod(LED_Setting->TimeCounter, DeltaT);
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3U; i++)
+    {
         DisplayColor[i] = HDIV_Div(Color1[i] * (DeltaT - CurrentTime), DeltaT) + HDIV_Div(Color2[i] * CurrentTime, DeltaT);
+    }
 
     /* Mapping Color to LED Format */
     Set_Single(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, DisplayColor[0], DisplayColor[1], DisplayColor[2]);
 }
 
-uint32_t Spring_i;
-uint32_t Spring_j;
 void FUNC_Spring(volatile struct LED_Setting_Tag *LED_Setting)
 {
     uint8_t DisplayColor[LED_GEN2_MAX_LED_NUMBER][3];
     uint8_t Color[cMeteor_LED][3];
     uint32_t Duration;
-    uint32_t Loop, DeltaT, DelayT;
+    uint32_t Loop;
+    uint32_t DeltaT;
+    uint32_t DelayT;
+    uint32_t Spring_i;
+    uint32_t Spring_j;
     uint32_t TempColor;
 
     /* Init Array */
-    for (Spring_j = 0; Spring_j < LED_Setting->LEDNum + 2 * cMeteor_LED; Spring_j++)
+    for (Spring_j = 0; Spring_j < (LED_Setting->LEDNum + (2U * cMeteor_LED)); Spring_j++)
     {
-        for (Spring_i = 0; Spring_i < 3; Spring_i++)
+        for (Spring_i = 0; Spring_i < 3U; Spring_i++)
+        {
             DisplayColor[Spring_j][Spring_i] = 0;
+        }
     }
 
     /* DeltaT is unit time */
-    DeltaT = 5 + HDIV_Div(LED_Setting->Speed, 20);
+    DeltaT = 5U + (uint32_t)HDIV_Div((int32_t)LED_Setting->Speed, 20);
 
     /* Duration is one time pass through */
-    Duration = DeltaT * (LED_Setting->LEDNum + cMeteor_LED * 2);
+    Duration = DeltaT * (LED_Setting->LEDNum + (cMeteor_LED * 2U));
 
     /* DelayT is delay on two ends */
     DelayT = HDIV_Div(LED_Setting->LEDNum * DeltaT, 2);
 
     /* Reset CountingTime */
-    if (LED_Setting->TimeCounter >= (2 * (Duration + DelayT)))
+    if (LED_Setting->TimeCounter >= (2U * (Duration + DelayT)))
     {
-        LED_Setting->TimeCounter -= 2 * (Duration + DelayT);
+        LED_Setting->TimeCounter -= (2U * (Duration + DelayT));
     }
 
     /* Forward */
@@ -1032,14 +1164,14 @@ void FUNC_Spring(volatile struct LED_Setting_Tag *LED_Setting)
         /* Loop to indicate which LED for first Color */
         Loop = HDIV_Div(LED_Setting->TimeCounter, DeltaT);
 
-        for (Spring_i = 0; Spring_i < 3; Spring_i++)
+        for (Spring_i = 0; Spring_i < 3U; Spring_i++)
         {
-            TempColor = *(&LED_Setting->Color_R + Spring_i);
+            TempColor = LED_GetColorComponent(LED_Setting, Spring_i);
 
             /* 1st 100%*/
             Color[0][Spring_i] = TempColor;
             /* 2nd 75% */
-            Color[1][Spring_i] = (TempColor * 3) >> 2;
+            Color[1][Spring_i] = (TempColor * 3U) >> 2U;
             /* 3rd 50% */
             Color[2][Spring_i] = TempColor >> 1;
             /* 4th 25% */
@@ -1048,72 +1180,92 @@ void FUNC_Spring(volatile struct LED_Setting_Tag *LED_Setting)
 
         for (Spring_j = Loop; Spring_j < (Loop + cMeteor_LED); Spring_j++)
         {
-            for (Spring_i = 0; Spring_i < 3; Spring_i++)
+            for (Spring_i = 0; Spring_i < 3U; Spring_i++)
+            {
                 DisplayColor[Spring_j][Spring_i] = Color[Spring_j - Loop][Spring_i];
+            }
         }
     }
     /* All Extinguish */
     else if (LED_Setting->TimeCounter < (Duration + DelayT))
     {
-        for (Spring_j = 0; Spring_j < LED_Setting->LEDNum + 2 * cMeteor_LED; Spring_j++)
+        for (Spring_j = 0; Spring_j < (LED_Setting->LEDNum + (2U * cMeteor_LED)); Spring_j++)
         {
-            for (Spring_i = 0; Spring_i < 3; Spring_i++)
+            for (Spring_i = 0; Spring_i < 3U; Spring_i++)
+            {
                 DisplayColor[Spring_j][Spring_i] = 0;
+            }
         }
     }
-    else if (LED_Setting->TimeCounter < (2 * Duration + DelayT))
+    else if (LED_Setting->TimeCounter < ((2U * Duration) + DelayT))
     {
         /* Loop to indicate which LED for first Color */
         Loop = HDIV_Div(LED_Setting->TimeCounter - (Duration + DelayT), DeltaT);
 
-        for (Spring_i = 0; Spring_i < 3; Spring_i++)
+        for (Spring_i = 0; Spring_i < 3U; Spring_i++)
         {
-            TempColor = *(&LED_Setting->Color_R + Spring_i);
+            TempColor = LED_GetColorComponent(LED_Setting, Spring_i);
 
             /* 1st 25%*/
             Color[0][Spring_i] = TempColor >> 2;
             /* 2nd 50% */
             Color[1][Spring_i] = TempColor >> 1;
             /* 3rd 75% */
-            Color[2][Spring_i] = (TempColor * 3) >> 2;
+            Color[2][Spring_i] = (TempColor * 3U) >> 2U;
             /* 4th 100% */
             Color[3][Spring_i] = TempColor;
         }
 
         for (Spring_j = (LED_Setting->LEDNum + cMeteor_LED - Loop); Spring_j < (LED_Setting->LEDNum + cMeteor_LED - Loop + cMeteor_LED); Spring_j++)
         {
-            for (Spring_i = 0; Spring_i < 3; Spring_i++)
+            for (Spring_i = 0; Spring_i < 3U; Spring_i++)
+            {
                 DisplayColor[Spring_j][Spring_i] = Color[Spring_j - (LED_Setting->LEDNum + cMeteor_LED - Loop)][Spring_i];
+            }
         }
     }
     /* All Extinguish */
     else
     {
-        for (Spring_j = 0; Spring_j < LED_Setting->LEDNum + 2 * cMeteor_LED; Spring_j++)
+        for (Spring_j = 0; Spring_j < (LED_Setting->LEDNum + (2U * cMeteor_LED)); Spring_j++)
         {
-            for (Spring_i = 0; Spring_i < 3; Spring_i++)
+            for (Spring_i = 0; Spring_i < 3U; Spring_i++)
+            {
                 DisplayColor[Spring_j][Spring_i] = 0;
+            }
         }
     }
 
     /* Mapping Color to LED Format */
     /* Direction forward or backward */
-    if (LED_Setting->Direction == Dir_Forward)
-        Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)(DisplayColor + cMeteor_LED), LED_Setting->Brightness);
-    else if (LED_Setting->Direction == Dir_Backward)
-        Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)(DisplayColor + cMeteor_LED), LED_Setting->Brightness);
+    if (LED_Setting->Direction == (uint8_t)Dir_Forward)
+    {
+        Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, &DisplayColor[cMeteor_LED][0], LED_Setting->Brightness);
+    }
+    else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
+    {
+        Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, &DisplayColor[cMeteor_LED][0], LED_Setting->Brightness);
+    }
+    else
+    {
+    }
 }
 
 void FUNC_Water(volatile struct LED_Setting_Tag *LED_Setting)
 {
     const uint8_t Brightness[4] = {100, 15, 5, 15};
     const uint8_t MeteorNum = 4;
-    static uint32_t i, j;
+    static uint32_t i;
+    static uint32_t j;
     uint32_t Cursor;
-    uint8_t DisplayColor[LED_GEN2_MAX_LED_NUMBER][3], Color[3];
-    uint32_t MotionPeriod, TimeInPhase, PhasePeriod;
+    uint8_t DisplayColor[LED_GEN2_MAX_LED_NUMBER][3];
+    uint8_t Color[3];
+    uint8_t next_color_index;
+    uint32_t MotionPeriod;
+    uint32_t TimeInPhase;
+    uint32_t PhasePeriod;
 
-    PhasePeriod = 1000 + LED_Setting->Speed * 4;
+    PhasePeriod = 1000U + (LED_Setting->Speed * 4U);
     MotionPeriod = HDIV_Div(PhasePeriod, 8);
     TimeInPhase = HDIV_Mod(LED_Setting->TimeCounter, PhasePeriod);
 
@@ -1123,14 +1275,23 @@ void FUNC_Water(volatile struct LED_Setting_Tag *LED_Setting)
         LED_Setting->TimeCounter -= PhasePeriod;
 
         /* If color index is overflow, reset color index. */
-        LED_Setting->ColorIndex = (LED_Setting->ColorIndex >= (RainbowSize - 1)) ? eColorRed : (LED_Setting->ColorIndex + 1);
+        if ((uint32_t)LED_Setting->ColorIndex >= (RainbowSize - 1U))
+        {
+            LED_Setting->ColorIndex = (uint8_t)eColorRed;
+        }
+        else
+        {
+            LED_Setting->ColorIndex++;
+        }
     }
 
+    next_color_index = (uint8_t)HDIV_Mod((LED_Setting->ColorIndex + 1U), RainbowSize);
+
     /* Set Mixed Color = Color1 + Color2 */
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3U; i++)
     {
         Color[i] = HDIV_Div(RainbowColor[LED_Setting->ColorIndex][i] * (PhasePeriod - TimeInPhase), PhasePeriod)\
-                   + HDIV_Div(RainbowColor[HDIV_Mod((LED_Setting->ColorIndex + 1), RainbowSize)][i] * TimeInPhase, PhasePeriod);
+                   + HDIV_Div(RainbowColor[next_color_index][i] * TimeInPhase, PhasePeriod);
     }
 
     /* Calculate the cursor for moving the Brightness */
@@ -1139,7 +1300,7 @@ void FUNC_Water(volatile struct LED_Setting_Tag *LED_Setting)
     /* Sets the Light Bar array and modified the brightness for meteor effect. */
     for (j = 0; j < LED_Setting->LEDNum; j++)
     {
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
         {
             DisplayColor[j][i] = HDIV_Div(Color[i] * Brightness[HDIV_Mod((Cursor + j), MeteorNum)], 100);
         }
@@ -1147,28 +1308,44 @@ void FUNC_Water(volatile struct LED_Setting_Tag *LED_Setting)
 
     /* Mapping Color to LED Format */
     /* Direction forward or backward */
-    if (LED_Setting->Direction == Dir_Forward)
+    if (LED_Setting->Direction == (uint8_t)Dir_Forward)
+    {
         Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)DisplayColor, LED_Setting->Brightness);
-    else if (LED_Setting->Direction == Dir_Backward)
+    }
+    else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
+    {
         Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)DisplayColor, LED_Setting->Brightness);
+    }
+    else
+    {
+    }
 }
 
 void FUNC_Rainbow(volatile struct LED_Setting_Tag *LED_Setting)
 {
     uint8_t DisplayColor[LED_GEN2_MAX_LED_NUMBER][3];
-    static uint32_t i, j;
-    uint32_t deltaT, TotalDuration, CurrentTime, NextTime;
-    uint8_t ColorCursor1, ColorCursor2;
+    static uint32_t i;
+    static uint32_t j;
+    uint32_t deltaT;
+    uint32_t TotalDuration;
+    uint32_t CurrentTime;
+    uint32_t NextTime;
+    uint8_t ColorCursor1;
+    int32_t speed_divisor;
 
     /* Init Array */
     for (j = 0; j < LED_Setting->LEDNum; j++)
     {
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < 3U; i++)
+        {
             DisplayColor[j][i] = 0;
+        }
     }
 
     /* Duration for one time effect */
-    TotalDuration = HDIV_Div(60 * 1000, HDIV_Div(255 - LED_Setting->Speed, 3) + 5);
+    speed_divisor = HDIV_Div(255 - (int32_t)LED_Setting->Speed, 3);
+    speed_divisor += 5;
+    TotalDuration = (uint32_t)HDIV_Div(60000, (int16_t)speed_divisor);
 
     /* Next LED time */
     NextTime = HDIV_Div(TotalDuration, 60);
@@ -1186,40 +1363,52 @@ void FUNC_Rainbow(volatile struct LED_Setting_Tag *LED_Setting)
     }
 
     /* Mix Color */
-    for (j = 0; j < LED_Setting->LEDNum; j++, CurrentTime += NextTime)
+    for (j = 0; j < LED_Setting->LEDNum; j++)
     {
         if (CurrentTime >= TotalDuration)
+        {
             CurrentTime -= TotalDuration;
+        }
 
         if (CurrentTime >= (deltaT * RainbowSize))
         {
             /* Color Cursor */
             ColorCursor1 = 0;
-            ColorCursor2 = 1;
 
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 3U; i++)
             {
-                DisplayColor[LED_Setting->LEDNum - j - 1][i] = RainbowColor[ColorCursor1][i];
+                DisplayColor[LED_Setting->LEDNum - j - 1U][i] = RainbowColor[ColorCursor1][i];
             }
         }
         else
         {
+            uint8_t ColorCursor2;
+
             /* Color Cursor */
             ColorCursor1 = HDIV_Mod(HDIV_Div(CurrentTime, deltaT), RainbowSize);
-            ColorCursor2 = HDIV_Mod((ColorCursor1 + 1), RainbowSize);
+            ColorCursor2 = (uint8_t)HDIV_Mod((ColorCursor1 + 1U), RainbowSize);
 
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 3U; i++)
             {
-                DisplayColor[LED_Setting->LEDNum - j - 1][i] = HDIV_Div(((RainbowColor[ColorCursor1][i] * ((ColorCursor1 + 1) * deltaT - CurrentTime)) + \
-                                                                         (RainbowColor[ColorCursor2][i] * (CurrentTime - ColorCursor1 * deltaT))), deltaT);
+                DisplayColor[LED_Setting->LEDNum - j - 1U][i] = HDIV_Div(((RainbowColor[ColorCursor1][i] * ((((uint32_t)ColorCursor1 + 1U) * deltaT) - CurrentTime)) + \
+                                                                          (RainbowColor[ColorCursor2][i] * (CurrentTime - ((uint32_t)ColorCursor1 * deltaT)))), deltaT);
             }
         }
+
+        CurrentTime += NextTime;
     }
 
     /* Mapping Color to LED Format */
     /* Direction forward or backward */
-    if (LED_Setting->Direction == Dir_Forward)
+    if (LED_Setting->Direction == (uint8_t)Dir_Forward)
+    {
         Set_Array(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)DisplayColor, LED_Setting->Brightness);
-    else if (LED_Setting->Direction == Dir_Backward)
+    }
+    else if (LED_Setting->Direction == (uint8_t)Dir_Backward)
+    {
         Set_InverseArray(LED_Setting->LED_Data, LED_Setting->LEDNum, LED_Setting->LED_Offset, (uint8_t *)DisplayColor, LED_Setting->Brightness);
+    }
+    else
+    {
+    }
 }

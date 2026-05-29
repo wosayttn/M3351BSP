@@ -1,5 +1,5 @@
 __STACK_SIZE = 0x00000800;
-__HEAP_SIZE  = 0x00000800;
+__HEAP_SIZE  = 0x00001000;
 
 /* ARMv8-M stack sealing:
    to use ARMv8-M stack sealing set __STACKSEAL_SIZE to 8 otherwise keep 0

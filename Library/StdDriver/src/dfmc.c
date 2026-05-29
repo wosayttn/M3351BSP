@@ -26,14 +26,6 @@
 //#define CHCKE_PAGE_FULL_PROC
 
 int32_t g_DFMC_i32ErrCode = DFMC_OK;    /*!< DFMC global error code */
-/* MISRA Rule 8.9 Deviation: static buffer due to limited stack size */
-static uint8_t s_au8DFMC_ECC_ErrorBit[] =
-{
-    0x03, 0x05, 0x06, 0x07, 0x09, 0x0A, 0x0B, 0x0C,
-    0x0D, 0x0E, 0x0F, 0x11, 0x12, 0x13, 0x14, 0x15,
-    0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D,
-    0x1E, 0x1F, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26
-};
 
 /**
   * @brief   Enable DFMC ISP function
@@ -232,6 +224,13 @@ uint32_t DFMC_Read(uint32_t u32Addr)
 uint32_t DFMC_Read_ECC(uint32_t u32Addr, int32_t *pi32ErrBit)
 {
     int32_t i32TimeOutCnt;
+    static const uint8_t au8DFMC_ECC_ErrorBit[] =
+    {
+        0x03, 0x05, 0x06, 0x07, 0x09, 0x0A, 0x0B, 0x0C,
+        0x0D, 0x0E, 0x0F, 0x11, 0x12, 0x13, 0x14, 0x15,
+        0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D,
+        0x1E, 0x1F, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26
+    };
 
     g_DFMC_i32ErrCode = DFMC_OK;
     *pi32ErrBit = -1;
@@ -267,9 +266,9 @@ uint32_t DFMC_Read_ECC(uint32_t u32Addr, int32_t *pi32ErrBit)
         {
             uint32_t i;
 
-            for (i = 0; i < (sizeof(s_au8DFMC_ECC_ErrorBit) / sizeof(s_au8DFMC_ECC_ErrorBit[0])); i++)
+            for (i = 0; i < (sizeof(au8DFMC_ECC_ErrorBit) / sizeof(au8DFMC_ECC_ErrorBit[0])); i++)
             {
-                if (s_au8DFMC_ECC_ErrorBit[i] == DFMC->MPDATE)
+                if (au8DFMC_ECC_ErrorBit[i] == DFMC->MPDATE)
                 {
                     *pi32ErrBit = i;
                     break;

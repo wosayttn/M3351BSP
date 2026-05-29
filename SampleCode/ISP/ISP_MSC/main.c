@@ -3,19 +3,21 @@
  * @version  V1.00
  * @brief    Use embedded flash as storage to implement a USB Mass-Storage device.
  *
+ * @note     Windows may prompt "There's a problem with this drive" upon connection.
+ *           This is harmless. For code size constraints, this ISP implements a minimal
+ *           "Fake FAT" that ignores Windows' background metadata writes.
+ *           Please safely ignore the warning and drag-and-drop the .bin file directly.
+ *
  * SPDX-License-Identifier: Apache-2.0
  * @copyright (C) 2025 Nuvoton Technology Corp. All rights reserved.
  *****************************************************************************/
 
 #include <stdio.h>
-#include "M3351_User.h"
+#include "NuMicro.h"
 #include "targetdev.h"
 #include "MassStorage.h"
-#include "usbd_User.h"
 
 #define CRYSTAL_LESS 1
-
-/* Must use usbd_User.c, usbd_User.h and M3351_User.h */
 
 int32_t SYS_Init(void)
 {
@@ -90,23 +92,10 @@ int32_t main(void)
     /* Get APROM and Data Flash size */
     //g_u32ApromSize = GetApromSize();
 
-    USBD_Open_User(&gsInfo);
-
     /* Endpoint configuration */
     MSC_Init();
 
-    /* Start of USBD_Start() */
-    CLK_SysTickDelay(100000);
-
-    /* Disable software-disconnect function */
-    USBD_CLR_SE0();
-
-    /* Clear USB-related interrupts before enable interrupt */
-    USBD_CLR_INT_FLAG(USBD_INT_BUS | USBD_INT_USB | USBD_INT_FLDET | USBD_INT_WAKEUP);
-
-    /* Enable USB-related interrupts. */
-    USBD_ENABLE_INT(USBD_INT_BUS | USBD_INT_USB | USBD_INT_FLDET | USBD_INT_WAKEUP);
-    /* End of USBD_Start() */
+    USBD_Start();
 
     NVIC_EnableIRQ(USBD_IRQn);
 

@@ -92,51 +92,51 @@ int32_t main(void)
         u32UpdateBank = u32ExecBank ^ 1;
 
         u32Loader0ChkSum = FMC_GetChkSum(LOADER_BASE, LOADER_SIZE);
-        u32Loader1ChkSum = FMC_GetChkSum(FMC_APROM_BANK_SIZE + LOADER_BASE, LOADER_SIZE);
+        u32Loader1ChkSum = FMC_GetChkSum(LOADER_BASE + FMC_APROM_BANK_SIZE, LOADER_SIZE);
         printf(" Loader0 checksum: 0x%08x \n Loader1 checksum: 0x%08x\n", u32Loader0ChkSum, u32Loader1ChkSum);
 
         u32App0ChkSum = FMC_GetChkSum(APP_BASE, APP_SIZE);
-        u32App1ChkSum = FMC_GetChkSum(FMC_APROM_BANK_SIZE + APP_BASE, APP_SIZE);
+        u32App1ChkSum = FMC_GetChkSum(APP_BASE + FMC_APROM_BANK_SIZE, APP_SIZE);
         printf(" App0 checksum: 0x%08x \n App1 checksum: 0x%08x\n", u32App0ChkSum, u32App1ChkSum);
 
         if ((u32ExecBank == 0) && (u32Loader0ChkSum != u32Loader1ChkSum))
         {
             printf("\n Create BANK%d Loader... \n",  u32UpdateBank);
 
-            /* Erase loader region */
+            /* Erase loader region in the other bank */
             for (u32Addr = LOADER_BASE; u32Addr < (LOADER_BASE + LOADER_SIZE); u32Addr += FMC_FLASH_PAGE_SIZE)
             {
-                FMC_Erase(FMC_APROM_BANK_SIZE * u32UpdateBank + u32Addr);
+                FMC_Erase(u32Addr + (FMC_APROM_BANK_SIZE * u32UpdateBank));
             }
 
             /* Create loader in the other bank */
             for (u32Addr = LOADER_BASE; u32Addr < (LOADER_BASE + LOADER_SIZE); u32Addr += 8)
             {
-                FMC_Write8Bytes(FMC_APROM_BANK_SIZE * u32UpdateBank + u32Addr,
-                                FMC_Read((FMC_APROM_BANK_SIZE * u32ExecBank) + u32Addr),
-                                FMC_Read((FMC_APROM_BANK_SIZE * u32ExecBank) + u32Addr + 4)
+                FMC_Write8Bytes(u32Addr + (FMC_APROM_BANK_SIZE * u32UpdateBank),
+                                FMC_Read(u32Addr + (FMC_APROM_BANK_SIZE * u32ExecBank)),
+                                FMC_Read(u32Addr + (FMC_APROM_BANK_SIZE * u32ExecBank) + 4)
                                );
             }
 
             printf(" Create Bank%d Loader completed. \n", (u32ExecBank ^ 1));
         }
 
-        if ((u32ExecBank == 0) && ((FMC_CheckAllOne((FMC_APROM_BANK_SIZE + APP_BASE), APP_SIZE)) == READ_ALLONE_YES))
+        if ((u32ExecBank == 0) && ((FMC_CheckAllOne((APP_BASE + FMC_APROM_BANK_SIZE), APP_SIZE)) == READ_ALLONE_YES))
         {
             printf("\n Create BANK%d App... \n", u32UpdateBank);
 
-            /* Erase app region */
+            /* Erase app region in the other bank */
             for (u32Addr = APP_BASE; u32Addr < (APP_BASE + APP_SIZE); u32Addr += FMC_FLASH_PAGE_SIZE)
             {
-                FMC_Erase(FMC_APROM_BANK_SIZE * u32UpdateBank + u32Addr);
+                FMC_Erase(u32Addr + (FMC_APROM_BANK_SIZE * u32UpdateBank));
             }
 
-            /* Create app in the other bank(just for test)*/
+            /* Create app in the other bank (just for test)*/
             for (u32Addr = APP_BASE; u32Addr < (APP_BASE + APP_SIZE); u32Addr += 8)
             {
-                FMC_Write8Bytes(FMC_APROM_BANK_SIZE * u32UpdateBank + u32Addr,
-                                FMC_Read((FMC_APROM_BANK_SIZE * u32ExecBank) + u32Addr),
-                                FMC_Read((FMC_APROM_BANK_SIZE * u32ExecBank) + u32Addr + 4)
+                FMC_Write8Bytes(u32Addr + (FMC_APROM_BANK_SIZE * u32UpdateBank),
+                                FMC_Read(u32Addr + (FMC_APROM_BANK_SIZE * u32ExecBank)),
+                                FMC_Read(u32Addr + (FMC_APROM_BANK_SIZE * u32ExecBank) + 4)
                                );
             }
 
@@ -162,7 +162,9 @@ int32_t main(void)
                 /* Remap Bank */
                 printf("\n BANK%d Loader before remap \n", u32ExecBank);
                 FMC_RemapBank(u32ExecBank ^ 1);
-                printf("\n Remap completed.\n");
+                /* Flush CACHE to ensure the CPU fetches updated instructions/data from the remapped bank */
+                CACHE_Flush();
+                printf("\n Remap to %d completed.\n", FMC_GetBankIdx());
             }
             else
             {

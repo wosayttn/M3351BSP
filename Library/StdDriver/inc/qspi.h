@@ -228,9 +228,20 @@ extern "C"
   * @details    Disable automatic slave selection function and set QSPIx_SS pin to high state.
   * \hideinitializer
   */
-#define QSPI_SET_SS_HIGH(qspi)                                  \
-    ((qspi)->SSCTL = ((qspi)->SSCTL & ~(QSPI_SSCTL_AUTOSS_Msk)) |   \
-                     (QSPI_SSCTL_SSACTPOL_Msk | QSPI_SSCTL_SS_Msk))
+__STATIC_INLINE void QSPI_SET_SS_HIGH(QSPI_T *qspi)
+{
+    uint32_t u32SSCtl = qspi->SSCTL & ~QSPI_SSCTL_AUTOSS_Msk;
+    uint32_t u32ActivePol = u32SSCtl & QSPI_SSCTL_SSACTPOL_Msk;
+
+    if (u32ActivePol != 0UL)
+    {
+        qspi->SSCTL = u32SSCtl | QSPI_SSCTL_SS_Msk;
+    }
+    else
+    {
+        qspi->SSCTL = u32SSCtl & ~QSPI_SSCTL_SS_Msk;
+    }
+}
 
 /**
   * @brief      Set QSPIx_SS pin to low state.
@@ -239,9 +250,20 @@ extern "C"
   * @details    Disable automatic slave selection function and set QSPIx_SS pin to low state.
   * \hideinitializer
   */
-#define QSPI_SET_SS_LOW(qspi)   \
-    ((qspi)->SSCTL = ((qspi)->SSCTL & ~(QSPI_SSCTL_AUTOSS_Msk | QSPI_SSCTL_SSACTPOL_Msk)) | \
-                     (QSPI_SSCTL_SS_Msk))
+__STATIC_INLINE void QSPI_SET_SS_LOW(QSPI_T *qspi)
+{
+    uint32_t u32SSCtl = qspi->SSCTL & ~QSPI_SSCTL_AUTOSS_Msk;
+    uint32_t u32ActivePol = u32SSCtl & QSPI_SSCTL_SSACTPOL_Msk;
+
+    if (u32ActivePol != 0UL)
+    {
+        qspi->SSCTL = u32SSCtl & ~QSPI_SSCTL_SS_Msk;
+    }
+    else
+    {
+        qspi->SSCTL = u32SSCtl | QSPI_SSCTL_SS_Msk;
+    }
+}
 
 /**
   * @brief      Enable Byte Reorder function.
@@ -270,9 +292,11 @@ extern "C"
   *             The length of suspend interval is ((u32SuspCycle + 0.5) * the length of one QSPI bus clock cycle).
   * \hideinitializer
   */
-#define QSPI_SET_SUSPEND_CYCLE(qspi, u32SuspCycle)          \
-    ((qspi)->CTL = ((qspi)->CTL & ~(QSPI_CTL_SUSPITV_Msk)) |    \
-                   ((u32SuspCycle) << QSPI_CTL_SUSPITV_Pos))
+__STATIC_INLINE void QSPI_SET_SUSPEND_CYCLE(QSPI_T *qspi, uint32_t u32SuspCycle)
+{
+    qspi->CTL = (qspi->CTL & ~QSPI_CTL_SUSPITV_Msk) |
+                ((u32SuspCycle & 0xFUL) << QSPI_CTL_SUSPITV_Pos);
+}
 
 /**
   * @brief      Set the QSPI transfer sequence with LSB first.
@@ -300,9 +324,26 @@ extern "C"
   * @details    The data width can be 8 ~ 32 bits.
   * \hideinitializer
   */
-#define QSPI_SET_DATA_WIDTH(qspi, u32Width) \
-    ((qspi)->CTL = ((qspi)->CTL & ~(QSPI_CTL_DWIDTH_Msk)) | \
-                   (((u32Width) & 0x1F) << QSPI_CTL_DWIDTH_Pos))
+__STATIC_INLINE void QSPI_SET_DATA_WIDTH(QSPI_T *qspi, uint32_t u32Width)
+{
+    uint32_t u32WidthTmp = u32Width;
+
+    if ((u32WidthTmp > 0U) && (u32WidthTmp < 8U))
+    {
+        u32WidthTmp = 8U;
+    }
+    else if (u32WidthTmp >= 32U)
+    {
+        u32WidthTmp = 0U;
+    }
+    else
+    {
+        u32WidthTmp &= 0x1FUL;
+    }
+
+    qspi->CTL = (qspi->CTL & ~QSPI_CTL_DWIDTH_Msk) |
+                (u32WidthTmp << QSPI_CTL_DWIDTH_Pos);
+}
 
 /**
   * @brief      Get the QSPI busy state.

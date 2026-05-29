@@ -374,7 +374,8 @@ uint32_t UART_Read(const UART_T *uart, uint8_t pu8RxBuf[], uint32_t u32ReadBytes
  */
 void UART_SetLineConfig(UART_T *uart, uint32_t u32baudrate, uint32_t u32data_width, uint32_t u32parity, uint32_t  u32stop_bits)
 {
-    uint32_t u32UartClkSrcSel = 0UL, u32UartClkDivNum = 0UL;
+    uint32_t u32UartClkSrcSel = 0UL;
+    uint32_t u32UartClkDivNum = 0UL;
     uint32_t au32ClkTbl[4] = {__HXT, 0UL, __LXT, __HIRC};
 
     /* Get UART clock source selection and UART clock divider number */
@@ -505,7 +506,8 @@ void UART_SetTimeoutCnt(UART_T *uart, uint32_t u32TOC)
  */
 void UART_SelectIrDAMode(UART_T *uart, uint32_t u32Buadrate, uint32_t u32Direction)
 {
-    uint32_t u32UartClkSrcSel = 0UL, u32UartClkDivNum = 0UL;
+    uint32_t u32UartClkSrcSel = 0UL;
+    uint32_t u32UartClkDivNum = 0UL;
     uint32_t au32ClkTbl[4] = {__HXT, 0UL, __LXT, __HIRC};
 
     /* Select IrDA function mode */

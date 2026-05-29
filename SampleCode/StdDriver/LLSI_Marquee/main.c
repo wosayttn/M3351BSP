@@ -10,22 +10,27 @@
 #include <stdio.h>
 #include "NuMicro.h"
 
-#define TEST_COUNT  1
+#define TEST_COUNT  1U
 
-volatile uint32_t g_au32RED_Marquee[TEST_COUNT] = {0x00000000};
-volatile uint32_t g_u32PatternToggle = 0;
-volatile uint32_t g_u32DataCount = 0;
+static volatile uint32_t g_u32DataCount = 0U;
 
-void LLSI0_IRQHandler()
+void LLSI0_IRQHandler(void);
+
+void LLSI0_IRQHandler(void)
 {
+    static const uint32_t g_au32RED_Marquee[TEST_COUNT] = {0x00000000U};
+
     if (LLSI_GetIntFlag(LLSI0, LLSI_TXTH_INT_MASK))
     {
         while (g_u32DataCount < TEST_COUNT)
         {
-            if (g_u32DataCount == (TEST_COUNT - 1))
+            if (g_u32DataCount == (TEST_COUNT - 1U))
+            {
                 LLSI_SET_LAST_DATA(LLSI0);
+            }
 
-            LLSI_WRITE_DATA(LLSI0, g_au32RED_Marquee[g_u32DataCount++]);
+            LLSI_WRITE_DATA(LLSI0, g_au32RED_Marquee[g_u32DataCount]);
+            g_u32DataCount++;
         }
 
         if (g_u32DataCount >= TEST_COUNT)
@@ -35,7 +40,7 @@ void LLSI0_IRQHandler()
     }
 }
 
-void SYS_Init(void)
+static void SYS_Init(void)
 {
     /* Unlock protected registers */
     SYS_UnlockReg();
@@ -79,7 +84,7 @@ void SYS_Init(void)
     SYS_LockReg();
 }
 
-void LLSI_Init(void)
+static void LLSI_Init(void)
 {
     /*---------------------------------------------------------------------------------------------------------*/
     /* Init LLSI                                                                                               */
@@ -89,7 +94,7 @@ void LLSI_Init(void)
     /* Set data transfer period. T_Period = 1250ns */
     /* Set duty period. T_T0H = 400ns; T_T1H = 850ns */
     /* Set reset command period. T_ResetPeriod = 50000ns */
-    LLSI_Open(LLSI0, LLSI_MODE_SW, LLSI_FORMAT_GRB, CLK_GetPCLK0Freq(), 1250, 400, 850, 50000, 6, LLSI_IDLE_LOW);
+    LLSI_Open(LLSI0, LLSI_MODE_SW, LLSI_FORMAT_GRB, CLK_GetPCLK0Freq(), 1250U, 400U, 850U, 50000U, 6U, LLSI_IDLE_LOW);
 
     /* Set TX FIFO threshold */
     LLSI_SetFIFO(LLSI0, 2);
@@ -105,6 +110,8 @@ void LLSI_Init(void)
 /*---------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
+    uint32_t g_u32PatternToggle = 0U;
+
     /* Init System, IP clock and multi-function I/O. */
     SYS_Init();
     /* Init Debug UART to 115200-8N1 for print message */
@@ -114,68 +121,67 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %d Hz\n", SystemCoreClock);
+    printf("\n\nCPU @ %u Hz\n", CLK_GetHCLKFreq());
     printf("+------------------------------------------------+\n");
     printf("|    LLSI Marquee Sample Code (Software Mode)    |\n");
     printf("+------------------------------------------------+\n");
+    printf("Please connect LED strips with PB.15.\n");
     printf("The first to sixth LEDs will flash red in sequence.\n\n");
 
     /* Init LLSI */
     LLSI_Init();
 
-    g_u32PatternToggle = 0;
-
     /*Enable LLSI Tx*/
     LLSI_ENABLE(LLSI0);
 
-    while (g_u32PatternToggle < 7)
+    while (g_u32PatternToggle < 7U)
     {
-        g_u32DataCount = 0;
+        g_u32DataCount = 0U;
 
         /* Write 4 word data to LLSI_DATA */
-        if (g_u32PatternToggle == 0)
+        if (g_u32PatternToggle == 0U)
         {
             LLSI_WRITE_DATA(LLSI0, 0x000000FF);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 1)
+        else if (g_u32PatternToggle == 1U)
         {
-            LLSI_WRITE_DATA(LLSI0, 0xFF000000);
+            LLSI_WRITE_DATA(LLSI0, 0xFF000000U);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 2)
+        else if (g_u32PatternToggle == 2U)
         {
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00FF0000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 3)
+        else if (g_u32PatternToggle == 3U)
         {
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x0000FF00);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
         }
-        else if (g_u32PatternToggle == 4)
+        else if (g_u32PatternToggle == 4U)
         {
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x000000FF);
         }
-        else if (g_u32PatternToggle == 5)
+        else if (g_u32PatternToggle == 5U)
         {
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
-            LLSI_WRITE_DATA(LLSI0, 0xFF000000);
+            LLSI_WRITE_DATA(LLSI0, 0xFF000000U);
         }
-        else if (g_u32PatternToggle == 6)
+        else
         {
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
             LLSI_WRITE_DATA(LLSI0, 0x00000000);
@@ -196,7 +202,7 @@ int main(void)
 
     printf("Exit LLSI sample code.\n");
 
-    while (1);
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

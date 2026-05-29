@@ -135,8 +135,8 @@ int32_t main(void)
     /* Enable Brown-out detector function */
     SYS_ENABLE_BOD();
 
-    /* Set Brown-out detector voltage level as 2.7V */
-    SYS_SET_BOD_LEVEL(SYS_BODCTL_BODVL_2_7V);
+    /* Set Brown-out detector voltage level as 2.8V */
+    SYS_SET_BOD_LEVEL(SYS_BODCTL_BODVL_2_8V);
 
     /* Enable Brown-out detector interrupt function */
     SYS_DISABLE_BOD_RST();
@@ -148,7 +148,7 @@ int32_t main(void)
     NVIC_EnableIRQ(BODOUT_IRQn);
     NVIC_EnableIRQ(PWRWU_IRQn);
 
-    printf("System wake-up if VDD voltage is lower than 2.7V.\n\n");
+    printf("System wake-up if VDD voltage is lower than 2.8V.\n\n");
     printf("Press any key to start test\n");
 
     getchar();

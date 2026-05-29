@@ -27,7 +27,7 @@
  *
  *  @details    Set basic configurations for TRNG and PRNG. Make sure module clock is enabled before calling this function.
  */
-static void RNG_BasicConfig()
+static void RNG_BasicConfig(void)
 {
     uint32_t retry_count;
 
@@ -40,12 +40,15 @@ static void RNG_BasicConfig()
     /* Wait LDORDY */
     retry_count = 0;
 
-    while ((TRNG->STS & TRNG_STS_LDORDY_Msk) == 0)
+    while ((TRNG->STS & TRNG_STS_LDORDY_Msk) == 0UL)
     {
         retry_count++;
 
-        if (retry_count > 5) break;
-    };
+        if (retry_count > 5UL)
+        {
+            break;
+        }
+    }
 
     /* Set NRST, then enable TRNGEN*/
     TRNG->CTL |= (TRNG_CTL_NRST_Msk);
@@ -65,7 +68,7 @@ static void RNG_BasicConfig()
  *
  *  @details    The function is used to initialize PRNG ready to generate random number.
  */
-int32_t RNG_Open()
+int32_t RNG_Open(void)
 {
     int32_t i;
     int32_t timeout = 0x1000000;
@@ -86,7 +89,10 @@ int32_t RNG_Open()
     }
 
     /* Reload seed from TRNG only at first time */
-    CRYPTO->PRNG_CTL = (PRNG_KEY_SIZE_256 << CRYPTO_PRNG_CTL_KEYSZ_Pos) | CRYPTO_PRNG_CTL_START_Msk | CRYPTO_PRNG_CTL_SEEDRLD_Msk | (0 << CRYPTO_PRNG_CTL_SEEDSRC_Pos);
+    CRYPTO->PRNG_CTL = (((uint32_t)PRNG_KEY_SIZE_256) << CRYPTO_PRNG_CTL_KEYSZ_Pos) |
+                       CRYPTO_PRNG_CTL_START_Msk |
+                       CRYPTO_PRNG_CTL_SEEDRLD_Msk |
+                       (0UL << CRYPTO_PRNG_CTL_SEEDSRC_Pos);
 
     i = 0;
     __DSB();
@@ -119,40 +125,50 @@ int32_t RNG_Random(uint32_t *pu32Buf, int32_t nWords)
 {
     int32_t i;
     int32_t timeout = 0x10000;
+    int32_t nWordsLocal = nWords;
 
     /* Waiting for Busy */
-    while (CRYPTO->PRNG_CTL & CRYPTO_PRNG_CTL_BUSY_Msk)
+    while ((CRYPTO->PRNG_CTL & CRYPTO_PRNG_CTL_BUSY_Msk) != 0UL)
     {
         if (timeout-- < 0)
+        {
             return 0;
+        }
     }
 
-    if (nWords > 8)
-        nWords = 8;
+    if (nWordsLocal > 8)
+    {
+        nWordsLocal = 8;
+    }
 
     /* Trig to generate seed 256 bits random number */
-    CRYPTO->PRNG_CTL = (PRNG_KEY_SIZE_256 << CRYPTO_PRNG_CTL_KEYSZ_Pos) | CRYPTO_PRNG_CTL_START_Msk | CRYPTO_PRNG_CTL_SEEDRLD_Msk | (0 << CRYPTO_PRNG_CTL_SEEDSRC_Pos);
+    CRYPTO->PRNG_CTL = (((uint32_t)PRNG_KEY_SIZE_256) << CRYPTO_PRNG_CTL_KEYSZ_Pos) |
+                       CRYPTO_PRNG_CTL_START_Msk |
+                       CRYPTO_PRNG_CTL_SEEDRLD_Msk |
+                       (0UL << CRYPTO_PRNG_CTL_SEEDSRC_Pos);
 
     timeout = 0x10000;
     __DSB();
 
-    while (CRYPTO->PRNG_CTL & CRYPTO_PRNG_CTL_BUSY_Msk)
+    while ((CRYPTO->PRNG_CTL & CRYPTO_PRNG_CTL_BUSY_Msk) != 0UL)
     {
         if (timeout-- < 0)
+        {
             return 0;
+        }
     }
 
-    for (i = 0; i < nWords; i++)
+    for (i = 0; i < nWordsLocal; i++)
     {
         pu32Buf[i] = CRYPTO->PRNG_KEY[i];
     }
 
-    return nWords;
+    return nWordsLocal;
 }
 
 
 /**
- *  @brief      To generate entropy from hardware entropy source (TRNG)
+ *  @brief      To generate entropy(TRNG)
  *
  *  @param[in]  pu32Out  Buffer pointer to store the random number in word
  *
@@ -165,37 +181,42 @@ int32_t RNG_Random(uint32_t *pu32Buf, int32_t nWords)
  */
 int32_t RNG_EntropyPoll(uint32_t *pu32Out, int32_t i32Len)
 {
-    int32_t timeout;
     int32_t i;
+    uint32_t *pu32OutLocal = pu32Out;
 
-    if ((TRNG->STS & TRNG_STS_TRNGRDY_Msk) == 0)
+    if ((TRNG->STS & TRNG_STS_TRNGRDY_Msk) == 0UL)
     {
         /* TRNG is not ready */
         return -1;
     }
 
     /* Trigger entropy generate */
-    TRNG->CTL |= (TRNG_CTL_TRNGEN_Msk | TRNG_CTL_DVIEN_Msk);
+    TRNG->CTL |= (TRNG_CTL_TRNGEN_Msk | (uint32_t)TRNG_CTL_MODE_OUTPUT_NRBG);
 
     for (i = 0; i < i32Len; i += 4)
     {
+        int32_t timeout;
+
         /* Trigger entropy generate */
-        TRNG->CTL |=  TRNG_CTL_START_Msk ;
+        TRNG->CTL |= TRNG_CTL_START_Msk;
 
         timeout = SystemCoreClock;
         __DSB();
 
-        while ((TRNG->STS & TRNG_STS_DVIF_Msk) == 0)
+        while ((TRNG->STS & TRNG_STS_DVIF_Msk) == 0UL)
         {
-            if (timeout-- <= 0)
+            if (timeout <= 0)
             {
                 /* Timeout error */
                 return -1;
             }
+
+            timeout--;
         }
 
         /* Get one word entroy */
-        *pu32Out++ = (uint32_t)(TRNG->DATA_OUT[0]);
+        *pu32OutLocal = TRNG->DATA_OUT[0];
+        pu32OutLocal++;
 
     }
 

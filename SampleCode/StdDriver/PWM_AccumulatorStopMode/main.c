@@ -12,6 +12,7 @@
 
 #define PWM_OUT_CH    0UL
 
+void PWM1P0_IRQHandler(void);
 void PWM1P0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -85,7 +86,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|             PWM AccumulatorStopMode Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -122,7 +123,9 @@ int main(void)
     PWM_Start(PWM1, PWM_CH_0_MASK);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

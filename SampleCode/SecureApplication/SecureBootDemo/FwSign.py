@@ -2,17 +2,42 @@
 import sys
 import os
 import subprocess
+import time
 
+# ==============================================================================
+# ⚠️ CRA Compliance Notice:
+# 1. DO NOT use sample or automatically generated keys in a production environment.
+#    Production keys must be stored securely (e.g., HSM/KMS) and never committed
+#    to source control.
+# 2. CRA mandates downgrade protection. The Security Counter (-s) MUST be
+#    incremented appropriately for every released security update.
+# ==============================================================================
+#
 # Usage: FwSign.py bin_file key_file [fw_ver]
 
 def main():
     if len(sys.argv) < 3:
-        print(f"Usage: {sys.argv[0]} bin_file key_file [fw_ver]")
+        print(f"Usage: {sys.argv[0]} <bin_file> <key_file> [security_counter]")
+        print(f"  e.g., {sys.argv[0]} app.bin dev_key.pem 1")
         sys.exit(1)
 
     bin_file = sys.argv[1]
     key_file = sys.argv[2]
-    fw_ver = sys.argv[3] if len(sys.argv) > 3 else "0"
+
+    # Retry once because the output binary may not be ready immediately.
+    if not os.path.isfile(bin_file):
+        print(f"[WARNING] Input image '{bin_file}' not found. Retry after 3 seconds...")
+        time.sleep(3)
+        if not os.path.isfile(bin_file):
+            print(f"[ERROR] Input image '{bin_file}' not found after retry.")
+            return 1
+
+    # Safe protection logic to ensure anti-rollback capabilities are not bypassed
+    if len(sys.argv) > 3:
+        fw_ver = sys.argv[3]
+    else:
+        print("[CRA WARNING] No security counter provided. Defaulting to '0'. Ensure this value increases on production release.")
+        fw_ver = "0"
 
     call_path = os.getcwd()
     script_path = os.path.dirname(os.path.abspath(__file__))
@@ -20,11 +45,12 @@ def main():
     key_path = os.path.dirname(key_file)
     key_basename = os.path.splitext(os.path.basename(key_file))[0]
 
-    imgtool_path = os.path.join(script_path, '../../../Tool/imgtool.py')
+    imgtool_path = os.path.join(script_path, '../../../Tool/mcuboot/imgtool.py')
 
     # Generate ECC P-256 private key if not exist
     if not os.path.isfile(key_file):
-        print(f"[INFO] Generating private key: {key_file}")
+        print(f"[CRA WARNING] Private key '{key_file}' not found. Generating a DEVELOPMENT-ONLY key.")
+        print("   NEVER deploy a production device using this auto-generated file.")
         subprocess.check_call([
             sys.executable, imgtool_path, 'keygen', '-k', key_file, '-t', 'ecdsa-p256'
         ])
@@ -46,7 +72,11 @@ def main():
         '-k', key_file,
         '--public-key-format', 'hash',
         '--align', '4',
-        '-v', '1.2.3+10',
+        # -v major.minor.revision+build_num
+        # M3351 maps build_num to ROTPK: default/no build_num -> active ROTPK (default ROTPK 0).
+        # 11 switches ROTPK 0 -> 1; 12 switches ROTPK 1 -> 2. Switch ROTPK 0 -> 2 is not allowed.
+        # Target ROTPK must exist in SOTP (max 3 keys), and rollback is not allowed.
+        '-v', '1.0.0+0',
         '-H', '0x400',
         '--pad-header',
         '-S', '0x40000',
@@ -54,7 +84,7 @@ def main():
         bin_file,
         signed_bin
     ])
-    print("[INFO] Done.")
+    print(f"Image successfully signed for development. Output saved to: {signed_bin}")
 
 if __name__ == "__main__":
     main()

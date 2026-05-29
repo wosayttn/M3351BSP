@@ -34,3 +34,4 @@ int32_t  I3C_FuncBTRead(I3C_DEVICE_T *dev, uint8_t tgt, uint8_t *buf, uint16_t *
 int32_t  I3C_FuncGETCCCResp(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt);
 int32_t  I3C_FuncSETCCC(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt);
 int32_t  I3C_FuncSetCCCData(I3C_DEVICE_T *dev, uint32_t ccc, uint8_t tgt);
+int32_t  I3C_DumpAllTargetInfo(I3C_DEVICE_T *dev);

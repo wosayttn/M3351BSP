@@ -24,6 +24,7 @@
     |      200     |_____200______|   40  |____60__|     PWM waveform
 
 */
+void PWM0P0_IRQHandler(void);
 void PWM0P0_IRQHandler(void)
 {
     static int32_t i32Toggle = 0;
@@ -113,7 +114,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("\n\nCPU @ %dHz(PLL@ %dHz)\n", SystemCoreClock, PllClock);
+    printf("\n\nCPU @ %uHz(PLL@ %uHz)\n", CLK_GetHCLKFreq(), CLK_GetPLLClockFreq());
     printf("+------------------------------------------------------------------------+\n");
     printf("|                    PWM DoubleBuffer Sample Code                       |\n");
     printf("+------------------------------------------------------------------------+\n");
@@ -136,7 +137,7 @@ int main(void)
     PWM_Start(PWM0, PWM_CH_0_MASK);
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

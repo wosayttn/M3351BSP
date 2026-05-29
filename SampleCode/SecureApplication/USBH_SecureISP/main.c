@@ -97,7 +97,9 @@ int  is_a_new_hid_device(HID_DEV_T *hdev)
     {
         if ((g_hid_list[i] != NULL) && (g_hid_list[i] == hdev) &&
                 (g_hid_list[i]->uid == hdev->uid))
+        {
             return 0;
+        }
     }
 
     return 1;
@@ -212,6 +214,7 @@ int32_t main(void)
     SYS_Init();
     /* Init Debug UART to 115200-8N1 for print message */
     InitDebugUart();
+    enable_sys_tick(100);
 
 #if defined (__GNUC__) && !defined(__ARMCC_VERSION) && defined(OS_USE_SEMIHOSTING)
     initialise_monitor_handles();

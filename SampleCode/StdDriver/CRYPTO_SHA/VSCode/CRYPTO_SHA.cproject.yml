@@ -14,7 +14,7 @@ project:
         - ../../../../Library/CMSIS/Compiler/include
         - ../../../../Library/Device/Nuvoton/M3351/Include
         - ../../../../Library/StdDriver/inc
-      add-path-asm:  
+      add-path-asm:
         - ../
       define:
         - __PLDM_EMU__
@@ -26,6 +26,8 @@ project:
           C-CPP:
             - -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -fdata-sections -Wall
             - -D__MICROLIB
+            - -Wconditional-uninitialized
+            - -mno-unaligned-access
           CPP:
             - -xc++
             - -std=c++11
@@ -40,6 +42,8 @@ project:
             - -std=gnu11
           C-CPP:
             - -mthumb -masm-syntax-unified -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+            - -Wmaybe-uninitialized
+            - -mno-unaligned-access
           Link:
             - -mthumb -fmessage-length=0 -fsigned-char --specs=nano.specs --specs=nosys.specs
             - -Wl,--gc-sections,-Map="$elf()$.map"
@@ -66,5 +70,5 @@ project:
       files:
         - file: ../main.c
         - file: ../vector_parser.c
-        - file: ../vector.vs.S 
-        - file: ../sha_test_vector 
+        - file: ../vector.vs.S
+        - file: ../sha_test_vector

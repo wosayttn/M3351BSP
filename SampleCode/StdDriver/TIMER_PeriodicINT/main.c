@@ -14,11 +14,16 @@
 /*---------------------------------------------------------------------------------------------------------*/
 static volatile uint32_t g_au32TMRINTCount[4] = {0};
 
+void TIMER0_IRQHandler(void);
+void TIMER1_IRQHandler(void);
+void TIMER2_IRQHandler(void);
+void TIMER3_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    if (TIMER_GetIntFlag(TIMER0) == 1)
+    if (TIMER_GetIntFlag(TIMER0) == 1U)
     {
         /* Clear Timer0 time-out interrupt flag */
         TIMER_ClearIntFlag(TIMER0);
@@ -40,7 +45,7 @@ void TIMER1_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    if (TIMER_GetIntFlag(TIMER1) == 1)
+    if (TIMER_GetIntFlag(TIMER1) == 1U)
     {
         /* Clear Timer1 time-out interrupt flag */
         TIMER_ClearIntFlag(TIMER1);
@@ -62,7 +67,7 @@ void TIMER2_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    if (TIMER_GetIntFlag(TIMER2) == 1)
+    if (TIMER_GetIntFlag(TIMER2) == 1U)
     {
         /* Clear Timer2 time-out interrupt flag */
         TIMER_ClearIntFlag(TIMER2);
@@ -84,7 +89,7 @@ void TIMER3_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
 
-    if (TIMER_GetIntFlag(TIMER3) == 1)
+    if (TIMER_GetIntFlag(TIMER3) == 1U)
     {
         /* Clear Timer3 time-out interrupt flag */
         TIMER_ClearIntFlag(TIMER3);
@@ -149,7 +154,9 @@ static void SYS_Init(void)
 
 int main(void)
 {
-    uint32_t u32InitCount, au32Counts[4];
+    uint32_t u32Failed;
+    uint32_t u32InitCount;
+    uint32_t au32Counts[4];
 
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -160,7 +167,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("+--------------------------------------------+\n");
     printf("|    Timer Periodic Interrupt Sample Code    |\n");
     printf("+--------------------------------------------+\n\n");
@@ -209,7 +216,11 @@ int main(void)
     NVIC_EnableIRQ(TIMER3_IRQn);
 
     /* Clear Timer0 ~ Timer3 interrupt counts to 0 */
-    g_au32TMRINTCount[0] = g_au32TMRINTCount[1] = g_au32TMRINTCount[2] = g_au32TMRINTCount[3] = 0;
+    g_au32TMRINTCount[0] = 0U;
+    g_au32TMRINTCount[1] = 0U;
+    g_au32TMRINTCount[2] = 0U;
+    g_au32TMRINTCount[3] = 0U;
+    u32Failed = 0U;
     u32InitCount = g_au32TMRINTCount[0];
 
     /* Start Timer0 ~ Timer3 counting */
@@ -221,7 +232,7 @@ int main(void)
     /* Check Timer0 ~ Timer3 interrupt counts */
     printf("# Timer interrupt counts :\n");
 
-    while (u32InitCount < 20)
+    while ((u32InitCount < 20U) && (u32Failed == 0U))
     {
         if (g_au32TMRINTCount[0] != u32InitCount)
         {
@@ -233,22 +244,25 @@ int main(void)
                    au32Counts[0], au32Counts[1], au32Counts[2], au32Counts[3]);
             u32InitCount = g_au32TMRINTCount[0];
 
-            if ((au32Counts[1] > (au32Counts[0] * 2 + 1)) || (au32Counts[1] < (au32Counts[0] * 2 - 1)) ||
-                    (au32Counts[2] > (au32Counts[0] * 4 + 1)) || (au32Counts[2] < (au32Counts[0] * 4 - 1)) ||
-                    (au32Counts[3] > (au32Counts[0] * 8 + 1)) || (au32Counts[3] < (au32Counts[0] * 8 - 1)))
+            if ((au32Counts[1] > ((au32Counts[0] * 2U) + 1U)) || (au32Counts[1] < ((au32Counts[0] * 2U) - 1U)) ||
+                    (au32Counts[2] > ((au32Counts[0] * 4U) + 1U)) || (au32Counts[2] < ((au32Counts[0] * 4U) - 1U)) ||
+                    (au32Counts[3] > ((au32Counts[0] * 8U) + 1U)) || (au32Counts[3] < ((au32Counts[0] * 8U) - 1U)))
             {
                 printf("*** FAIL ***\n");
-                goto lexit;
+                u32Failed = 1U;
             }
         }
     }
 
-    printf("*** PASS ***\n");
-
-lexit:
+    if (u32Failed == 0U)
+    {
+        printf("*** PASS ***\n");
+    }
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1)
+    {
+    }
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

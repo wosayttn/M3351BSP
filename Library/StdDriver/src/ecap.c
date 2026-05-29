@@ -8,6 +8,8 @@
 *****************************************************************************/
 #include "NuMicro.h"
 
+#define ECAP_MODULE_NULL ((ECAP_T *)0)
+
 /** @addtogroup Standard_Driver Standard Driver
   @{
 */
@@ -33,9 +35,18 @@
   */
 void ECAP_Open(ECAP_T *ecap, uint32_t u32FuncMask)
 {
-    /* Clear Input capture mode*/
-    ecap->CTL0 = ecap->CTL0 & ~(ECAP_CTL0_CMPEN_Msk);
-    ecap->CTL1 = ecap->CTL1 & ~(ECAP_CTL1_CAP0RLDEN_Msk | ECAP_CTL1_CAP1RLDEN_Msk | ECAP_CTL1_CAP2RLDEN_Msk);
+    if (ecap == ECAP_MODULE_NULL)
+    {
+        return;
+    }
+
+    if ((u32FuncMask != ECAP_DISABLE_COMPARE_RELOAD) &&
+            (u32FuncMask != ECAP_RELOAD_FUNCTION) &&
+            (u32FuncMask != ECAP_COMPARE_FUNCTION) &&
+            (u32FuncMask != ECAP_RELOAD_COMPARE_FUNCTION))
+    {
+        return;
+    }
 
     /* Enable Input Capture and set mode */
     ecap->CTL0 |= ECAP_CTL0_CAPEN_Msk;
@@ -63,6 +74,7 @@ void ECAP_Open(ECAP_T *ecap, uint32_t u32FuncMask)
             break;
 
         default:
+            /* Invalid function mask should not reach here due to parameter validation above */
             break;
     }
 }
@@ -75,6 +87,11 @@ void ECAP_Open(ECAP_T *ecap, uint32_t u32FuncMask)
   */
 void ECAP_Close(ECAP_T *ecap)
 {
+    if (ecap == ECAP_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Disable Input Capture*/
     ecap->CTL0 &= ~ECAP_CTL0_CAPEN_Msk;
 }
@@ -93,8 +110,13 @@ void ECAP_Close(ECAP_T *ecap)
   */
 void ECAP_EnableINT(ECAP_T *ecap, uint32_t u32Mask)
 {
+    if (ecap == ECAP_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Enable input channel interrupt */
-    ecap->CTL0 |= (u32Mask);
+    ecap->CTL0 |= (u32Mask & ECAP_INTEN_MASK);
 }
 
 /**
@@ -111,8 +133,13 @@ void ECAP_EnableINT(ECAP_T *ecap, uint32_t u32Mask)
   */
 void ECAP_DisableINT(ECAP_T *ecap, uint32_t u32Mask)
 {
+    if (ecap == ECAP_MODULE_NULL)
+    {
+        return;
+    }
+
     /* Disable input channel interrupt */
-    ecap->CTL0 &= ~(u32Mask);
+    ecap->CTL0 &= ~(u32Mask & ECAP_INTEN_MASK);
 }
 
 /** @} end of group ECAP_EXPORTED_FUNCTIONS */

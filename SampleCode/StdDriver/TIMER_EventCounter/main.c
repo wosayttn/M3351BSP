@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "NuMicro.h"
 
+void TIMER0_IRQHandler(void);
+
 void TIMER0_IRQHandler(void)
 {
     uint32_t u32TimeOutCnt = SystemCoreClock; /* 1 second time-out */
@@ -73,7 +75,7 @@ static void SYS_Init(void)
 
 int main(void)
 {
-    volatile int i;
+    volatile uint32_t i;
 
     /* Init System, IP clock and multi-function I/O */
     SYS_Init();
@@ -84,7 +86,7 @@ int main(void)
     initialise_monitor_handles();
 #endif
 
-    printf("System core clock = %d\n", SystemCoreClock);
+    printf("System core clock = %u\n", CLK_GetHCLKFreq());
     printf("\nThis sample code use TM0 counter pin PB.5 to count PB.4 input event\n");
     printf("Please connect PB.5 to PB.4, press any key to continue\n");
     getchar();
@@ -93,11 +95,11 @@ int main(void)
     PB4 = 1;    // Set init state to high
 
     // Give a dummy target frequency here. Will over write prescale and compare value with macro
-    TIMER_Open(TIMER0, TIMER_ONESHOT_MODE, 100);
+    TIMER_Open(TIMER0, TIMER_ONESHOT_MODE, 100U);
 
     // Update prescale and compare value to what we need in event counter mode.
-    TIMER_SET_PRESCALE_VALUE(TIMER0, 0);
-    TIMER_SET_CMP_VALUE(TIMER0, 1000);
+    TIMER_SET_PRESCALE_VALUE(TIMER0, 0U);
+    TIMER_SET_CMP_VALUE(TIMER0, 1000U);
     // Counter increase on falling edge
     TIMER_EnableEventCounter(TIMER0, TIMER_COUNTER_EVENT_FALLING);
 
@@ -108,16 +110,16 @@ int main(void)
     // Start Timer 0
     TIMER_Start(TIMER0);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0U; i < 1000U; i++)
     {
         PB4 = 0; // low
-        CLK_SysTickDelay(1);
+        CLK_SysTickDelay(1U);
         PB4 = 1;  // high
-        CLK_SysTickDelay(1);
+        CLK_SysTickDelay(1U);
     }
 
     /* Got no where to go, just loop forever */
-    while (1) ;
+    while (1) {}
 }
 
 /*** (C) COPYRIGHT 2025 Nuvoton Technology Corp. ***/

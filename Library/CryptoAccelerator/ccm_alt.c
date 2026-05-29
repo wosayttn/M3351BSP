@@ -47,6 +47,7 @@
     #endif /* MBEDTLS_SELF_TEST && MBEDTLS_AES_C */
 #endif /* MBEDTLS_PLATFORM_C */
 
+#include "NuMicro.h"
 
 
 /*
