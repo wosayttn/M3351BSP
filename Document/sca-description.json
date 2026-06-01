@@ -1,0 +1,538 @@
+{
+  "project_name": "NuMicro-M3351BSP",
+  "project_version": "v3.0.2",
+  "release_date": "2026-06-01",
+  "supplier": "Nuvoton Technology",
+  "total_components": 39,
+  "vulnerability_summary": {
+    "Critical": 5,
+    "High": 9,
+    "Medium": 9,
+    "Low": 0,
+    "Negligible": 0,
+    "Unknown": 0
+  },
+  "components": [
+    {
+      "name": "ARM-software/cmsis-actions/armlm",
+      "version": "v1",
+      "type": "library",
+      "purl": "pkg:github/ARM-software/cmsis-actions@v1#armlm",
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "ARM-software/cmsis-actions/vcpkg",
+      "version": "v1",
+      "type": "library",
+      "purl": "pkg:github/ARM-software/cmsis-actions@v1#vcpkg",
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "HID Transfer Test Tool",
+      "version": "1.1.0.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "NuvPos58 Driver",
+      "version": "1.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "NuvPos58 Driver",
+      "version": "1.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "WDF Coinstaller",
+      "version": "1.11.9200.16384",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "WDF Coinstaller",
+      "version": "1.11.9200.16384",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "Windows Driver Foundation - User-mode Platform Device Update Co-Installer",
+      "version": "6.1.7600.16385",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "actions/checkout",
+      "version": "v4",
+      "type": "library",
+      "purl": "pkg:github/actions/checkout@v4",
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "actions/checkout",
+      "version": "v4",
+      "type": "library",
+      "purl": "pkg:github/actions/checkout@v4",
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "actions/upload-artifact",
+      "version": "v4",
+      "type": "library",
+      "purl": "pkg:github/actions/upload-artifact@v4",
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusb-win32 - DLL",
+      "version": "1.2.6.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusb-win32 - DLL",
+      "version": "1.2.6.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "type": "application",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/.github/workflows/SBOM_CVE.yml",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/.github/workflows/VSCode.yml",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/WdfCoInstaller01011.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0_x86.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK_x86.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/WdfCoInstaller01011.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/install-filter.exe",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0_x86.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusbK.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/winusbcoinstaller2.dll",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/StdDriver/USBD_MicroPrinter/Windows driver/NuvPos58_Driver.exe",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/SampleCode/StdDriver/USBD_Printer_And_HID_Transfer/Windows driver/NuvPos58_Driver.exe",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "/mnt/tank/M3351BSP/Tool/HIDTransferTest/Debug/HIDTransferTest.exe",
+      "version": null,
+      "type": "file",
+      "purl": null,
+      "license": "Unknown",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "cmsis-core",
+      "version": "5.9.0",
+      "type": "library",
+      "purl": "pkg:github/ARM-software/CMSIS_5@5.9.0",
+      "license": "Apache-2.0",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "FatFs",
+      "version": "0.15",
+      "type": "library",
+      "purl": "pkg:generic/FatFs@0.15",
+      "license": "ChaN License",
+      "vulnerabilities_found": 0
+    },
+    {
+      "name": "FreeRTOS",
+      "version": "10.5.1",
+      "type": "library",
+      "purl": "pkg:github/FreeRTOS/FreeRTOS-Kernel@10.5.1",
+      "license": "MIT",
+      "vulnerabilities_found": 1
+    },
+    {
+      "name": "mbedtls",
+      "version": "3.1.0",
+      "type": "library",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "license": "Apache-2.0",
+      "vulnerabilities_found": 22
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "vuln_id": "CVE-2025-47917",
+      "severity": "Critical",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.4 allows a use-after-free in certain situations of applications that are developed in accordance with the documentation. The function mbedtls_x509_string_to_names() takes a head argument that is documented as an output argument. The documentation does not suggest that the function will free that pointer; however, the function does call mbedtls_asn1_free_named_data_list() on that argument, which performs a deep free(). As a result, application code that uses this function (relying only on documented behavior) is likely to still hold pointers to the memory blocks that were freed, resulting in a high risk of use-after-free or double-free. In particular, the two sample programs x509/cert_write and x509/cert_req are affected (use-after-free if the san string contains more than one DN).",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2022-35409",
+      "severity": "Critical",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS before 2.28.1 and 3.x before 3.2.0. In some configurations, an unauthenticated attacker can send an invalid ClientHello message to a DTLS server that causes a heap-based buffer over-read of up to 255 bytes. This can cause a server crash or possibly information disclosure based on error responses. Affected configurations have MBEDTLS_SSL_DTLS_CLIENT_PORT_REUSE enabled and MBEDTLS_SSL_IN_CONTENT_LEN less than a threshold that depends on the configuration: 258 bytes if using mbedtls_ssl_cookie_check, and possibly up to 571 bytes with a custom cookie check function.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2022-46393",
+      "severity": "Critical",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS before 2.28.2 and 3.x before 3.3.0. There is a potential heap-based buffer overflow and heap-based buffer over-read in DTLS if MBEDTLS_SSL_DTLS_CONNECTION_ID is enabled and MBEDTLS_SSL_CID_IN_LEN_MAX > 2 * MBEDTLS_SSL_CID_OUT_LEN_MAX.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2024-23775",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Integer Overflow vulnerability in Mbed TLS 2.x before 2.28.7 and 3.x before 3.5.2, allows attackers to cause a denial of service (DoS) via mbedtls_x509_set_extension().",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2023-43615",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS 2.x before 2.28.5 and 3.x before 3.5.0 has a Buffer Overflow.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2026-34877",
+      "severity": "Critical",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS versions from 2.19.0 up to 3.6.5, Mbed TLS 4.0.0. Insufficient protection of serialized SSL context or session structures allows an attacker who can modify the serialized structures to induce memory corruption, leading to arbitrary code execution. This is caused by Incorrect Use of Privileged APIs.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-52497",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.4 has a PEM parsing one-byte heap-based buffer underflow, in mbedtls_pem_read_buffer and two mbedtls_pk_parse functions, via untrusted PEM input.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-48965",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.4 has a NULL pointer dereference because mbedtls_asn1_store_named_data can trigger conflicting data with val.p of NULL but val.len greater than zero.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2024-28960",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS 2.18.0 through 2.28.x before 2.28.8 and 3.x before 3.6.0, and Mbed Crypto. The PSA Crypto API mishandles shared memory.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2022-46392",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS before 2.28.2 and 3.x before 3.3.0. An adversary with access to precise enough information about memory accesses (typically, an untrusted operating system attacking a secure enclave) can recover an RSA private key after observing the victim performing a single private-key operation, if the window size (MBEDTLS_MPI_WINDOW_SIZE) used for the exponentiation is 3 or smaller.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2024-23170",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS 2.x before 2.28.7 and 3.x before 3.5.2. There was a timing side channel in RSA private operations. This side channel could be sufficient for a local attacker to recover the plaintext. It requires the attacker to send a large number of messages for decryption, as described in \"Everlasting ROBOT: the Marvin Attack\" by Hubert Kario.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-27810",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 2.28.10 and 3.x before 3.6.3, in some cases of failed memory allocation or hardware errors, uses uninitialized stack memory to compose the TLS Finished message, potentially leading to authentication bypasses such as replays.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-27809",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 2.28.10 and 3.x before 3.6.3, on the client side, accepts servers that have trusted certificates for arbitrary hostnames unless the TLS client application calls mbedtls_ssl_set_hostname.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-52496",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.4 has a race condition in AESNI detection if certain compiler optimizations occur. An attacker may be able to extract an AES key from a multithreaded program, or perform a GCM forgery.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2023-52353",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS through 3.5.1. In mbedtls_ssl_session_reset, the maximum negotiable TLS version is mishandled. For example, if the last connection negotiated TLS 1.2, then 1.2 becomes the new maximum.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2024-28115",
+      "severity": "High",
+      "package_name": "FreeRTOS",
+      "package_version": "10.5.1",
+      "purl": "pkg:github/FreeRTOS/FreeRTOS-Kernel@10.5.1",
+      "description": "FreeRTOS is a real-time operating system for microcontrollers. FreeRTOS Kernel versions through 10.6.1 do not sufficiently protect against local privilege escalation via Return Oriented Programming techniques should a vulnerability exist that allows code injection and execution. These issues affect ARMv7-M MPU ports, and ARMv8-M ports with Memory Protected Unit (MPU) support enabled (i.e. `configENABLE_MPU` set to 1). These issues are fixed in version 10.6.2 with a new MPU wrapper.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-59438",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS through 3.6.4 has an Observable Timing Discrepancy.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2026-34876",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS 3.x before 3.6.6. An out-of-bounds read vulnerability in mbedtls_ccm_finish() in library/ccm.c allows attackers to obtain adjacent CCM context data via invocation of the multipart CCM API with an oversized tag_len parameter. This is caused by missing validation of the tag_len parameter against the size of the internal 16-byte authentication buffer. The issue affects the public multipart CCM API in Mbed TLS 3.x, where mbedtls_ccm_finish() can be invoked directly by applications. In Mbed TLS 4.x versions prior to the fix, the same missing validation exists in the internal implementation; however, the function is not exposed as part of the public API. Exploitation requires application-level invocation of the multipart CCM API.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-54764",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.5 allows a local timing attack against certain RSA operations, and direct calls to mbedtls_mpi_mod_inv or mbedtls_mpi_gcd.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2026-25835",
+      "severity": "High",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "Mbed TLS before 3.6.6 and TF-PSA-Crypto before 1.1.0 misuse seeds in a Pseudo-Random Number Generator (PRNG).",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2025-66442",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "In Mbed TLS through 4.0.0, there is a compiler-induced timing side channel (in RSA and CBC/ECB decryption) that only occurs with LLVM's select-optimize feature. TF-PSA-Crypto through 1.0.0 is also affected.",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2026-34872",
+      "severity": "Critical",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS 3.5.x and 3.6.x through 3.6.5 and TF-PSA-Crypto 1.0. There is a lack of contributory behavior in FFDH due to improper input validation. Using finite-field Diffie-Hellman, the other party can force the shared secret into a small set of values (lack of contributory behavior). This is a problem for protocols that depend on contributory behavior (which is not the case for TLS). The attack can be carried by the peer, or depending on the protocol by an active network attacker (person in the middle).",
+      "fix_state": "unknown"
+    },
+    {
+      "vuln_id": "CVE-2026-34871",
+      "severity": "Medium",
+      "package_name": "mbedtls",
+      "package_version": "3.1.0",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "description": "An issue was discovered in Mbed TLS before 3.6.6 and 4.x before 4.1.0 and TF-PSA-Crypto before 1.1.0. There is a Predictable Seed in a Pseudo-Random Number Generator (PRNG).",
+      "fix_state": "unknown"
+    }
+  ]
+}

@@ -24,7 +24,7 @@ SBOM_PATH = os.path.join(WORKSPACE, "sbom.json")
 CVE_PATH = os.path.join(WORKSPACE, "cve-report.json")
 SCA_JSON_PATH = os.path.join(WORKSPACE, "sca-description.json")
 SCA_MD_PATH = os.path.join(WORKSPACE, "sca-description.md")
-MANIFEST_PATH = os.path.join(WORKSPACE, "manifest.json")
+MANIFEST_PATH = os.path.join(WORKSPACE, "Document", "manifest.json")
 
 def load_manifest():
     if os.path.exists(MANIFEST_PATH):
@@ -43,7 +43,7 @@ def run_command(cmd, cwd=WORKSPACE):
 
 def main():
     manifest = load_manifest()
-    bsp_name = manifest.get("bsp_name", "NuMicro-M33-BSP")
+    bsp_name = manifest.get("bsp_name", "NuMicro-M3351BSP")
     bsp_version = manifest.get("bsp_version", "v3.0.2")
     supplier = manifest.get("supplier", "Nuvoton Technology")
     

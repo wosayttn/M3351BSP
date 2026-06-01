@@ -1,0 +1,1227 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:d10db528-2974-4e87-8529-cd84a7be4906",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-06-01T16:21:04+08:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "author": "anchore",
+          "name": "syft",
+          "version": "1.44.0"
+        }
+      ]
+    },
+    "component": {
+      "bom-ref": "pkg:generic/NuMicro-M3351BSP@v3.0.2?type=device",
+      "type": "device",
+      "name": "NuMicro-M3351BSP",
+      "version": "v3.0.2",
+      "supplier": {
+        "name": "Nuvoton Technology"
+      }
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:github/arm-software/cmsis-actions@v1?package-id=65037b80df6adcad#armlm",
+      "type": "library",
+      "name": "ARM-software/cmsis-actions/armlm",
+      "version": "v1",
+      "cpe": "cpe:2.3:a:ARM-software\\/cmsis-actions\\/armlm:ARM-software\\/cmsis-actions\\/armlm:v1:*:*:*:*:*:*:*",
+      "purl": "pkg:github/ARM-software/cmsis-actions@v1#armlm",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "github-actions-usage-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "github-action"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "github-actions-use-statement"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis-actions\\/armlm:ARM_software\\/cmsis_actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis_actions\\/armlm:ARM-software\\/cmsis-actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis_actions\\/armlm:ARM_software\\/cmsis_actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis:ARM-software\\/cmsis-actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis:ARM_software\\/cmsis_actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis:ARM-software\\/cmsis-actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis:ARM_software\\/cmsis_actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM:ARM-software\\/cmsis-actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM:ARM_software\\/cmsis_actions\\/armlm:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/.github/workflows/VSCode.yml"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/arm-software/cmsis-actions@v1?package-id=1629b3e7bde9242c#vcpkg",
+      "type": "library",
+      "name": "ARM-software/cmsis-actions/vcpkg",
+      "version": "v1",
+      "cpe": "cpe:2.3:a:ARM-software\\/cmsis-actions\\/vcpkg:ARM-software\\/cmsis-actions\\/vcpkg:v1:*:*:*:*:*:*:*",
+      "purl": "pkg:github/ARM-software/cmsis-actions@v1#vcpkg",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "github-actions-usage-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "github-action"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "github-actions-use-statement"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis-actions\\/vcpkg:ARM_software\\/cmsis_actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis_actions\\/vcpkg:ARM-software\\/cmsis-actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis_actions\\/vcpkg:ARM_software\\/cmsis_actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis:ARM-software\\/cmsis-actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM-software\\/cmsis:ARM_software\\/cmsis_actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis:ARM-software\\/cmsis-actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM_software\\/cmsis:ARM_software\\/cmsis_actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM:ARM-software\\/cmsis-actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:ARM:ARM_software\\/cmsis_actions\\/vcpkg:v1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/.github/workflows/VSCode.yml"
+        }
+      ]
+    },
+    {
+      "bom-ref": "b6d1bf6edbc2c07e",
+      "type": "application",
+      "name": "HID Transfer Test Tool",
+      "version": "1.1.0.0",
+      "cpe": "cpe:2.3:a:HID_Transfer_Test_Tool:HID_Transfer_Test_Tool:1.1.0.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/Tool/HIDTransferTest/Debug/HIDTransferTest.exe"
+        }
+      ]
+    },
+    {
+      "bom-ref": "5c184be549ddeb6d",
+      "type": "application",
+      "name": "NuvPos58 Driver",
+      "version": "1.0",
+      "cpe": "cpe:2.3:a:NuvPos58_Driver:NuvPos58_Driver:1.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/StdDriver/USBD_MicroPrinter/Windows driver/NuvPos58_Driver.exe"
+        }
+      ]
+    },
+    {
+      "bom-ref": "470549638e85b93b",
+      "type": "application",
+      "name": "NuvPos58 Driver",
+      "version": "1.0",
+      "cpe": "cpe:2.3:a:NuvPos58_Driver:NuvPos58_Driver:1.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/StdDriver/USBD_Printer_And_HID_Transfer/Windows driver/NuvPos58_Driver.exe"
+        }
+      ]
+    },
+    {
+      "bom-ref": "68c37d2906de8bf3",
+      "type": "application",
+      "name": "WDF Coinstaller",
+      "version": "1.11.9200.16384",
+      "cpe": "cpe:2.3:a:WDF_Coinstaller:WDF_Coinstaller:1.11.9200.16384:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/WdfCoInstaller01011.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "7b04c424b503306a",
+      "type": "application",
+      "name": "WDF Coinstaller",
+      "version": "1.11.9200.16384",
+      "cpe": "cpe:2.3:a:WDF_Coinstaller:WDF_Coinstaller:1.11.9200.16384:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/WdfCoInstaller01011.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "bf71cac99c5dbe91",
+      "type": "application",
+      "name": "Windows Driver Foundation - User-mode Platform Device Update Co-Installer",
+      "version": "6.1.7600.16385",
+      "cpe": "cpe:2.3:a:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_-_User:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_-_User:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation___User:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_:Windows_Driver_Foundation_-_User-mode_Platform_Device_Update_Co-Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:Windows_Driver_Foundation_:Windows_Driver_Foundation___User_mode_Platform_Device_Update_Co_Installer:6.1.7600.16385:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/winusbcoinstaller2.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/actions/checkout@v4?package-id=85ffb3d232222c45",
+      "type": "library",
+      "name": "actions/checkout",
+      "version": "v4",
+      "cpe": "cpe:2.3:a:actions\\/checkout:actions\\/checkout:v4:*:*:*:*:*:*:*",
+      "purl": "pkg:github/actions/checkout@v4",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "github-actions-usage-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "github-action"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "github-actions-use-statement"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/.github/workflows/SBOM_CVE.yml"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/actions/checkout@v4?package-id=372d9b3f1f5f9f7f",
+      "type": "library",
+      "name": "actions/checkout",
+      "version": "v4",
+      "cpe": "cpe:2.3:a:actions\\/checkout:actions\\/checkout:v4:*:*:*:*:*:*:*",
+      "purl": "pkg:github/actions/checkout@v4",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "github-actions-usage-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "github-action"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "github-actions-use-statement"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/.github/workflows/VSCode.yml"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/actions/upload-artifact@v4?package-id=5bb55ea3ff974d11",
+      "type": "library",
+      "name": "actions/upload-artifact",
+      "version": "v4",
+      "cpe": "cpe:2.3:a:actions\\/upload-artifact:actions\\/upload-artifact:v4:*:*:*:*:*:*:*",
+      "purl": "pkg:github/actions/upload-artifact@v4",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "github-actions-usage-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "github-action"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "github-actions-use-statement"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:actions\\/upload-artifact:actions\\/upload_artifact:v4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:actions\\/upload_artifact:actions\\/upload-artifact:v4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:actions\\/upload_artifact:actions\\/upload_artifact:v4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:actions\\/upload:actions\\/upload-artifact:v4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:actions\\/upload:actions\\/upload_artifact:v4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/.github/workflows/SBOM_CVE.yml"
+        }
+      ]
+    },
+    {
+      "bom-ref": "b8389e2abd44a30e",
+      "type": "application",
+      "name": "libusb-win32 - DLL",
+      "version": "1.2.6.0",
+      "cpe": "cpe:2.3:a:libusb-win32_-_DLL:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_DLL:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___DLL:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___DLL:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "86da19749c6dc703",
+      "type": "application",
+      "name": "libusb-win32 - DLL",
+      "version": "1.2.6.0",
+      "cpe": "cpe:2.3:a:libusb-win32_-_DLL:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_DLL:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___DLL:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___DLL:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb-win32_-_DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb_win32___DLL:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0_x86.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "c43e2cae2400373c",
+      "type": "application",
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "cpe": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0_x86.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "ff1204fa159e3d67",
+      "type": "application",
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "cpe": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/install-filter.exe"
+        }
+      ]
+    },
+    {
+      "bom-ref": "b816c3bf0b89a4c7",
+      "type": "application",
+      "name": "libusb-win32 - Install-Filter",
+      "version": "1.2.6.0",
+      "cpe": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install-Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install_Filter:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_-_Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32___Install:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb-win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb_win32_:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb-win32_-_Install-Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:libusb:libusb_win32___Install_Filter:1.2.6.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "dfd339558d9de869",
+      "type": "application",
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "cpe": "cpe:2.3:a:libusbK.dll:libusbK.dll:3.0.7.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2ece3c745f6fb48d",
+      "type": "application",
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "cpe": "cpe:2.3:a:libusbK.dll:libusbK.dll:3.0.7.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK_x86.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "fe96b57fa413e90e",
+      "type": "application",
+      "name": "libusbK.dll",
+      "version": "3.0.7.0",
+      "cpe": "cpe:2.3:a:libusbK.dll:libusbK.dll:3.0.7.0:*:*:*:*:*:*:*",
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "pe-binary-package-cataloger"
+        },
+        {
+          "name": "syft:package:type",
+          "value": "binary"
+        },
+        {
+          "name": "syft:package:metadataType",
+          "value": "pe-binary"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusbK.dll"
+        }
+      ]
+    },
+    {
+      "bom-ref": "d3d36944e659c5f2",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/.github/workflows/SBOM_CVE.yml",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "76e49c17b424f98d370f4fd211a0c9c6ac304a6c"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "5c675b79013100699fbad3d49eeebceebbde1f344e84aa4a62928349e4f85987"
+        }
+      ]
+    },
+    {
+      "bom-ref": "6ed0e076b12e69e9",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/.github/workflows/VSCode.yml",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "9a662966f563e2f13d59e39ad769a7366dc5c0fc"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "316ac0e69dc7b73f72c63449f512ac788f367ab4a625a3749097dac8daae4eb5"
+        }
+      ]
+    },
+    {
+      "bom-ref": "fa54aa801e5956bd",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/WdfCoInstaller01011.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "dee0ddc820cd0da546dff8bcf2bc490326da90a2"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "c7649879a10c9332fc0f9744c7e3224647aee9e7e62c7e21cf9e987462e3dd06"
+        }
+      ]
+    },
+    {
+      "bom-ref": "5ca95c995a8baa06",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "bab236f840f1521c43bcbaa2a7b92f14f329bc70"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "4f18b5d2c28aa66b648c8683c6d09b52b92cbbee85984bbefad5f38a64bc2a14"
+        }
+      ]
+    },
+    {
+      "bom-ref": "61d24f04e410616e",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusb0_x86.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "7dd82b6d52a840c4979a7515fc7a9ca3725363c4"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "5e84d13636fbce7869cddc8b20c7d83fa0063e98c319e8e5ab751edc9ee1da76"
+        }
+      ]
+    },
+    {
+      "bom-ref": "4c6b8e3b6a5c39bb",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "fa8489441ac82d22567b5c3d5b494576df54f37d"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "592cd24bae321f1cb6cbe2f6e1bc5c05e279328e1c86814eb64ea1e89fdea188"
+        }
+      ]
+    },
+    {
+      "bom-ref": "081a41e9e7d4fe80",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/amd64/libusbK_x86.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "fc2350e45b0c7bdac7ac35f42b65f5fdfd622464"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "22803c719494f193d22519bfaff9484fecdcf1fadd6f082efd024fcee0b97ba4"
+        }
+      ]
+    },
+    {
+      "bom-ref": "f8bbc17e9ea529e5",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/WdfCoInstaller01011.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "dee0ddc820cd0da546dff8bcf2bc490326da90a2"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "c7649879a10c9332fc0f9744c7e3224647aee9e7e62c7e21cf9e987462e3dd06"
+        }
+      ]
+    },
+    {
+      "bom-ref": "7ac17bbe7440dac9",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/install-filter.exe",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "7dd82b6d52a840c4979a7515fc7a9ca3725363c4"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "5e84d13636fbce7869cddc8b20c7d83fa0063e98c319e8e5ab751edc9ee1da76"
+        }
+      ]
+    },
+    {
+      "bom-ref": "ef19ac8cdf5e28b7",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "7dd82b6d52a840c4979a7515fc7a9ca3725363c4"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "5e84d13636fbce7869cddc8b20c7d83fa0063e98c319e8e5ab751edc9ee1da76"
+        }
+      ]
+    },
+    {
+      "bom-ref": "68f3b1df45f1bbf4",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusb0_x86.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "3a238468009a6dea3e4f70821339185e56ea3b69"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "00caca07869b19d10b370552ac7cc2f6f2ee246fc15db11650f6cd3f4ef9b666"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2dc42974bf4115a3",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/libusbK.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "fc2350e45b0c7bdac7ac35f42b65f5fdfd622464"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "22803c719494f193d22519bfaff9484fecdcf1fadd6f082efd024fcee0b97ba4"
+        }
+      ]
+    },
+    {
+      "bom-ref": "69135bd6db3acfc6",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/ISP/ISP_DFU/WindowsDriver/x86/winusbcoinstaller2.dll",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "1633b3715014c90d1c552cd757ef5de33c161dee"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "ebe3b7708dd974ee87efed3113028d266af87ca8dbae77c47c6f7612824d3d6c"
+        }
+      ]
+    },
+    {
+      "bom-ref": "1486191160df43a4",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/StdDriver/USBD_MicroPrinter/Windows driver/NuvPos58_Driver.exe",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "ba09b88a8ffa9b06bcd30ad7b45f6acb880b4cb9"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "911e4c166fe9b06c8e2e31ab46b56ef662c43cba208d2088ca1d41c6d584e183"
+        }
+      ]
+    },
+    {
+      "bom-ref": "11262e8592cd2f3d",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/SampleCode/StdDriver/USBD_Printer_And_HID_Transfer/Windows driver/NuvPos58_Driver.exe",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "ba09b88a8ffa9b06bcd30ad7b45f6acb880b4cb9"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "911e4c166fe9b06c8e2e31ab46b56ef662c43cba208d2088ca1d41c6d584e183"
+        }
+      ]
+    },
+    {
+      "bom-ref": "7132a6e4e31aa619",
+      "type": "file",
+      "name": "/mnt/tank/M3351BSP/Tool/HIDTransferTest/Debug/HIDTransferTest.exe",
+      "hashes": [
+        {
+          "alg": "SHA-1",
+          "content": "8513f8d15aaceb2ebbe854632d3587924037c11a"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "ed3f21632d154bc59477ac4a35dfc3009e417799109582b70cd82fe7e8445f72"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/ARM-software/CMSIS_5@5.9.0?package-id=cmsis-core",
+      "type": "library",
+      "name": "cmsis-core",
+      "version": "5.9.0",
+      "description": "CMSIS Core hardware abstraction layer for Cortex-M processors",
+      "purl": "pkg:github/ARM-software/CMSIS_5@5.9.0",
+      "cpe": "cpe:2.3:a:arm:cmsis:5.9.0:*:*:*:*:*:*:*",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "custom-thirdparty-cataloger"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/Library/CMSIS"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:generic/FatFs@0.15?package-id=fatfs",
+      "type": "library",
+      "name": "FatFs",
+      "version": "0.15",
+      "description": "Generic FAT Filesystem Module",
+      "purl": "pkg:generic/FatFs@0.15",
+      "cpe": "cpe:2.3:a:fatfs_project:fatfs:0.15:*:*:*:*:*:*:*",
+      "licenses": [
+        {
+          "license": {
+            "name": "ChaN License"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "custom-thirdparty-cataloger"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/ThirdParty/FatFs"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/FreeRTOS/FreeRTOS-Kernel@10.5.1?package-id=freertos",
+      "type": "library",
+      "name": "FreeRTOS",
+      "version": "10.5.1",
+      "description": "Real-time operating system kernel for embedded devices",
+      "purl": "pkg:github/FreeRTOS/FreeRTOS-Kernel@10.5.1",
+      "cpe": "cpe:2.3:o:amazon:freertos:10.5.1:*:*:*:*:*:*:*",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "custom-thirdparty-cataloger"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/ThirdParty/FreeRTOS"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:github/Mbed-TLS/mbedtls@3.1.0?package-id=mbedtls",
+      "type": "library",
+      "name": "mbedtls",
+      "version": "3.1.0",
+      "description": "Lightweight, portable cryptographic and SSL/TLS library",
+      "purl": "pkg:github/Mbed-TLS/mbedtls@3.1.0",
+      "cpe": "cpe:2.3:a:arm:mbed_tls:3.1.0:*:*:*:*:*:*:*",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "syft:package:foundBy",
+          "value": "custom-thirdparty-cataloger"
+        },
+        {
+          "name": "syft:location:0:path",
+          "value": "/ThirdParty/mbedtls"
+        }
+      ]
+    }
+  ]
+}
