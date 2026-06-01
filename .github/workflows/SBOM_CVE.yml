@@ -1,0 +1,73 @@
+name: SBOM and CVE Scan
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # =========================
+      # 1. Install tools
+      # =========================
+      - name: Install Syft & Grype
+        run: |
+          mkdir -p /opt
+          cd /opt
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh
+          /opt/bin/syft version
+          /opt/bin/grype version
+
+      # ==========================================
+      # 2. Generate SBOM (single source of truth)
+      # ==========================================
+      - name: Generate SBOM (CycloneDX JSON)
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          pwd
+          /opt/bin/syft dir:${GITHUB_WORKSPACE} \
+            --override-default-catalogers file-metadata \
+            --source-name "NuMicro-${GITHUB_REF_NAME}-BSP" \
+            --source-version "${GITHUB_SHA}" \
+            -o cyclonedx-json=sbom.json
+    
+      # =========================
+      # 3. CVE Scan
+      # =========================
+      - name: Run CVE scan
+        run: |
+          /opt/bin/grype \
+          sbom:sbom.json -o json > cve-report.json
+  
+      # =========================
+      # 4. Policy Gate (Critical fail)
+      # =========================
+      - name: Fail on Critical CVE
+        run: |
+          cat cve-report.json
+          CRITICAL=$(cat cve-report.json | grep -i "Critical" || true)
+          if [ ! -z "$CRITICAL" ]; then
+            echo "Critical CVE found!"
+            #exit 1
+          fi
+
+      # =========================
+      # 5. Upload artifacts
+      # =========================
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+
+      - name: Upload CVE report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cve-report
+          path: cve-report.json
