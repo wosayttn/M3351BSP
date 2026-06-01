@@ -1,0 +1,14 @@
+{
+  "bsp_name": "NuMicro-M33-BSP",
+  "bsp_version": "v3.0.2",
+  "release_date": "2026-06-01",
+  "supplier": "Nuvoton Technology",
+  "components": [
+    {
+      "name": "cmsis-core",
+      "version": "5.9.0",
+      "license": "Apache-2.0",
+      "purl": "pkg:github/ARM-software/CMSIS_5@5.9.0"
+    }
+  ]
+}
