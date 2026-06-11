@@ -1,15 +1,15 @@
 {
   "bsp_name": "NuMicro-M3351BSP",
-  "bsp_version": "v3.0.2",
+  "bsp_version": "v3.00.002",
   "release_date": "2026-06-01",
   "supplier": "Nuvoton Technology",
   "components": [
     {
       "name": "cmsis-core",
-      "version": "5.9.0",
+      "version": "6.2.0",
       "license": "Apache-2.0",
-      "purl": "pkg:github/ARM-software/CMSIS_5@5.9.0",
-      "cpe": "cpe:2.3:a:arm:cmsis:5.9.0:*:*:*:*:*:*:*",
+      "purl": "pkg:github/ARM-software/CMSIS_6@6.2.0",
+      "cpe": "cpe:2.3:a:arm:cmsis:6.2.0:*:*:*:*:*:*:*",
       "description": "CMSIS Core hardware abstraction layer for Cortex-M processors",
       "paths": [
         "/Library/CMSIS"
